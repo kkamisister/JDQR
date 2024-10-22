@@ -29,11 +29,14 @@
 
 **FrontEnd**
 
-- react
+- React
+- Tanstack-Query
+- Zustand
 
 **BackEnd**
 
-- 
+- Node.js
+- Spring
 
 ### 4. 핵심 기술
 

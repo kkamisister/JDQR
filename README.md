@@ -44,9 +44,14 @@
 - Spring
 - FastAPI
 
+**Infra**
+
+- docker-compose
+- Jenkins
+
 ### 4. 핵심 기술
 
-- MSA + K8S
+- 
 - 
 
 ### 5. 예상 문제점

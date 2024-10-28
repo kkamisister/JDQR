@@ -1,0 +1,32 @@
+1. java17 설치
+    - sudo apt update
+    - sudo apt install openjdk-17-jdk
+    - sudo vi /etc/environment
+    - JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
+2. mysql 설치
+    - sudo apt update
+    - sudo apt-get install mysql-server
+    - mysql --version
+3. mysql 루트 계정 비밀번호 설정
+    - sudo mysql -u root -p
+    - select user, Host, plugin from mysql.user; => root계정의 plugin이 auto_socket인데 mysql_native_password로 변경해주면서 새로운 비밀번호를 설정해줘야 한다.
+    - alter user 'root'@'localhost' identified with mysql_native_password by '새로운 비밀번호';
+    - grant all privileges on *.* to 'root'@'localhost';
+    - flush privileges;
+    - exit;
+    - mysql -u root -p로 변경된 비밀번호로 접속가능한지 확인
+4. mysql 작업용 유저 생성
+    - create user ssafy;
+    - alter user 'ssafy'@'%' identified by '새로운 비밀번호'; :%는 접속허용ip를 모두 허용하는 걸 의미
+    - grant all privileges on *.* TO 'ssafy'@'%'; :모든 db에 권한부여
+    - flush privileges;
+5. mysql 외부접속 bind address 설정
+    - sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+    - bind-address=127.0.0.1 => bind-address=0.0.0.0
+6. ufw 설정
+    - sudo ufw status
+    - sudo ufw allow 22
+    - sudo ufw allow 3306
+    - sudo ufw enable
+7. aws 인바운드 설정
+

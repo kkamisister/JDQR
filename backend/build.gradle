@@ -45,6 +45,14 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.3.0'
 
+	// jwt 의존성 추가
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+	// redis 설정
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '3.3.0'
+
 	// QueryDSL 추가
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 

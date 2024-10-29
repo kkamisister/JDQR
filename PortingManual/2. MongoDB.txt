@@ -1,0 +1,11 @@
+1. MongoDB 설치
+https://www.mongodb.com/ko-kr/docs/manual/tutorial/install-mongodb-on-ubuntu/#install-mongodb-community-edition
+2. MongoDB 계정 생성 및 비밀번호 설정
+    - mongosh
+    - use admin
+    - db.createUser({ user: '이름', pwd: '비밀번호', roles: ['root'] })
+3. 외부 접속 허용
+    - sudo vi /etc/mongod.conf
+    - bindIp: 127.0.0.1 => 0.0.0.0
+    - aws에서 27017 인바운드 설정하기
+    - sudo ufw allow 27017

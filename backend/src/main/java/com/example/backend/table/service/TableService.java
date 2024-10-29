@@ -9,6 +9,6 @@ import com.example.backend.user.dto.UserRequest;
 
 public interface TableService {
 
-	ResponseWithData<String> createTable(TableInfo tableInfo,String userCode);
+	ResponseWithData<String> createTable(TableInfo tableInfo,Integer userId);
 
 }

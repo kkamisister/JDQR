@@ -3,6 +3,7 @@ package com.example.backend.table.entity;
 import com.example.backend.common.entity.BaseEntity;
 import com.example.backend.etc.entity.Restaurant;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.*;
 
 @Entity

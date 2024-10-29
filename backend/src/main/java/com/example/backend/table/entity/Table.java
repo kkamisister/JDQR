@@ -9,9 +9,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import com.example.backend.common.enums.UseStatus;
 import com.example.backend.table.dto.Grid;
-import com.example.backend.table.dto.TableRequest;
 import com.example.backend.table.dto.TableRequest.TableInfo;
-import com.example.backend.user.dto.UserRequest;
 
 import jakarta.persistence.Id;
 import lombok.AccessLevel;

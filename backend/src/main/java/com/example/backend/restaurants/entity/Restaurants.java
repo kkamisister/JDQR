@@ -1,8 +1,8 @@
 package com.example.backend.restaurants.entity;
 
 import com.example.backend.common.entity.BaseEntity;
-import com.example.backend.user.entity.User;
 
+import com.example.backend.owner.entity.Owner;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -48,6 +48,6 @@ public class Restaurants extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "owner_id")
-	private User user;
+	private Owner owner;
 
 }

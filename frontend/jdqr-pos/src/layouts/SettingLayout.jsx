@@ -3,10 +3,10 @@ import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Button, Box, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import { colors } from 'constants/colors';
-import logoImage from 'assets/images/logo.png';
+import AppLogo from 'assets/images/AppLogo.png';
 import { strings } from 'constants/strings';
-
-const MainLayout = () => {
+import DefaultLayout from './DefaultLayout';
+const SettingLayout = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const isHomePage = location.pathname === '/'; // HomePage 여부 확인
@@ -22,7 +22,7 @@ const MainLayout = () => {
 	}, []);
 
 	return (
-		<Stack
+		<DefaultLayout
 			direction="row"
 			sx={{
 				width: '100%',
@@ -68,7 +68,7 @@ const MainLayout = () => {
 						}}>
 						<img
 							style={{ width: '100%', height: '100%' }}
-							src={logoImage}
+							src={AppLogo}
 							alt="로고 이미지"
 						/>
 					</Box>
@@ -81,28 +81,6 @@ const MainLayout = () => {
 						{strings.title}
 					</Typography>
 				</Stack>
-				{/* '로그인' 버튼 : HomePage에서만 노출 */}
-				{isHomePage && (
-					<Button
-						sx={{
-							textAlign: 'center',
-							cursor: 'pointer',
-							padding: '7px 15px',
-							borderRadius: '5px',
-							fontWeight: 'bold',
-							transition: 'background-color 0.3s ease, color 0.3s ease',
-							whiteSpace: 'nowrap',
-							color: colors.text.white,
-
-							backgroundColor: colors.main.primary400,
-							'&:hover': {
-								backgroundColor: colors.main.primary500,
-							},
-						}}
-						onClick={() => navigate('/login')}>
-						로그인
-					</Button>
-				)}
 			</Stack>
 
 			<Box
@@ -118,8 +96,8 @@ const MainLayout = () => {
 				}}>
 				<Outlet />
 			</Box>
-		</Stack>
+		</DefaultLayout>
 	);
 };
 
-export default MainLayout;
+export default SettingLayout;

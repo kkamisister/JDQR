@@ -11,4 +11,5 @@ import com.example.backend.owner.entity.Owner;
 public interface OwnerRepository extends JpaRepository<Owner, Integer> {
 
 	Optional<Owner> findByEmail(String email);
+	Optional<Owner> findByCode(String code);
 }

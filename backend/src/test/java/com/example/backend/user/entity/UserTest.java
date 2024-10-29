@@ -8,8 +8,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.backend.common.config.QuerydslConfig;
 import com.example.backend.user.repository.UserRepository;
@@ -36,12 +39,6 @@ class UserTest {
 			.email("sujipark2009@gmail.com")
 			.code("ABCDEFG")
 			.name("김영표")
-			.industry("주식")
-			.address("경기도 수원시 영통구 덕영대로")
-			.image("sadlkjf3092u0954")
-			.registrationNumber("11-6654-42332-45")
-			.lat(33.117779)
-			.lng(127.6484846)
 			.build();
 
 		userRepository.save(user);

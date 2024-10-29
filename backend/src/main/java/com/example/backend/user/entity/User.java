@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "members")
-public class User{
+public class User extends BaseEntity{
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -30,17 +30,4 @@ public class User{
 	private String email;
 	@Column(name = "name")
 	private String name;
-	@Column(name = "industry")
-	private String industry;
-	@Column(name = "address")
-	private String address;
-	@Column(name = "image")
-	private String image;
-	@Column(name = "registration_number")
-	private String registrationNumber;
-	@Column(name = "lat")
-	private Double lat;
-	@Column(name = "lng")
-	private Double lng;
-
 }

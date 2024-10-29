@@ -55,8 +55,15 @@ public class JDQRFilter extends OncePerRequestFilter {
         else {
             try{
                 if(tokenProvider.validateToken(accessToken)){
-                    String userId = tokenProvider.extractSubject(accessToken);
-                    request.setAttribute("userId",userId);
+                    Object type = tokenProvider.extractTypeClaim(accessToken);
+                    if(!ObjectUtils.isEmpty(type)){
+                        String tableId = tokenProvider.extractSubject(accessToken);
+                        request.setAttribute("tableId",tableId);
+                    }
+                    else{
+                        String userId = tokenProvider.extractSubject(accessToken);
+                        request.setAttribute("userId",userId);
+                    }
                 }
             }catch(MalformedJwtException | IllegalArgumentException e){
                 log.info("유효하지 않은 구성의 JWT 토큰 입니다.");

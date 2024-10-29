@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import MenuPage from "./pages/menu/MenuPage";
 import IndexPage from "./pages/Index/IndexPage";
 import Layout from "./Layout";
+import DishPage from "./pages/dish/DishPage";
 
 function App() {
   return (
@@ -16,10 +16,10 @@ function App() {
           }
         />
         <Route
-          path="/menu"
+          path="/dish"
           element={
             <Layout>
-              <MenuPage />
+              <DishPage />
             </Layout>
           }
         />

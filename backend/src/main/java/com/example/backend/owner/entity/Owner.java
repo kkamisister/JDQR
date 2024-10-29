@@ -29,17 +29,4 @@ public class Owner extends BaseEntity {
 	private String email;
 	@Column(name = "name")
 	private String name;
-	@Column(name = "industry")
-	private String industry;
-	@Column(name = "address")
-	private String address;
-	@Column(name = "image")
-	private String image;
-	@Column(name = "registration_number")
-	private String registrationNumber;
-	@Column(name = "lat")
-	private Double lat;
-	@Column(name = "lng")
-	private Double lng;
-
 }

@@ -1,9 +1,7 @@
-package com.example.backend.user.entity;
+package com.example.backend.owner.entity;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.example.backend.common.config.QuerydslConfig;
-import com.example.backend.user.repository.UserRepository;
+import com.example.backend.owner.repository.OwnerRepository;
 
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 @DataJpaTest
 @Import({QuerydslConfig.class})
 @Slf4j
-class UserTest {
+class OwnerTest {
 
 	@Autowired
-	private UserRepository userRepository;
+	private OwnerRepository ownerRepository;
 	@Autowired
 	private EntityManager em;
 
@@ -32,7 +30,7 @@ class UserTest {
 	@Test
 	void findByCode(){
 
-		User user = User.builder()
+		Owner owner = Owner.builder()
 			.email("sujipark2009@gmail.com")
 			.code("ABCDEFG")
 			.name("김영표")
@@ -44,9 +42,9 @@ class UserTest {
 			.lng(127.6484846)
 			.build();
 
-		userRepository.save(user);
+		ownerRepository.save(owner);
 
-		assertThat(user.getCode()).isEqualTo("ABCDEFG");
+		assertThat(owner.getCode()).isEqualTo("ABCDEFG");
 	}
 
 }

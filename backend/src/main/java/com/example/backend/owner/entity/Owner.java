@@ -1,6 +1,4 @@
-package com.example.backend.user.entity;
-
-import com.example.backend.common.entity.BaseEntity;
+package com.example.backend.owner.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,8 +17,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "members")
-public class User{
+@Table(name = "owners")
+public class Owner {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

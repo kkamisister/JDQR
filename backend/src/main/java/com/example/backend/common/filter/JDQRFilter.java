@@ -112,7 +112,8 @@ public class JDQRFilter extends OncePerRequestFilter {
         return pathMatcher.match("/api/v1/admin/login/**", path)
             || pathMatcher.match("/api/v1/swagger-ui/**", path)		// swagger ui 실행시 동작하는 api
             || pathMatcher.match("/v3/api-docs/**", path)			// swagger ui 실행시 동작하는 api
-            || pathMatcher.match("/api/v1/test/**", path);
+            || pathMatcher.match("/api/v1/test/**", path)
+            || pathMatcher.match("/api/v1/order/auth/**", path);
     }
 
     /**

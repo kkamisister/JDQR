@@ -4,6 +4,6 @@ import com.example.backend.common.dto.CommonResponse.ResponseWithData;
 
 public interface OrderService {
 
-	String redirectUrl(String tableName);
+	String redirectUrl(String tableName,String uuid);
 
 }

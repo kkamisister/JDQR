@@ -56,6 +56,11 @@ public class TableServiceImpl implements TableService{
 		//4. QRCode를 생성하기위한 링크를 반환한다.
 		String link = generateLink.create(savedTable.getId());
 
+		log.warn("link : {}",link);
+		//5. 테이블의 qrlink를 업데이트한다
+		log.warn("_id : {}",savedTable.getId());
+		tableRepository.updateQrCode(savedTable.getId(),link);
+
 		return new ResponseWithData<>(HttpStatus.OK.value(),"URL 생성에 성공하였습니다",link);
 	}
 }

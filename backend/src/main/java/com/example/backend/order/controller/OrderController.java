@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.backend.order.service.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,13 +30,17 @@ public class OrderController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "토큰 발급 완료"),
 	})
-	@GetMapping("/auth/{tableName}")
-	public void createAuthToken(@PathVariable("tableId") String tableId, HttpServletResponse response) throws
+	@GetMapping("/auth/{tableId}/{uuid}")
+	public void createAuthToken(@PathVariable("tableId") String tableId, @PathVariable("uuid") String uuid, HttpServletResponse response) throws
 		IOException {
 
-		String authLink = orderService.redirectUrl(tableId);
+		log.warn("here");
+		log.warn("tableId : {}",tableId);
+		String authLink = orderService.redirectUrl(tableId,uuid);
 
+		System.out.println("authLink : "+ authLink);
 		response.sendRedirect(authLink);
 	}
 
 }
+

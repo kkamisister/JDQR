@@ -46,7 +46,7 @@ public class DishServiceImpl implements DishService {
 			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
 
 		//가게 주인의 메뉴 목록을 가지고 온다
-		List<Dish> alldishes = dishRepository.getAllDishes(); //db에서 모든 dish 엔터티를 조회
+		List<Dish> alldishes = dishRepository.findAll(); //db에서 모든 dish 엔터티를 조회
 
 		//메뉴 정보를 dto로 변환한 리스트를 만든다
 		List<DishSummaryInfo> dishSummarys = alldishes.stream()

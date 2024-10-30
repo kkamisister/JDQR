@@ -11,54 +11,32 @@ public final class TimeUtil {
   private final static ZoneId timeZoneUTC = ZoneId.of("UTC");
   private final static ZoneId timeZoneSeoul = ZoneId.of("Asia/Seoul");
 
+  // LocalDateTime -> TimeStamp형으로 변환하는 메서드
   public static long getTimeStampFrom(LocalDateTime localDateTime){
     return localDateTime.atZone(timeZoneSeoul).toInstant().toEpochMilli();
   }
 
+  // TimeStamp -> LocalDate 형으로 변환하는 메서드
   public static LocalDate getLocalDateFrom(long epochMillis){
     Instant instant = Instant.ofEpochMilli(epochMillis);
     return instant.atZone(timeZoneSeoul).toLocalDate();
   }
 
+  // 현재 시간 기준 TimeStamp 형으로 변환하는 메서드
   public static long getCurrentTimeMillisUtc() {
     LocalDateTime localDateTime = LocalDateTime.now();
     return getTimeStampFrom(localDateTime);
   }
 
-  public static long convertToEpochTime(String dobString) {
-    // Parse the input string using the specified format (yyMMdd)
-    LocalDate dob = LocalDate.parse(dobString, DateTimeFormatter.ofPattern("yyMMdd"));
-
-    // Convert the LocalDate to UTC-0 epoch time in milliseconds
-    return dob.atStartOfDay().atZone(timeZoneUTC).toInstant().toEpochMilli();
-  }
-
+  // TimeStamp를 주어진 pattern에 해당하게 파싱하여 반환하는 메서드
   public static String convertEpochToDateString(long epochMillis, String pattern) {
     LocalDate localDate = Instant.ofEpochMilli(epochMillis).atZone(timeZoneSeoul).toLocalDate();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
     return localDate.format(formatter);
   }
 
-  public static int calculateAge(long dobEpochMillis) {
-    Instant dobInstant = Instant.ofEpochMilli(dobEpochMillis);
-    LocalDate dobDate = dobInstant.atZone(ZoneId.systemDefault()).toLocalDate();
-    LocalDate currentDate = LocalDate.now();
-
-    int age = currentDate.getYear() - dobDate.getYear();
-
-    if (currentDate.getMonthValue() < dobDate.getMonthValue()
-      || (currentDate.getMonthValue() == dobDate.getMonthValue() && currentDate.getDayOfMonth() < dobDate.getDayOfMonth())) {
-      age--;
-    }
-    return age;
-  }
-
+  // localDate에 해당하는 TimeStamp를 계산 후 반환
   public static long toStartOfDaySeoul(LocalDate localDate) {
     return getTimeStampFrom(localDate.atStartOfDay(timeZoneSeoul).toLocalDateTime());
   }
-
-  public static long toStartOfNextDaySeoul(LocalDate localDate) {
-    return getTimeStampFrom(localDate.atStartOfDay(timeZoneSeoul).plusDays(1).toLocalDateTime());
-  }
-
 }

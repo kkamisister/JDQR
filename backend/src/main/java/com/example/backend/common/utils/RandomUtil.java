@@ -4,6 +4,8 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 public final class RandomUtil {
+
+  // 6자리 랜덤 숫자를 생성하는 메서드
   public static String generateRandomSixDigitNumber() {
     Random random = new Random();
     int min = 100_000; // Minimum 6-digit number (100000)
@@ -13,6 +15,8 @@ public final class RandomUtil {
     return String.format("%06d", randomNumber);
   }
 
+  // 8자리 random 문자열을 생성하는 메서드
+  // 문자로 가능한 종류 : 알파벳 대소문자 + 숫자
   public static String generateRandomString() {
     String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     SecureRandom random = new SecureRandom();

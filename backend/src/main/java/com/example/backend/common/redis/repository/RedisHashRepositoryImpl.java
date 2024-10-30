@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import com.example.backend.order.dto.CartRequest.ProductInfo;
 
 @Repository
 @RequiredArgsConstructor
@@ -39,5 +42,25 @@ public class RedisHashRepositoryImpl implements RedisHashRepository{
 		}
 
 		return redisTemplate.opsForHash().get(key,subKey);
+	}
+
+	@Override
+	public List<ProductInfo> getCartDatas(String tableId) {
+
+		String key = "table::"+tableId;
+
+		Object cachedData = redisTemplate.opsForValue().get(key);
+		if(cachedData != null){
+			return (List<ProductInfo>)cachedData;
+		}
+		return null;
+	}
+
+	@Override
+	public void saveCartDatas(String tableId, List<ProductInfo> cartDatas) {
+		String key = "table::"+tableId;
+
+		redisTemplate.opsForValue().set(key,cartDatas);
+		redisTemplate.expire(key,20, TimeUnit.MINUTES);
 	}
 }

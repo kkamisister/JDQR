@@ -7,6 +7,6 @@ import com.example.backend.common.dto.CommonResponse.ResponseWithData;
 
 public interface TableService {
 
-	ResponseWithData<String> createTable(TableInfo tableInfo,String userCode);
+	ResponseWithData<String> createTable(TableInfo tableInfo,Integer userId);
 
 }

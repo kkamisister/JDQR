@@ -8,7 +8,8 @@ import com.example.backend.dish.dto.DishResponse;
 import com.example.backend.dish.entity.Dish;
 
 public interface DishService {
-	void addDish(Dish dish);
+
+	void addDish(Dish dish,Integer userId);
 	ResponseWithData<DishSummaryResultDto> getAllDishes(Integer userId);
 
 }

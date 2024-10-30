@@ -1,9 +1,7 @@
 package com.example.backend.dish.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +11,7 @@ import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
 import com.example.backend.dish.dto.DishResponse;
 import com.example.backend.dish.dto.DishResponse.DishSummaryInfo;
-import com.example.backend.dish.dto.DishResponse.DishSummaryResultDto
+import com.example.backend.dish.dto.DishResponse.DishSummaryResultDto;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.owner.entity.Owner;

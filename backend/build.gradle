@@ -67,6 +67,9 @@ dependencies {
 
 	// WebClient 추가
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+	// common utils
+	implementation 'com.google.guava:guava:32.0.0-android'
 }
 
 tasks.named('test') {

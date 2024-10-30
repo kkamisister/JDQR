@@ -15,6 +15,11 @@ public enum ErrorCode {
 	// 토큰 관련 에러
 	TOKEN_REISSUE_FAIL(HttpStatus.BAD_REQUEST,"토큰 재발급에 문제가 발생했습니다"),
 
+	// 외부 api 호출시 400번대 에러 발생
+	WEBCLIENT_400_ERROR(HttpStatus.BAD_REQUEST, "외부 api 호출 도중 400번대 에러가 발생하였습니다"),
+	// 외부 api 호출시 500번대 에러 발생
+	WEBCLIENT_500_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "외부 api 호출 도중 500번대 에러가 발생하였습니다"),
+
 	// 테스트용 에러
 	FUCKED_UP_QR(HttpStatus.BAD_REQUEST,"되었습니다");
 

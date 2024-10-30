@@ -3,10 +3,11 @@ import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Button, Box, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import { colors } from 'constants/colors';
-import logoImage from 'assets/images/logo.png';
+import AppLogo from 'assets/images/AppLogo.png';
 import { strings } from 'constants/strings';
-
-const MainLayout = () => {
+import DefaultLayout from './DefaultLayout';
+import RestaurantLogoSample from 'assets/images/RestaurantLogoSample.png';
+const SettingLayout = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const isHomePage = location.pathname === '/'; // HomePage 여부 확인
@@ -20,9 +21,29 @@ const MainLayout = () => {
 			setHeaderHeight(headerRef.current.offsetHeight);
 		}
 	}, []);
+	const currentTime = () => {
+		const now = new Date();
 
+		const year = now.getFullYear();
+		const month = String(now.getMonth() + 1).padStart(2, '0');
+		const date = String(now.getDate()).padStart(2, '0');
+		const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+		const week = weekdays[now.getDay()];
+
+		const hour = String(now.getHours()).padStart(2, '0');
+		const minute = String(now.getMinutes()).padStart(2, '0');
+		const second = String(now.getSeconds()).padStart(2, '0');
+
+		return `(${week}) ${year}/${month}/${date} ${hour}:${minute}:${second}`;
+	};
+
+	// useState 이용, 랜더링 후 첫 값은 nowTime return 값 사용
+	const [clock, setclock] = useState(currentTime);
+
+	// 1초마다 clock의 값을 다시 계산 후 랜더링 (setClock 이용)
+	setInterval(() => setclock(currentTime), 1000);
 	return (
-		<Stack
+		<DefaultLayout
 			direction="row"
 			sx={{
 				width: '100%',
@@ -39,7 +60,7 @@ const MainLayout = () => {
 					top: 0,
 					left: 0,
 					width: '100%',
-					padding: '10px 80px',
+					padding: '10px 40px',
 					alignItems: 'center',
 					justifyContent: 'space-between',
 					zIndex: 1000,
@@ -47,62 +68,31 @@ const MainLayout = () => {
 					background: 'rgba(255,255,255,0.3)',
 					backdropFilter: 'blur(3px)',
 				}}>
-				{/* 로고 */}
+				<Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+					{clock}
+				</Typography>
 				<Stack
 					direction="row"
+					spacing={1}
 					sx={{
-						cursor: 'pointer',
 						alignItems: 'center',
 						justifyContent: 'center',
-					}}
-					spacing={1}
-					onClick={() => {
-						navigate('/');
 					}}>
-					<Box
-						sx={{
-							width: '36px',
-							height: '36px',
-							borderRadius: '25%',
-							overflow: 'hidden',
-						}}>
+					<Box sx={{ width: 'auto', height: '40px' }}>
 						<img
-							style={{ width: '100%', height: '100%' }}
-							src={logoImage}
-							alt="로고 이미지"
+							style={{
+								borderRadius: '10px',
+								width: '100%',
+								height: '100%',
+							}}
+							src={RestaurantLogoSample}
+							alt={'가게 로고'}
 						/>
 					</Box>
-					<Typography
-						sx={{
-							color: colors.text.sub1,
-							fontSize: '16px',
-							fontWeight: '600',
-						}}>
-						{strings.title}
+					<Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+						{'바나프레소 강남테헤란로점'}
 					</Typography>
 				</Stack>
-				{/* '로그인' 버튼 : HomePage에서만 노출 */}
-				{isHomePage && (
-					<Button
-						sx={{
-							textAlign: 'center',
-							cursor: 'pointer',
-							padding: '7px 15px',
-							borderRadius: '5px',
-							fontWeight: 'bold',
-							transition: 'background-color 0.3s ease, color 0.3s ease',
-							whiteSpace: 'nowrap',
-							color: colors.text.white,
-
-							backgroundColor: colors.main.primary400,
-							'&:hover': {
-								backgroundColor: colors.main.primary500,
-							},
-						}}
-						onClick={() => navigate('/login')}>
-						로그인
-					</Button>
-				)}
 			</Stack>
 
 			<Box
@@ -118,8 +108,8 @@ const MainLayout = () => {
 				}}>
 				<Outlet />
 			</Box>
-		</Stack>
+		</DefaultLayout>
 	);
 };
 
-export default MainLayout;
+export default SettingLayout;

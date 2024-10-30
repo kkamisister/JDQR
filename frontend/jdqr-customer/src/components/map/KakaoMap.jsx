@@ -8,7 +8,7 @@ const loadKakaoMapScript = () => {
       return
     }
     const script = document.createElement("script")
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${"830555c3e8786f3b05edfbe3f056b4c8"}`
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=KAKAO_API_KEY`
     script.onload = () => resolve(window.kakao)
     script.onerror = () => reject(new Error("에러다에러"))
     document.head.appendChild(script)

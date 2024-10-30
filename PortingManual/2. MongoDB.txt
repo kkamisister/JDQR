@@ -4,6 +4,12 @@ https://www.mongodb.com/ko-kr/docs/manual/tutorial/install-mongodb-on-ubuntu/#in
     - mongosh
     - use admin
     - db.createUser({ user: '이름', pwd: '비밀번호', roles: ['root'] })
+    - 아래의 설정 추가
+    #security:
+    security:
+      authorization: enabled
+
+
 3. 외부 접속 허용
     - sudo vi /etc/mongod.conf
     - bindIp: 127.0.0.1 => 0.0.0.0

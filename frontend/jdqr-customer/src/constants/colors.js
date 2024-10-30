@@ -1,0 +1,41 @@
+export const colors = {
+	text: {
+		main: '#303030',
+		sub1: '#606060',
+		sub2: '#909090',
+		icon: '#303030',
+		icon2: '#909090',
+		white: '#ffffff',
+	},
+	main: {
+		primary100: '#DFF0FD',
+		primary200: '#9FD2F9',
+		primary300: '#60B4F6',
+		primary400: '#2196F3',
+		primary500: '#1C80D0',
+		primary600: '#176BAD',
+		primary700: '#12558A',
+		primary800: '#0E4068',
+		primary900: '#092A45',
+	},
+	sub: {
+		sub1: '#64B5F6',
+		sub2: '#BBDEFB',
+	},
+	background: {
+		primary: '#F6F7F9',
+		box: '#E5E8EB',
+		white: '#FFFFFF',
+		green: 'rgba(46, 125, 50, 0.2)',
+		red: 'rgba(240, 66, 81, 0.2)',
+	},
+	point: {
+		yellow: '#FDD835',
+		yellowHover: '#D7C500',
+		green: '#2E7D32',
+		red: '#F04251',
+		redHover: '#EF9A9A',
+		blue: '#1D66FA',
+		stroke: '#DDE1E6',
+	},
+};

@@ -22,7 +22,7 @@ const ErrorPage = ({ message }) => {
 					fontWeight: '600',
 					color: colors.text.white,
 				}}>
-				{message || '내부에서 문제가 발생했어요'}
+				{`'내부에서 문제가 발생했어요': ${message}`}
 			</Box>
 		</Stack>
 	);

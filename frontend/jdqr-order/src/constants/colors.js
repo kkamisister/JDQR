@@ -1,0 +1,47 @@
+export const colors = {
+  text: {
+    main: "#303030",
+    sub1: "#606060",
+    sub2: "#909090",
+    white: "#ffffff",
+  },
+  main: {
+    primary100: "#FFD8CF",
+    primary200: "#FFB19F",
+    primary300: "#FF9D87",
+    primary400: "#FF8A6F",
+    primary500: "#FF7758",
+    primary600: "#DA664B",
+    primary700: "#B6553E",
+    primary800: "#914432",
+    primary900: "#482219",
+  },
+  point: {
+    yellow: "#FFDE58",
+    red: "#FF5E58",
+    blue: "#58A6FF",
+    green: "#CDDC39",
+  },
+  tag: {
+    purple: "#64B5F6",
+    teal: "#BBDEFB",
+    blue: "#64B5F6",
+    yellow: "#BBDEFB",
+  },
+  background: {
+    primary: "#F6F7F9",
+    box: "#E5E8EB",
+    white: "#FFFFFF",
+  },
+  table: [
+    "#629BE4",
+    "#77B366",
+    "#E7873D",
+    "#E4B82F",
+    "#AE82BE",
+    "#6A7684",
+    "#5194A3",
+    "#3D61AA",
+    "#9D704B",
+  ],
+};

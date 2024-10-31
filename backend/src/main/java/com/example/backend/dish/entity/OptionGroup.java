@@ -1,4 +1,4 @@
-package com.example.backend.menu.entity;
+package com.example.backend.dish.entity;
 
 import com.example.backend.common.entity.BaseEntity;
 import jakarta.persistence.*;

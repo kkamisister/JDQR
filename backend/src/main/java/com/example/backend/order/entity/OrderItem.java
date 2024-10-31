@@ -1,8 +1,7 @@
 package com.example.backend.order.entity;
 
 import com.example.backend.common.entity.BaseEntity;
-import com.example.backend.etc.entity.Restaurant;
-import com.example.backend.menu.entity.Menu;
+import com.example.backend.dish.entity.Dish;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,8 +22,8 @@ public class OrderItem extends BaseEntity {
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id")
-    private Menu menu;
+    @JoinColumn(name = "dish_id")
+    private Dish dish;
 
     private Integer quantity;
     @Column(name = "order_price")

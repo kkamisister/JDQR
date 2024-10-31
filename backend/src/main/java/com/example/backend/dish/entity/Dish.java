@@ -1,7 +1,6 @@
-package com.example.backend.menu.entity;
+package com.example.backend.dish.entity;
 
 import com.example.backend.common.entity.BaseEntity;
-import com.example.backend.etc.entity.Restaurant;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,17 +9,23 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "menu_categories")
-public class MenuCategory extends BaseEntity {
+@Table(name = "dish")
+public class Dish extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
-    private Restaurant restaurant;
+    @JoinColumn(name = "dish_category_id")
+    private DishCategory dishCategory;
 
     private String name;
-}
+    private Integer price;
+    private String description;
 
+    @Column(name = "image_path")
+    private String imagePath;
+    @Column(name = "image_name")
+    private String imageName;
+}

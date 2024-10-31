@@ -1,7 +1,7 @@
 package com.example.backend.order.entity;
 
 import com.example.backend.common.entity.BaseEntity;
-import com.example.backend.menu.entity.Option;
+import com.example.backend.dish.entity.Option;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -79,4 +79,13 @@ public class RedisHashRepositoryImpl implements RedisHashRepository{
 		redisTemplate.opsForHash().put(tableId,userId,cartDatas);
 		redisTemplate.expire(key,20, TimeUnit.MINUTES);
 	}
+
+	/**
+	 * redis에 key에 해당하는 데이터를 모두 삭제한다.
+	 * @param key : 삭제를 희망하는 redis의 key
+	 */
+	@Override
+	public void removeKey(String key) {
+		redisTemplate.opsForValue().getAndDelete(key);
+	}
 }

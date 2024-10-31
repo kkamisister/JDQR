@@ -11,6 +11,7 @@ import lombok.Builder;
 public record CartDto(
 
 	Integer dishId,
+	String userId,
 	String dishName,
 	Integer dishCategoryId,
 	String dishCategoryName,

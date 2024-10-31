@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import com.example.backend.common.dto.CommonResponse.*;
+import com.example.backend.common.enums.SimpleResponseMessage;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -79,19 +82,16 @@ public class OrderController {
 
 		String tableId = (String)request.getAttribute("tableId");
 		log.warn("테이블 id : {}",tableId);
+		orderService.addItem(tableId,productInfo);
+	}
 
-		// 쿠키에서 userId 추출
-		String userId = null;
-		if (request.getCookies() != null) {
-			for (Cookie cookie : request.getCookies()) {
-				if (USER_COOKIE.getExplain().equals(cookie.getName())) {
-					userId = cookie.getValue();
-					break;
-				}
-			}
-		}
-		log.warn("userId : {}",userId);
-		orderService.addItem(tableId,userId,productInfo);
+	@PostMapping("/")
+	public ResponseWithMessage saveOrder(HttpServletRequest request){
+		String tableId = (String)request.getAttribute("tableId");
+
+		SimpleResponseMessage message = orderService.saveWholeOrder(tableId);
+
+		return new ResponseWithMessage(HttpStatus.OK.value(), message.getMessage());
 	}
 
 }

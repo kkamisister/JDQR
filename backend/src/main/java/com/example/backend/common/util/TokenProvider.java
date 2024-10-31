@@ -42,6 +42,33 @@ public class TokenProvider {
         secretKey = Keys.hmacShaKeyFor(key.getBytes());
     }
 
+    /**
+     * Qr 인증을 위한 accessToken을 발급하는 메서드
+     * @param subject
+     * @param expiredDate
+     * @return
+     */
+    public String generateQrAccessToken(String subject,Date expiredDate){
+        return Jwts.builder()
+            .claim("type","QR")
+            .setSubject(subject)
+            .issuedAt(new Date())
+            .setExpiration(expiredDate)
+            .signWith(secretKey,SignatureAlgorithm.HS256)
+            .compact();
+    }
+
+    /**
+     * QR 인증을 위한 refreshToken을 발급하는 메서드
+     * @param subject
+     * @param expiredDate
+     * @param accessToken
+     */
+    public void generateQrRefreshToken(String subject,Date expiredDate,String accessToken){
+        String refreshToken = generateQrAccessToken(subject,expiredDate);
+        tokenService.saveOrUpdate(accessToken,refreshToken,20L);
+    }
+
     public String generateAccessToken(String subject, Date expiredDate){
         return generateToken(subject,expiredDate);
     }
@@ -68,6 +95,11 @@ public class TokenProvider {
         return claims.getExpiration().after(new Date());
     }
 
+    public Object extractTypeClaim(String token){
+        Claims claims = parseClaims(token);
+        return claims.get("type");
+    }
+
     public String extractSubject(String accessToken){
         Claims claims = parseClaims(accessToken);
         return claims.getSubject();
@@ -79,17 +111,21 @@ public class TokenProvider {
             .parseSignedClaims(accessToken)
             .getPayload();
     }
-    public AuthToken generate(Integer userId){
+    public AuthToken generate(Integer userId,String accessToken){
 
         Long now = (new Date()).getTime();
         Date accessTokenExpiredDate = new Date(now + ACCESS_TOKEN_VALIDITY_SECONDS);
         Date refreshTokenExpiredDate = new Date(now + REFRESH_TOKEN_VALIDITY_SECONDS);
 
         String subject = userId.toString();
-        String accessToken = generateAccessToken(subject, accessTokenExpiredDate);
-        generateRefreshToken(subject,refreshTokenExpiredDate,accessToken);
 
-        return AuthToken.of(accessToken);
+        // 기존 엔트리 제거
+        tokenService.deleteRefreshToken(accessToken);
+        // 새로운 토큰 발급
+        String newAccessToken = generateAccessToken(subject, accessTokenExpiredDate);
+        generateRefreshToken(subject,refreshTokenExpiredDate,newAccessToken);
+
+        return AuthToken.of(newAccessToken);
     }
 
     public String reissueToken(String accessToken){
@@ -111,7 +147,7 @@ public class TokenProvider {
             if(!StringUtils.hasText(refreshToken) && validateToken(refreshToken)){
                 log.warn("유효한 리프레시 토큰");
                 String subject = extractSubject(refreshToken);
-                AuthToken authToken = generate(Integer.parseInt(subject));
+                AuthToken authToken = generate(Integer.parseInt(subject),accessToken);
                 log.warn("재발급 된 엑세스 토큰 : {}",authToken.accessToken());
                 return authToken.accessToken();
             }

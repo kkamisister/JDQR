@@ -24,14 +24,19 @@ public class Restaurant extends BaseEntity {
     @JoinColumn(name = "owner_id")
     private Owner owner;
 
+    @Column(name = "name")
     private String name;
+    @Column(name = "address")
     private String address;
 
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "latitude")
     private Double latitude;
+    @Column(name = "longitude")
     private Double longitude;
+    @Column(name = "industry")
     private String industry;
 
     @Column(name = "registration_number")

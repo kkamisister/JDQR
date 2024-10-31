@@ -1,6 +1,11 @@
 package com.example.backend.table.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import com.example.backend.table.entity.Table;
@@ -18,5 +23,28 @@ public class TableRepositoryImpl implements TableRepository {
 	@Override
 	public Table save(Table table) {
 		return mongoTemplate.save(table);
+	}
+
+	@Override
+	public Optional<Table> findById(String id) {
+
+		Query query = new Query();
+
+		query.addCriteria(Criteria.where("_id").is(id));
+
+		return Optional.ofNullable(mongoTemplate.findOne(query,Table.class));
+	}
+
+	@Override
+	public Table updateQrCode(String id, String qrCode) {
+
+		Query query = new Query();
+
+		query.addCriteria(Criteria.where("_id").is(id));
+
+		Update update = new Update();
+		update.set("qr_code",qrCode);
+
+		return mongoTemplate.findAndModify(query,update,Table.class);
 	}
 }

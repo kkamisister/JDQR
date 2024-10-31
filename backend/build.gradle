@@ -30,7 +30,7 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 	// MySQL 설정
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -64,6 +64,12 @@ dependencies {
 
 	// mongoDB 추가
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+	// WebClient 추가
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+	// common utils
+	implementation 'com.google.guava:guava:32.0.0-android'
 }
 
 tasks.named('test') {

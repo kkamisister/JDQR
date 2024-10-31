@@ -31,7 +31,7 @@ public class Table {
 	private int restaurantId;
 	@Field("qr_code")
 	private String qrCode;
-	@Field("table_number")
+	@Field("name")
 	private String name;
 
 	@Field("people")

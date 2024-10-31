@@ -4,6 +4,8 @@ import java.util.Optional;
 
 public interface TokenService {
 
+	void saveOrUpdate(String accessToken,String refreshToken,Long ttl);
+
 	void saveOrUpdate(String accessToken,String refreshToken);
 
 	Optional<String> findByAccessToken(String accessToken);

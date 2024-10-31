@@ -34,6 +34,12 @@ spring:
       host: localhost
       port: 6379
 
+external:
+  token:
+    toss: test_sk_Z61JOxRQVEGdzZDnPgkQ8W0X9bAq
+  url:
+    toss: https://api.tosspayments.com
+
 
 #  mongodb:
 #    uri: mongodb://ssafy:zeroticket607@j11a607.p.ssafy.io:27017/

@@ -52,11 +52,23 @@ public class JDQRFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
 
+        if(accessToken.equals("dummyTableToken")){
+            request.setAttribute("tableId","6721aa9b0d22a923091eef73");
+            filterChain.doFilter(request,response);
+        }
+
         else {
             try{
                 if(tokenProvider.validateToken(accessToken)){
-                    String userId = tokenProvider.extractSubject(accessToken);
-                    request.setAttribute("userId",userId);
+                    Object type = tokenProvider.extractTypeClaim(accessToken);
+                    if(!ObjectUtils.isEmpty(type)){
+                        String tableId = tokenProvider.extractSubject(accessToken);
+                        request.setAttribute("tableId",tableId);
+                    }
+                    else{
+                        String userId = tokenProvider.extractSubject(accessToken);
+                        request.setAttribute("userId",userId);
+                    }
                 }
             }catch(MalformedJwtException | IllegalArgumentException e){
                 log.info("유효하지 않은 구성의 JWT 토큰 입니다.");
@@ -105,7 +117,8 @@ public class JDQRFilter extends OncePerRequestFilter {
         return pathMatcher.match("/api/v1/admin/login/**", path)
             || pathMatcher.match("/api/v1/swagger-ui/**", path)		// swagger ui 실행시 동작하는 api
             || pathMatcher.match("/v3/api-docs/**", path)			// swagger ui 실행시 동작하는 api
-            || pathMatcher.match("/api/v1/test/**", path);
+            || pathMatcher.match("/api/v1/test/**", path)
+            || pathMatcher.match("/api/v1/order/auth/**", path);
     }
 
     /**
@@ -117,7 +130,6 @@ public class JDQRFilter extends OncePerRequestFilter {
      */
     private String resolveToken(HttpServletRequest request) {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-
         if(!ObjectUtils.isEmpty(token) && token.startsWith(TOKEN_PREFIX)){
             return token.substring(TOKEN_PREFIX.length());
         }

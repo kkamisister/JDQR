@@ -44,7 +44,7 @@ export default function DishHeader() {
           bgcolor: colors.background.white,
           color: colors.text.sub1,
           border: "solid",
-          borderColor: colors.text.sub,
+          borderColor: colors.background.box,
           p: 1,
         }}
       >

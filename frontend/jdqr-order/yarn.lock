@@ -8229,6 +8229,11 @@ react-scripts@5.0.1:
   optionalDependencies:
     fsevents "^2.3.2"
 
+react-scroller@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/react-scroller/-/react-scroller-0.0.3.tgz#718c772fad296cbe467188096331769caf9438ba"
+  integrity sha512-pP68kt4mtrjQOPvsdqd8DfXcE9TGs9ggU3412bD+NGIf4VW8Gp4pscyRB63ISd4srsudCqlvezm+uuiNDVqemg==
+
 react-transition-group@^4.4.5:
   version "4.4.5"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.4.5.tgz#e53d4e3f3344da8521489fbef8f2581d42becdd1"

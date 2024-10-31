@@ -23,12 +23,6 @@ export const colors = {
     blue: "#58A6FF",
     green: "#CDDC39",
   },
-  tag: {
-    purple: "#64B5F6",
-    teal: "#BBDEFB",
-    blue: "#64B5F6",
-    yellow: "#BBDEFB",
-  },
   background: {
     primary: "#F6F7F9",
     box: "#E5E8EB",

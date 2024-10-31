@@ -1,67 +1,68 @@
-import React from "react";
-import { Box, Stack, Avatar } from "@mui/material";
-import { colors } from "constants/colors";
+import { Box, Stack, Typography } from "@mui/material";
+import { colors } from "../../constants/colors";
+import DishTagChip from "../chip/DishTagChip";
 
-const DishItemCard = ({
-  dishId,
-  dishName,
-  price,
-  description,
-  imageUrl,
-  tags,
-  children,
-  sx,
-}) => {
+const DishItemCard = ({ dish, sx }) => {
   return (
     <Stack
       direction="row"
       spacing={2}
       sx={{
-        backgroundColor: colors.background.box,
         padding: "10px",
         borderRadius: "10px",
         justifyContent: "space-between",
         alignItems: "center",
-        width: "100%",
         "&:hover": {
-          backgroundColor: colors.point.stroke,
+          backgroundColor: colors.background.primary,
         },
         transition: "all 0.3s ease", // transition 적용
         cursor: "pointer",
-        ...sx,
+        color: colors.text.main,
       }}
     >
-      <Stack
-        direction="row"
-        spacing={1}
-        sx={{
-          justifyContent: "space-between",
-          alignItems: "center",
-          fontSize: "14px",
-        }}
-      >
-        <Avatar
-          alt={dishName}
-          src="//images.ctfassets.net/j8tkpy1gjhi5/5OvVmigx6VIUsyoKz1EHUs/b8173b7dcfbd6da341ce11bcebfa86ea/Salami-pizza-hero.jpg?w=576&fm=webp&q=80"
-        />
-        <Stack
-          spacing={0.5}
-          sx={{
-            justifyContent: "center",
-            alignItems: "flex-start",
-          }}
-        >
-          <Box sx={{ fontWeight: "bold" }}>{dishName}</Box>
-          <Box
+      <Stack>
+        <Stack direction="row">
+          <Typography
             sx={{
-              color: colors.text.sub2,
+              fontSize: "18px",
+              pr: 1,
+              fontWeight: "550",
             }}
           >
-            {description}
-          </Box>
+            {dish.dishName}
+          </Typography>
+          {dish.tags.length > 0 &&
+            dish.tags.map((tag, index) => (
+              <DishTagChip key={index} label={tag} />
+            ))}
         </Stack>
+        <Typography
+          sx={{
+            fontSize: "12px",
+            color: colors.text.sub2,
+          }}
+        >
+          {dish.description}
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: "16px",
+          }}
+        >
+          {dish.price.toLocaleString()}원
+        </Typography>
       </Stack>
-      {children}
+      <Box
+        component="img"
+        alt={dish.dishName}
+        src="https://cdn.dominos.co.kr/admin/upload/goods/20230619_F33836Pn.jpg"
+        sx={{
+          width: 120,
+          height: 120,
+          borderRadius: "8px", // 곡률 조절
+          objectFit: "cover",
+        }}
+      />
     </Stack>
   );
 };

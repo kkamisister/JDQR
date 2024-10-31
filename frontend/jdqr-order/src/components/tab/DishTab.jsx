@@ -21,7 +21,7 @@ export default function DishTab({ dishCategories }) {
         textColor={colors.text.main}
         TabIndicatorProps={{
           style: {
-            backgroundColor: colors.text.sub3,
+            backgroundColor: colors.main.primary500,
           },
         }}
       >

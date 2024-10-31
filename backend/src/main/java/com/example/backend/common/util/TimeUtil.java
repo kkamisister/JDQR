@@ -1,4 +1,4 @@
-package com.example.backend.common.utils;
+package com.example.backend.common.util;
 
 import java.time.Instant;
 import java.time.LocalDate;

@@ -10,8 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.example.backend.common.redis.repository.RedisHashRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,66 +19,64 @@ import lombok.extern.slf4j.Slf4j;
 public class NotificationService {
 
 	// 테이블 ID별로 구독자를 관리하는 맵
-	private final ConcurrentHashMap<String, List<SseEmitter>> tableEmitters = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
-	public SseEmitter subscribe(String tableId){
+	public int getSubscriberSize(String topicId){
+		List<SseEmitter> list = emitters.getOrDefault(topicId,new ArrayList<>());
+		return list.size();
+	}
+
+	public SseEmitter subscribe(String topicId){
 
 		SseEmitter emitter = new SseEmitter(600000L);
 
 		// 새로운 구독자 추가
-		if(!tableEmitters.containsKey(tableId)){
+		if(!emitters.containsKey(topicId)){
 			List<SseEmitter> sseEmitters = new CopyOnWriteArrayList<>();
 			sseEmitters.add(emitter);
-			tableEmitters.put(tableId,sseEmitters);
+			emitters.put(topicId,sseEmitters);
 		}
 		else{
-			List<SseEmitter> sseEmitters = tableEmitters.get(tableId);
+			List<SseEmitter> sseEmitters = emitters.get(topicId);
 			sseEmitters.add(emitter);
-			tableEmitters.put(tableId,sseEmitters);
+			emitters.put(topicId,sseEmitters);
 		}
 
 		// 연결 종료 시 해당 emitter만 구독 목록에서 제거
 		emitter.onCompletion(() -> {
-			List<SseEmitter> sseEmitters = tableEmitters.get(tableId);
+			List<SseEmitter> sseEmitters = emitters.get(topicId);
 			log.warn("emitter : {}",emitter);
 			sseEmitters.remove(emitter);
 			log.warn("sseEmitters.size() : {}",sseEmitters.size());
 			if (sseEmitters.isEmpty()) {
-				tableEmitters.remove(tableId); // 리스트가 비어 있으면 tableId도 삭제
+				emitters.remove(topicId); // 리스트가 비어 있으면 tableId도 삭제
 			}
-			else tableEmitters.put(tableId,sseEmitters);
+			else emitters.put(topicId,sseEmitters);
 		});
 
 		emitter.onTimeout(() -> {
-			List<SseEmitter> sseEmitters = tableEmitters.get(tableId);
+			List<SseEmitter> sseEmitters = emitters.get(topicId);
 			sseEmitters.remove(emitter);
 			if (sseEmitters.isEmpty()) {
-				tableEmitters.remove(tableId); // 리스트가 비어 있으면 tableId도 삭제
+				emitters.remove(topicId); // 리스트가 비어 있으면 tableId도 삭제
 			}
-		else tableEmitters.put(tableId,sseEmitters);
+		else emitters.put(topicId,sseEmitters);
 		});
 
 		return emitter;
 	}
 
 	public void sentToClient(String topicId, Object data){
-		List<SseEmitter> emitters = tableEmitters.get(topicId);
-		log.warn("여기서 터지나?");
-		// for(SseEmitter emitter : emitters){
-		// 	log.warn("emitter : {}",emitter);
-		// }
+		List<SseEmitter> emitters = this.emitters.get(topicId);
 		if(emitters != null){
 			synchronized(emitters){
-
 				for(SseEmitter emitter : emitters){
 					try{
-						log.warn("emitter@@@@@ : {}",emitter);
 						emitter.send(SseEmitter.event()
-							.name("cart_items")
+							.name("sse")
 							.data(data, MediaType.APPLICATION_JSON)
 							.reconnectTime(1000L));
 
-						log.warn("보냈다");
 					}catch(IOException e){
 						emitters.remove(emitter);
 					}

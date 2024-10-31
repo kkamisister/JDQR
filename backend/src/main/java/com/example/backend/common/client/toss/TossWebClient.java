@@ -4,7 +4,7 @@ import com.example.backend.common.client.JDQRWebClient;
 import com.example.backend.common.client.toss.dto.TossErrorResponse;
 import com.example.backend.common.client.toss.dto.TossPaymentRequestDto;
 import com.example.backend.common.client.toss.dto.TossPaymentResponseDto;
-import com.example.backend.common.utils.JsonUtil;
+import com.example.backend.common.util.JsonUtil;
 import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

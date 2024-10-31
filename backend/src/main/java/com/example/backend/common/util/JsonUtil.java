@@ -1,4 +1,4 @@
-package com.example.backend.common.utils;
+package com.example.backend.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -141,6 +141,7 @@ public class JsonUtil {
     }
   }
 
+
   public static String writeRootValueInclude(Object value) {
     try {
       return getMapperWrapRootValueEnable().writeValueAsString(value);
@@ -170,6 +171,14 @@ public class JsonUtil {
       return getMapperIgnoreJsonPropertyAnnotation().readValue(json, clazz);
     } catch (IOException e) {
       throw new RuntimeException(EXCEPTION_MESSAGE_PREFIX, e);
+    }
+  }
+
+  public static String objectToString(Object cachedData) {
+    try {
+      return getMapper().writeValueAsString(cachedData);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Json write error : ", e);
     }
   }
 

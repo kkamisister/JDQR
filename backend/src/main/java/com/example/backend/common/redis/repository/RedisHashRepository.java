@@ -12,4 +12,6 @@ public interface RedisHashRepository {
 
 	List<ProductInfo> getCartDatas(String tableId);
 	void saveCartDatas(String tableId,List<ProductInfo> cartDatas);
+
+	void removeKey(String key);
 }

@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import IndexPage from "./pages/Index/IndexPage";
-import Layout from "./Layout";
-import DishPage from "./pages/dish/DishPage";
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import IndexPage from "./pages/Index/IndexPage"
+import HomePage from "./pages/place/HomePage"
+import Layout from "./Layout"
+import DishPage from "./pages/dish/DishPage"
 
 function App() {
   return (
@@ -11,7 +12,7 @@ function App() {
           path="/"
           element={
             <Layout>
-              <IndexPage />
+              <HomePage />
             </Layout>
           }
         />
@@ -25,7 +26,7 @@ function App() {
         />
       </Routes>
     </BrowserRouter>
-  );
+  )
 }
 
-export default App;
+export default App

@@ -1,59 +1,80 @@
-import React, { useRef } from "react"
-import { useQuery } from "@tanstack/react-query"
+import React, { useState } from "react"
+import { Stack, Button } from "@mui/material"
+import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk"
+import activeMapmarker from "../assets/images/mapmarker1.png"
+import inactiveMapmarker from "../assets/images/mapmarker2.png"
+import zIndex from "@mui/material/styles/zIndex"
 
-const kakaoMapApiKey = process.env.REACT_APP_KAKAO_MAP_API_KEY
+const { kakao } = window
 
-const loadKakaoMapScript = () => {
-  return new Promise((resolve, reject) => {
-    if (window.kakao && window.kakao.maps) {
-      resolve(window.kakao)
-      return
-    }
-    const script = document.createElement("script")
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${kakaoMapApiKey}`
-    script.onload = () => resolve(window.kakao)
-    script.onerror = () => reject(new Error("에러다에러"))
-    document.head.appendChild(script)
-  })
-}
+const KakaoMap = () => {
+  const [isActive, setIsActive] = useState(false)
 
-const useKakaoMap = (latitude, longitude) => {
-  const mapContainerRef = useRef(null)
+  useKakaoLoader()
 
-  const queryResult = useQuery(
-    ["KakaoMap", latitude, longitude],
-    async () => {
-      const kakao = await loadKakaoMapScript()
-      kakao.maps.load(() => {
-        if (mapContainerRef.current) {
-          const mapOption = {
-            center: new kakao.maps.LatLng(latitude, longitude),
-            level: 3,
-          }
-          return new kakao.maps.Map(mapContainerRef.current, mapOption)
-        }
-      })
-    },
-    {
-      enabled: !!latitude && !!longitude,
-      retry: false,
-      refetchOnWindowFocus: false,
-    }
-  )
-  return { mapContainerRef, ...queryResult }
-}
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      const lat = position.coords.latitude
+      const lon = position.coords.longitude
 
-const KakaoMap = ({ longitude, latitude }) => {
-  const { mapContainerRef, isLoading, isError, error } = useKakaoMap(
-    latitude,
-    longitude
-  )
+      const locPosition = new kakao.maps.LatLng(lat, lon)
 
-  if (isLoading) return <div>로딩중이지렁</div>
-  if (isError) return <div>Error : {error.mesage}</div>
+      displayMarker(locPosition)
+    })
+  } else {
+    const locPosition = new kakao.maps.LatLng(
+      37.50125774784631,
+      127.03956684373539
+    )
+
+    displayMarker(locPosition)
+  }
+
+  function displayMarker(locPosition) {
+    const marker = new kakao.maps.Marker({})
+  }
 
   return (
-    <div ref={mapContainerRef} style={{ width: "100%", heigh: "400px" }}></div>
+    <Stack>
+      <Map
+        id="map"
+        center={{
+          lat: 37.50125774784631,
+          lng: 127.03956684373539,
+        }}
+        style={{
+          width: "100%",
+          height: "45vh",
+        }}
+        level={3}
+        draggable={true}
+        scrollwheel={true}
+      >
+        <MapMarker
+          position={{ lat: 37.50125774784631, lng: 127.03956684373539 }}
+          image={{
+            src: isActive ? activeMapmarker : inactiveMapmarker,
+            size: {
+              width: 65,
+              height: 50,
+            },
+          }}
+          onClick={() => setIsActive(!isActive)} // 일단 클릭 시 활성상태 전환으로 설정해둠~~
+        ></MapMarker>
+      </Map>
+      <Stack
+        sx={{
+          zIndex: 1,
+          position: "absolute",
+          bottom: 0,
+          width: "100%",
+          height: "60%",
+          backgroundColor: "black",
+          borderTopLeftRadius: "35px",
+          borderTopRightRadius: "35px",
+        }}
+      ></Stack>
+    </Stack>
   )
 }
 

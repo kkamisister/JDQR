@@ -3,6 +3,7 @@ export const colors = {
     main: "#303030",
     sub1: "#606060",
     sub2: "#909090",
+    sub3: "#DDDDDD",
     white: "#ffffff",
   },
   main: {

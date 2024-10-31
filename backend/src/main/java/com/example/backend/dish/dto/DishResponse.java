@@ -26,8 +26,7 @@ public record DishResponse() {
 		String name,
 		Integer price,
 		String description,
-		String imagePath,
-		String imageName
+		String image
 	){
 		public static DishSummaryInfo from(Dish dish) {
 			return DishSummaryInfo.builder()
@@ -36,8 +35,7 @@ public record DishResponse() {
 				.name(dish.getName())
 				.price(dish.getPrice())
 				.description(dish.getDescription())
-				.imagePath(dish.getImagePath())
-				.imageName(dish.getImageName())
+				.image(dish.getImage())
 				.build();
 		}
 	}

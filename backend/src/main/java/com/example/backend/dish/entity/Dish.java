@@ -1,6 +1,9 @@
 package com.example.backend.dish.entity;
 
 import com.example.backend.common.entity.BaseEntity;
+import com.example.backend.dish.dto.DishRequest;
+import com.example.backend.dish.dto.DishRequest.DishInfo;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,8 +27,17 @@ public class Dish extends BaseEntity {
     private Integer price;
     private String description;
 
-    @Column(name = "image_path")
-    private String imagePath;
-    @Column(name = "image_name")
-    private String imageName;
+    @Column(name = "image")
+    private String image;
+
+    public static Dish of(DishInfo dishInfo,DishCategory dishCategory,String imageUrl){
+        return Dish.builder()
+            .dishCategory(dishCategory)
+            .name(dishInfo.dishName())
+            .price(dishInfo.price())
+            .description(dishInfo.description())
+            .image(imageUrl)
+            .build();
+    }
+
 }

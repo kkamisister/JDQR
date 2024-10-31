@@ -12,6 +12,12 @@ public enum ErrorCode {
 	// 유저관련 에러
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자가 존재하지 않습니다"),
 
+	// 옵션관련 에러
+	OPTIONGROUP_NOT_FOUND(HttpStatus.BAD_REQUEST,"옵션그룹이 존재하지 않습니다"),
+
+	// 태그관련 에러
+	TAG_NOT_FOUND(HttpStatus.BAD_REQUEST, "태그가 존재하지 않습니다"),
+
 	// 토큰 관련 에러
 	TOKEN_REISSUE_FAIL(HttpStatus.BAD_REQUEST,"토큰 재발급에 문제가 발생했습니다"),
 

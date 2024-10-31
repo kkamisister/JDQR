@@ -5,6 +5,8 @@ import com.example.backend.dish.entity.Dish;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Builder
@@ -21,6 +23,9 @@ public class OrderItem extends BaseEntity {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    @Column(name = "user_id")
+    private String userId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dish_id")
     private Dish dish;
@@ -28,4 +33,7 @@ public class OrderItem extends BaseEntity {
     private Integer quantity;
     @Column(name = "order_price")
     private Integer orderPrice;
+
+    @Column(name = "ordered_at")
+    private LocalDateTime orderedAt;
 }

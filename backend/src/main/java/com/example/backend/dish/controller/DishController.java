@@ -38,22 +38,7 @@ public class DishController {
 	private final DishService dishService;
 
 	//1. 전체 메뉴 조회
-	@Operation(summary = "모든 메뉴 조회", description = "등록된 모든 메뉴를 조회하는 api")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "메뉴 조회 성공"),
-		@ApiResponse(responseCode = "500", description = "서버 에러")
-	})
-	@GetMapping("/all")
-	public ResponseEntity<ResponseWithData<DishSummaryResultDto>> getAllDishes(HttpServletRequest request){
 
-		String id = (String)request.getAttribute("userId");
-		Integer userId = Integer.valueOf(id);
-
-		log.info("User ID: {}가 모든 메뉴를 조회했습니다.", userId);
-		ResponseWithData<DishSummaryResultDto> allDishes = dishService.getAllDishes(userId);
-		return ResponseEntity.status(allDishes.status())
-			.body(allDishes);
-	}
 
 	//2. 메뉴 추가
 	@Operation(summary = "메뉴 추가", description = "새로운 메뉴를 추가하는 api")

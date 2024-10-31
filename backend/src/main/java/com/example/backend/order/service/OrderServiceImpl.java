@@ -3,6 +3,9 @@ package com.example.backend.order.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.backend.common.enums.SimpleResponseMessage;
+import com.example.backend.order.entity.Order;
+import com.example.backend.order.enums.OrderStatus;
 import org.springframework.stereotype.Service;
 
 import com.example.backend.common.exception.ErrorCode;
@@ -10,13 +13,13 @@ import com.example.backend.common.exception.JDQRException;
 import com.example.backend.common.redis.repository.RedisHashRepository;
 import com.example.backend.common.util.GenerateLink;
 import com.example.backend.order.dto.CartRequest.ProductInfo;
-import com.example.backend.order.dto.ProductOption;
 import com.example.backend.notification.service.NotificationService;
 import com.example.backend.table.entity.Table;
 import com.example.backend.table.repository.TableRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -67,10 +70,10 @@ public class OrderServiceImpl implements OrderService {
 		//
 		// dishRepository.findById(dishId); 이런식으로 확인해서 없으면 Exception
 
-		log.warn("productInfo : {}",productInfo);
-		for(ProductOption o: productInfo.options()){
-			log.warn("option : {}",o);
-		}
+//		log.warn("productInfo : {}",productInfo);
+//		for(ProductOption o: productInfo.options()){
+//			log.warn("option : {}",o);
+//		}
 
 		// 테이블 장바구니에 물품을 담는다
 		List<ProductInfo> cachedCartData = redisHashRepository.getCartDatas(tableId);
@@ -90,4 +93,40 @@ public class OrderServiceImpl implements OrderService {
 
 		notificationService.sentToClient(tableId,sendDatas);
 	}
+
+	/**
+	 * 유저가 담은 상품의 정보를 db에 저장한다
+	 * orders, order_items, order_item_options 테이블 전체를 포함
+	 *
+	 * @param tableId : 유저가 주문하는 테이블의 id
+	 * @return : 성공/실패 여부를 담은 문자열
+	 */
+	@Override
+	@Transactional
+	public SimpleResponseMessage saveWholeOrder(String tableId) {
+
+		List<ProductInfo> cartDatas = redisHashRepository.getCartDatas(tableId);
+
+		// redis에 아직 데이터가 없을 경우
+		if (cartDatas == null || cartDatas.isEmpty()) {
+			return SimpleResponseMessage.ORDER_ITEM_EMPTY;
+		}
+
+		Order order = saveOrder(cartDatas);
+
+
+		return SimpleResponseMessage.ORDER_ITEM_EMPTY;
+	}
+
+	private Order saveOrder(List<ProductInfo> cartDatas) {
+		Order order = Order.builder()
+			.orderStatus(OrderStatus.PENDING)
+			.menuCnt(cartDatas.size())
+			.build();
+
+
+
+		return null;
+	}
+
 }

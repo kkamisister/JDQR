@@ -1,10 +1,9 @@
-import * as React from "react";
 import AppBar from "@mui/material/AppBar";
-import { Box, Stack, Typography, Toolbar, Chip } from "@mui/material";
+import { Box, Typography, Toolbar, Chip } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { colors } from "../../constants/colors"; // named export인지 확인
 
-export default function OrderAppBar({ tableName }) {
+export default function Header({ tableName }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar

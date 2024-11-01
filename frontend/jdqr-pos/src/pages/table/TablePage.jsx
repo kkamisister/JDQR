@@ -31,13 +31,19 @@ const TablePage = () => {
 				</Stack>
 			</Stack>
 
-			<Stack direction="row" spacing={3}>
+			<Stack direction="row" spacing={3} sx={{ height: '100%' }}>
 				{/* 테이블 정보 리스트 */}
-				<Box
-					display="flex"
-					flexWrap="wrap"
-					gap={2} // 박스 간 간격을 조정하고 싶다면 gap 속성을 추가
-				>
+				<Stack
+					direction="row"
+					spacing={2}
+					useFlexGap
+					sx={{
+						justifyContent: 'flex-start',
+						alignItems: 'flex-start',
+						width: '100%', // 원하는 너비로 설정
+						flexWrap: 'wrap',
+						height: 'fit-content',
+					}}>
 					{SampleTableRequestData.data.tables.map(table => (
 						<Box onClick={() => handleTableClick(table)}>
 							<OrderBox
@@ -47,7 +53,7 @@ const TablePage = () => {
 							/>
 						</Box>
 					))}
-				</Box>
+				</Stack>
 				{/* 테이블 상세 주문 정보 */}
 				<Stack
 					spacing={1}

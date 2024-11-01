@@ -1,8 +1,8 @@
 import React, { useState } from "react"
 import { Stack, Button } from "@mui/material"
 import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk"
-import activeMapmarker from "../assets/images/mapmarker1.png"
-import inactiveMapmarker from "../assets/images/mapmarker2.png"
+import activeMapmarker from "../../assets/images/mapmarker1.png"
+import inactiveMapmarker from "../../assets/images/mapmarker2.png"
 import zIndex from "@mui/material/styles/zIndex"
 
 const { kakao } = window

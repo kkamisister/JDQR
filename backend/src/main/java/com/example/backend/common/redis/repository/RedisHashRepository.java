@@ -1,8 +1,9 @@
 package com.example.backend.common.redis.repository;
 
 import java.util.List;
+import java.util.Map;
 
-import com.example.backend.order.dto.CartRequest.ProductInfo;
+import com.example.backend.order.dto.CartDto;
 
 public interface RedisHashRepository {
 	void saveHashData(String key,String subKey,Object value,long ttl);
@@ -10,8 +11,8 @@ public interface RedisHashRepository {
 
 	Object getHashData(String key,String subKey);
 
-	List<ProductInfo> getCartDatas(String tableId);
-	void saveCartDatas(String tableId,List<ProductInfo> cartDatas);
-
+	Map<String,Map<Integer,CartDto>> getAllCartDatas(String tableId);
+	Map<Integer,CartDto> getCartDatas(String tableId,String userId);
+	void saveCartDatas(String tableId,int hashCode,Map<String,List<CartDto>> cartDatas);
 	void removeKey(String key);
 }

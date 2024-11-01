@@ -14,6 +14,9 @@ public enum ErrorCode {
 	// 메뉴 관련 에러
 	DISH_NOT_FOUND(HttpStatus.BAD_REQUEST, "메뉴가 존재하지 않습니다"),
 
+	// 테이블관련 에러
+	TABLE_NOT_FOUND(HttpStatus.BAD_REQUEST,"테이블이 존재하지 않습니다"),
+
 	// 옵션관련 에러
 	OPTIONGROUP_NOT_FOUND(HttpStatus.BAD_REQUEST,"옵션그룹이 존재하지 않습니다"),
 

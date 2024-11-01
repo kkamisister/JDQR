@@ -6,9 +6,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import com.example.backend.order.dto.CartRequest.ProductInfo;
+import com.example.backend.common.util.JsonUtil;
+import com.example.backend.order.dto.CartDto;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @Repository
 @RequiredArgsConstructor
@@ -45,22 +49,36 @@ public class RedisHashRepositoryImpl implements RedisHashRepository{
 	}
 
 	@Override
-	public List<ProductInfo> getCartDatas(String tableId) {
+	public Map<String, Map<Integer, CartDto>> getAllCartDatas(String tableId) {
+		String key = "table::" + tableId;
+		Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);
 
-		String key = "table::"+tableId;
+		return entries.entrySet().stream()
+			.collect(Collectors.toMap(
+				entry -> (String) entry.getKey(),
+				entry -> JsonUtil.readMap(JsonUtil.objectToString(entry.getValue()),
+					new TypeReference<Map<Integer, CartDto>>() {})));
+	}
 
-		Object cachedData = redisTemplate.opsForValue().get(key);
-		if(cachedData != null){
-			return (List<ProductInfo>)cachedData;
+	@Override
+	public Map<Integer,CartDto> getCartDatas(String tableId,String userId) {
+
+		Object cachedData = redisTemplate.opsForHash().get(tableId,userId);
+		if(cachedData != null) {
+			log.warn("cachedData : {}",cachedData);
+			return JsonUtil.readMap(JsonUtil.objectToString(cachedData),
+				new TypeReference<Map<Integer, CartDto>>() {
+				});
 		}
 		return null;
 	}
 
 	@Override
-	public void saveCartDatas(String tableId, List<ProductInfo> cartDatas) {
+	public void saveCartDatas(String tableId,int hashCode, Map<String,List<CartDto>> cartDatas) {
 		String key = "table::"+tableId;
 
-		redisTemplate.opsForValue().set(key,cartDatas);
+		// redisTemplate.opsForValue().set(key,cartDatas);
+		redisTemplate.opsForHash().put(tableId,hashCode,cartDatas);
 		redisTemplate.expire(key,20, TimeUnit.MINUTES);
 	}
 

@@ -32,7 +32,7 @@ export default function DishTab({ dishCategories }) {
             sx={{
               fontWeight: "bold",
               fontSize: "16px",
-              width: "25%",
+              minWidth: "25%",
             }}
           />
         ))}

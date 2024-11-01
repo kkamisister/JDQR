@@ -21,7 +21,13 @@ const DishItemCard = ({ dish, sx }) => {
       }}
     >
       <Stack>
-        <Stack direction="row">
+        <Stack
+          direction="row"
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+          }}
+        >
           <Typography
             sx={{
               fontSize: "18px",
@@ -31,10 +37,12 @@ const DishItemCard = ({ dish, sx }) => {
           >
             {dish.dishName}
           </Typography>
-          {dish.tags.length > 0 &&
-            dish.tags.map((tag, index) => (
-              <DishTagChip key={index} label={tag} />
-            ))}
+          <Box>
+            {dish.tags.length > 0 &&
+              dish.tags.map((tag, index) => (
+                <DishTagChip key={index} label={tag} />
+              ))}
+          </Box>
         </Stack>
         <Typography
           sx={{

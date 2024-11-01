@@ -12,6 +12,18 @@ const KakaoMap = () => {
 
   useKakaoLoader()
 
+  function initializeMap() {
+    return new Promise((resolve) => {
+      const container = document.getElementById("map")
+      const options = {
+        center: new kakao.maps.Latlng(37.50125774784631, 127.03956684373539),
+        level: 10,
+      }
+      const map = new kakao.maps.Map(container, options)
+      resolve(map)
+    })
+  }
+
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function (position) {
       const lat = position.coords.latitude
@@ -69,7 +81,7 @@ const KakaoMap = () => {
           bottom: 0,
           width: "100%",
           height: "60%",
-          backgroundColor: "black",
+          backgroundColor: "white",
           borderTopLeftRadius: "35px",
           borderTopRightRadius: "35px",
         }}

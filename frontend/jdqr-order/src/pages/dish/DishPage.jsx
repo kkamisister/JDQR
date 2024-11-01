@@ -18,7 +18,7 @@ const DishPage = () => {
           categoryName: "인기 메뉴",
           items: [
             {
-              dishId: 3,
+              dishId: 5,
               dishName: "치즈볼",
               price: 3000,
               description: "쫄깃하고 고소한 치즈볼",
@@ -37,15 +37,7 @@ const DishPage = () => {
               price: 12800,
               description: "불닭볶음면보다 매운 피자🔥",
               imageUrl: "https://example.com/image1.jpg",
-              tags: [
-                "인기",
-                "시그니처",
-                "계절",
-                "집에",
-                "가고",
-                "싶다",
-                "한정",
-              ],
+              tags: ["인기", "시그니처"],
             },
             {
               dishId: 2,
@@ -78,7 +70,7 @@ const DishPage = () => {
           categoryName: "사이드",
           items: [
             {
-              dishId: 3,
+              dishId: 5,
               dishName: "치즈볼",
               price: 3000,
               description: "쫄깃하고 고소한 치즈볼",
@@ -109,14 +101,18 @@ const DishPage = () => {
   return (
     <Box
       sx={{
-        height: "100%",
+        height: "100vh",
+        overflowY: "auto",
+        "&::-webkit-scrollbar": {
+          display: "none",
+        },
+        msOverflowStyle: "none",
+        scrollbarWidth: "none",
       }}
     >
-      <Stack>
-        <Header tableName={mockData.data.tableName} />
-        <DishHeader />
-        <DishList dishes={mockData.data.dishes} />
-      </Stack>
+      <Header tableName={mockData.data.tableName} />
+      <DishHeader />
+      <DishList dishes={mockData.data.dishes} />
     </Box>
   );
 };

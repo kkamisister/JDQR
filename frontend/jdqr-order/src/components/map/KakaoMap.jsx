@@ -12,18 +12,6 @@ const KakaoMap = () => {
 
   useKakaoLoader()
 
-  function initializeMap() {
-    return new Promise((resolve) => {
-      const container = document.getElementById("map")
-      const options = {
-        center: new kakao.maps.Latlng(37.50125774784631, 127.03956684373539),
-        level: 10,
-      }
-      const map = new kakao.maps.Map(container, options)
-      resolve(map)
-    })
-  }
-
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function (position) {
       const lat = position.coords.latitude
@@ -43,8 +31,25 @@ const KakaoMap = () => {
   }
 
   function displayMarker(locPosition) {
-    const marker = new kakao.maps.Marker({})
+    const marker = new kakao.maps.Marker({ locPosition })
   }
+
+  // const customOverlay = new kakao.mapsCustomOverlay({
+  //   position: position,
+  //   content: content,
+  // })
+
+  // function initializeMap() {
+  //   return new Promise((resolve) => {
+  //     const container = document.getElementById("map")
+  //     const options = {
+  //       center: new kakao.maps.Latlng(37.50125774784631, 127.03956684373539),
+  //       level: 10,
+  //     }
+  //     const map = new kakao.maps.Map(container, options)
+  //     resolve(map)
+  //   })
+  // }
 
   return (
     <Stack>
@@ -67,25 +72,13 @@ const KakaoMap = () => {
           image={{
             src: isActive ? activeMapmarker : inactiveMapmarker,
             size: {
-              width: 65,
-              height: 50,
+              width: 80,
+              height: 60,
             },
           }}
           onClick={() => setIsActive(!isActive)} // 일단 클릭 시 활성상태 전환으로 설정해둠~~
         ></MapMarker>
       </Map>
-      <Stack
-        sx={{
-          zIndex: 1,
-          position: "absolute",
-          bottom: 0,
-          width: "100%",
-          height: "60%",
-          backgroundColor: "white",
-          borderTopLeftRadius: "35px",
-          borderTopRightRadius: "35px",
-        }}
-      ></Stack>
     </Stack>
   )
 }

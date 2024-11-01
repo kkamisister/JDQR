@@ -3,11 +3,12 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import { useState } from "react";
 import { colors } from "../../constants/colors";
-export default function DishTab({ dishCategories }) {
+export default function DishTab({ dishCategories, onTabClick }) {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    onTabClick(dishCategories[newValue]);
   };
 
   return (

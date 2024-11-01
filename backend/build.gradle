@@ -51,7 +51,7 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
 	// redis 설정
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '3.3.0'
+	implementation 'org.redisson:redisson-spring-boot-starter:3.38.0'
 
 	// QueryDSL 추가
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

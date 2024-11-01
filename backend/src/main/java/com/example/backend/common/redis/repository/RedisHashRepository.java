@@ -11,8 +11,8 @@ public interface RedisHashRepository {
 
 	Object getHashData(String key,String subKey);
 
-	Map<String,List<CartDto>> getAllCartDatas(String tableId);
-	List<CartDto> getCartDatas(String tableId,String userId);
-	void saveCartDatas(String tableId,String userId,List<CartDto> cartDatas);
+	Map<String,Map<Integer,CartDto>> getAllCartDatas(String tableId);
+	Map<Integer,CartDto> getCartDatas(String tableId,String userId);
+	void saveCartDatas(String tableId,int hashCode,Map<String,List<CartDto>> cartDatas);
 	void removeKey(String key);
 }

@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum UserCookie {
+public enum RedirectUrl {
 
-	USER_COOKIE("JDQR-order-user-id");
+	FRONT("http://localhost:3000/tableToken");
 
 	private final String explain;
 }

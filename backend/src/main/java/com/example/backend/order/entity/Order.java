@@ -2,6 +2,7 @@ package com.example.backend.order.entity;
 
 import com.example.backend.common.entity.BaseEntity;
 import com.example.backend.order.enums.OrderStatus;
+import com.example.backend.order.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,5 +19,12 @@ public class Order extends BaseEntity {
 
     @Column(name = "menu_cnt")
     private Integer menuCnt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status")
     private OrderStatus orderStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
+    private PaymentMethod paymentMethod;
 }

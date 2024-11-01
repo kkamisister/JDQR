@@ -1,26 +1,30 @@
 package com.example.backend.order.controller;
 
-import static com.example.backend.order.dto.CartRequest.*;
-
 import java.io.IOException;
+import java.util.UUID;
 
+import org.springframework.http.ResponseEntity;
 import com.example.backend.common.dto.CommonResponse.*;
 import com.example.backend.common.enums.SimpleResponseMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.example.backend.common.enums.UseCookie;
 import com.example.backend.notification.service.NotificationService;
+import com.example.backend.order.dto.CartDto;
 import com.example.backend.order.service.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -45,25 +49,57 @@ public class OrderController {
 
 		String authLink = orderService.redirectUrl(tableId,uuid);
 
+		log.warn("authLink  :{}",authLink);
 		response.sendRedirect(authLink);
 	}
 
+	@Operation(summary = "쿠키 발급", description = "유저 ID를 랜덤생성하여 반환하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "쿠키 발급 완료"),
+	})
+	@GetMapping("/cart/cookie")
+	public ResponseEntity<Void> setUserCookie(HttpServletResponse response){
+
+		// 쿠키 생성 및 설정
+		Cookie cookie = new Cookie(UseCookie.USE_COOKIE.getExplain(), UUID.randomUUID().toString());
+		cookie.setPath("/"); // 쿠키 적용 경로 설정
+		// cookie.setHttpOnly(true); // HttpOnly 설정
+		cookie.setMaxAge(60 * 20); // 쿠키 유효 시간 : 20분
+		response.addCookie(cookie); // 응답에 쿠키 추가
+
+		return ResponseEntity.ok().build();
+	}
+
+	@Operation(summary = "SSE 구독 요청", description = "SSE연결을 요청하는 api")
 	@GetMapping("/cart/subscribe")
 	public SseEmitter subscribe(HttpServletRequest request){
 
 		String tableId = (String)request.getAttribute("tableId");
+		log.warn("tableId : {}",tableId);
 
 		return notificationService.subscribe(tableId);
 	}
 
-	@PostMapping("/cart/addItem")
-	public void addItemToCart(@RequestBody ProductInfo productInfo,HttpServletRequest request){
-
+	@Operation(summary = "장바구니 항목 담기", description = "장바구니에 항목을 담는 api")
+	@PostMapping("/cart/item")
+	public void addItemToCart(@RequestBody CartDto productInfo,HttpServletRequest request){
 
 		String tableId = (String)request.getAttribute("tableId");
 		log.warn("테이블 id : {}",tableId);
 		orderService.addItem(tableId,productInfo);
 	}
+
+
+	@Operation(summary = "장바구니 항목 제거", description = "장바구니 항목을 제거하는 api")
+	@PutMapping("/cart/item")
+	public void deleteItem(@RequestBody CartDto productInfo,HttpServletRequest request){
+
+		String tableId = (String)request.getAttribute("tableId");
+		log.warn("테이블 id : {}",tableId);
+		orderService.deleteItem(tableId,productInfo);
+
+	}
+
 
 	@PostMapping("/")
 	public ResponseWithMessage saveOrder(HttpServletRequest request){

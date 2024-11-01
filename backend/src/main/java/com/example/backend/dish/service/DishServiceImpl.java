@@ -82,7 +82,32 @@ public class DishServiceImpl implements DishService {
 		return new ResponseWithMessage(HttpStatus.OK.value(), "메뉴목록에 추가했습니다");
 	}
 
+	@Override
+	public ResponseWithMessage removeDish(Integer userId, Integer dishId) {
+		//해당하는 가게 주인이 존재하는지 찾는다.
+		Owner owner = ownerRepository.findById(userId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
 
+		//가게 주인이 없애려는 메뉴가 db에 존재하는지 찾는다
+		Dish dish = dishRepository.findById(dishId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+
+
+		//매뉴옵션그룹(dish_options) 테이블에서 dish_id컬럼이 dishId인 행들을 삭제
+		List<DishOptionGroup> dishOptionGroups = dishOptionGroupRepository.findByDishId(dishId);
+		for(DishOptionGroup dishOptionGroup : dishOptionGroups){
+			dishOptionGroupRepository.delete(dishOptionGroup);
+		}
+		//메뉴태그(dish_tag) 테이블에서 dis_id컬럼이 dishId인 행들을 삭제
+		List<DishTag> dishTags = dishTagRepository.findByDishId(dishId);
+		for (DishTag dishTag : dishTags) {
+			dishTagRepository.delete(dishTag);
+		}
+		//메뉴(dish) 테이블에서 id컬럼이 dishId인 행 삭제
+		dishRepository.delete(dish);
+
+		return new ResponseWithMessage(HttpStatus.OK.value(), "메뉴에서 삭제되었습니다.");
+	}
 
 
 

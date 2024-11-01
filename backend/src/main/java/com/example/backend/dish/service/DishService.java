@@ -9,5 +9,6 @@ import com.example.backend.common.dto.CommonResponse.ResponseWithData;
 public interface DishService {
 
 	ResponseWithMessage addDish(Integer userId, DishInfo dishInfo);
+	ResponseWithMessage removeDish(Integer userId, Integer dishId);
 
 }

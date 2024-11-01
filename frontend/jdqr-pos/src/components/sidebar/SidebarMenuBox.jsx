@@ -2,8 +2,9 @@ import { Stack } from '@mui/material';
 import { colors } from 'constants/colors';
 import { useNavigate } from 'react-router-dom';
 const commonStyle = {
-	fontSize: '25px',
-	padding: '10px 15px 10px 15px',
+	fontSize: '35px',
+	padding: '20px 20px 20px 20px',
+	width: '160px',
 	borderRadius: '5px',
 	transition: 'background-color 0.3s ease, color 0.3s ease, width 0.3s ease', // 부드러운 애니메이션
 	'&:hover': {
@@ -11,7 +12,7 @@ const commonStyle = {
 	},
 	cursor: 'pointer',
 	justifyContent: 'center',
-	alignItems: 'center',
+	alignItems: 'flex-start',
 };
 const selectStyle = {
 	backgroundColor: colors.background.box,

@@ -34,10 +34,10 @@ const HeaderBox = () => {
 				alignItems: 'center',
 				paddingLeft: '20px',
 				paddingRight: '20px',
-				height: '60px',
+				height: '100px',
 				backgroundColor: colors.background.box,
 			}}>
-			<Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+			<Typography variant="h4" sx={{ fontWeight: 'bold' }}>
 				{clock}
 			</Typography>
 			<Stack
@@ -52,12 +52,12 @@ const HeaderBox = () => {
 					alt="JDQR 로고"
 					borderRadius="5px"
 					sx={{
-						width: '40px',
-						height: '40px',
+						width: '55px',
+						height: '55px',
 						justifySelf: 'center',
 					}}
 				/>
-				<Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+				<Typography variant="h4" sx={{ fontWeight: 'bold' }}>
 					{'바나프레소 강남테헤란로점'}
 				</Typography>
 			</Stack>

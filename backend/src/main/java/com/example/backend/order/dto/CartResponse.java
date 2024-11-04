@@ -18,4 +18,13 @@ public record CartResponse() {
 			return new CartInfo(cartList,tableName,peopleCnt);
 		}
 	}
+
+	@Schema(name = "토스 결제 요청 데이터", description = "서버에서 저장한 주문 번호와 수량을 담는 response dto")
+	@Builder
+	public record InitialPaymentResponseDto(
+		String tossOrderId,
+		Integer amount
+	) {
+
+	}
 }

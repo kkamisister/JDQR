@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
+import com.example.backend.order.dto.CartRequest.*;
+import com.example.backend.order.dto.CartResponse.*;
 import org.springframework.http.ResponseEntity;
 import com.example.backend.common.dto.CommonResponse.*;
 import com.example.backend.common.enums.SimpleResponseMessage;
@@ -73,6 +75,19 @@ public class OrderController {
 		return ResponseEntity.ok().build();
 	}
 
+	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")
+	@PostMapping("/payment")
+	public ResponseEntity<ResponseWithData<InitialPaymentResponseDto>> payForOrder(HttpServletRequest request, PaymentRequestDto paymentRequestDto) {
+		String tableId = (String)request.getAttribute("tableId");
+
+		InitialPaymentResponseDto initialPaymentResponseDto = orderService.payForOrder(tableId, paymentRequestDto);
+
+		ResponseWithData<InitialPaymentResponseDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(), "부분결제 요청에 성공하였습니다", initialPaymentResponseDto);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
+	}
+
 	@Operation(summary = "장바구니 항목 담기", description = "장바구니에 항목을 담는 api")
 	@MessageMapping("/cart/add")
 	public void addItemToCart(@Payload CartDto productInfo, @Header("simpSessionAttributes") Map<String,Object> attributes){
@@ -95,12 +110,15 @@ public class OrderController {
 
 
 	@PostMapping("/")
-	public ResponseWithMessage saveOrder(HttpServletRequest request){
+	public ResponseEntity<ResponseWithMessage> saveOrder(HttpServletRequest request){
 		String tableId = (String)request.getAttribute("tableId");
 
 		SimpleResponseMessage message = orderService.saveWholeOrder(tableId);
 
-		return new ResponseWithMessage(HttpStatus.OK.value(), message.getMessage());
+		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(), message.getMessage());
+
+		return ResponseEntity.status(responseWithMessage.status())
+			.body(responseWithMessage);
 	}
 
 }

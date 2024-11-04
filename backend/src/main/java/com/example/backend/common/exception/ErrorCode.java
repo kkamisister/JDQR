@@ -17,6 +17,12 @@ public enum ErrorCode {
 	// 테이블관련 에러
 	TABLE_NOT_FOUND(HttpStatus.BAD_REQUEST,"테이블이 존재하지 않습니다"),
 
+	// 결제관련 에러
+	ORDER_ALREADY_PAID(HttpStatus.BAD_REQUEST, "이미 결제된 주문입니다"),
+	PAYMENT_METHOD_NOT_VALID(HttpStatus.BAD_REQUEST, "잘못된 결제 방식으로 결제를 시도하였습니다"),
+	EXCEED_TOTAL_PURCHASE_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액이 총 주문 금액을 초과하였습니다"),
+	EXCEED_MENU_PURCHASE_AMOUNT(HttpStatus.BAD_REQUEST, "이미 결제된 메뉴에 대해 결제를 시도하였습니다"),
+
 	// 옵션관련 에러
 	OPTIONGROUP_NOT_FOUND(HttpStatus.BAD_REQUEST,"옵션그룹이 존재하지 않습니다"),
 

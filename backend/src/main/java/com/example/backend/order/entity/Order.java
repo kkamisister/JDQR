@@ -8,6 +8,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,6 +17,9 @@ public class Order extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(name = "table_id")
+    private String tableId;
 
     @Column(name = "menu_cnt")
     private Integer menuCnt;

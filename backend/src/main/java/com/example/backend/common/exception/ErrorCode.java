@@ -14,6 +14,9 @@ public enum ErrorCode {
 	// 메뉴 관련 에러
 	DISH_NOT_FOUND(HttpStatus.BAD_REQUEST, "메뉴가 존재하지 않습니다"),
 
+	// 식당 관련 에러
+	RESTAURANT_NOT_FOUND(HttpStatus.BAD_REQUEST,"사업장이 존재하지 않습니다"),
+
 	// 테이블관련 에러
 	TABLE_NOT_FOUND(HttpStatus.BAD_REQUEST,"테이블이 존재하지 않습니다"),
 
@@ -42,5 +45,4 @@ public enum ErrorCode {
 
 	private final HttpStatus httpStatus;
 	private final String message;
-
 }

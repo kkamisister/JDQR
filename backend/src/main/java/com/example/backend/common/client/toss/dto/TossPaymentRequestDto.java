@@ -1,6 +1,6 @@
 package com.example.backend.common.client.toss.dto;
 
-import com.example.backend.order.dto.OrderRequest;
+import com.example.backend.order.dto.CartRequest;
 import lombok.*;
 
 @Getter
@@ -13,7 +13,7 @@ public class TossPaymentRequestDto {
   private Integer amount;
   private String orderId;
 
-  public static TossPaymentRequestDto from(OrderRequest.TossPaymentRequestDto tossPaymentRequestDto, String orderId) {
+  public static TossPaymentRequestDto from(CartRequest.TossPaymentRequestDto tossPaymentRequestDto, String orderId) {
     return com.example.backend.common.client.toss.dto.TossPaymentRequestDto.builder()
       .paymentKey(tossPaymentRequestDto.paymentKey())
       .amount(tossPaymentRequestDto.amount())

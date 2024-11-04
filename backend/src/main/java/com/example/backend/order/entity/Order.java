@@ -17,6 +17,9 @@ public class Order extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "table_id")
+    private String tableId;
+
     @Column(name = "menu_cnt")
     private Integer menuCnt;
 

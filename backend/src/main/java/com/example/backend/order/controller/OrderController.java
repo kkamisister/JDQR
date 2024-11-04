@@ -3,6 +3,7 @@ package com.example.backend.order.controller;
 import java.io.IOException;
 import java.util.UUID;
 
+import com.example.backend.order.dto.CartRequest.*;
 import org.springframework.http.ResponseEntity;
 import com.example.backend.common.dto.CommonResponse.*;
 import com.example.backend.common.enums.SimpleResponseMessage;
@@ -68,6 +69,19 @@ public class OrderController {
 		response.addCookie(cookie); // 응답에 쿠키 추가
 
 		return ResponseEntity.ok().build();
+	}
+
+	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")
+	@PostMapping("/payment")
+	public ResponseWithMessage payForOrder(HttpServletRequest request, PaymentRequestDto paymentRequestDto) {
+
+		//
+		String tableId = (String)request.getAttribute("tableId");
+//		String userId = (String)request.getAttribute("userId");
+
+		SimpleResponseMessage message = orderService.payForOrder(tableId, paymentRequestDto);
+
+		return new ResponseWithMessage(HttpStatus.OK.value(), message.getMessage());
 	}
 
 	@Operation(summary = "SSE 구독 요청", description = "SSE연결을 요청하는 api")

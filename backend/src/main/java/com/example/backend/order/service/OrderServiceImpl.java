@@ -2,13 +2,9 @@ package com.example.backend.order.service;
 
 import static com.example.backend.order.dto.CartResponse.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.IntStream;
 import java.util.Map;
 
 import com.example.backend.common.enums.SimpleResponseMessage;
@@ -16,10 +12,12 @@ import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.Option;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.OptionRepository;
+import com.example.backend.order.dto.CartRequest;
 import com.example.backend.order.entity.Order;
 import com.example.backend.order.entity.OrderItem;
 import com.example.backend.order.entity.OrderItemOption;
 import com.example.backend.order.enums.OrderStatus;
+import com.example.backend.order.enums.PaymentMethod;
 import com.example.backend.order.repository.OrderItemOptionRepository;
 import com.example.backend.order.repository.OrderItemRepository;
 import com.example.backend.order.repository.OrderRepository;
@@ -214,7 +212,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		// 1. orders table에 데이터를 추가한다
-		Order order = saveOrder(cartDatas);
+		Order order = saveOrder(cartDatas, tableId);
 
 		// 2. order_items에 데이터를 추가한다
 		List<OrderItem> orderItems = saveOrderItems(order, cartDatas);
@@ -226,6 +224,27 @@ public class OrderServiceImpl implements OrderService {
 		redisHashRepository.removeKey(tableId);
 
 		return SimpleResponseMessage.ORDER_SUCCESS;
+	}
+
+	/**
+	 * 결제 방식에 따라 결제를 수행한 후, 성공 여부를 반환하는 api
+	 * @param tableId : 결제를 시도하는 고객의 tableId
+	 * @param paymentRequestDto : 결제에 필요한 정보를 담고 있는 request dto
+	 * @return : 결제 성공 여부를 담은 메시지
+	 */
+	@Override
+	public SimpleResponseMessage payForOrder(String tableId, CartRequest.PaymentRequestDto paymentRequestDto) {
+		// 1. 결제 방식을 확인한다
+		PaymentMethod paymentMethod = paymentRequestDto.type();
+
+		// 2. 해당 테이블의 가장 최근 order를 확인하고, 결제 방식을 업데이트시킨다
+		// 2-1. 테이블의 가장 최근 order 가져오기
+		orderRepository.find
+
+
+
+
+		return null;
 	}
 
 	/**
@@ -306,10 +325,12 @@ public class OrderServiceImpl implements OrderService {
 	 * 유저들이 담은 메뉴들의 정보를 바탕으로, orders table에 데이터를 저장한다
 	 *
 	 * @param cartDatas : 유저들이 담은 메뉴들의 정보
+	 * @param tableId
 	 * @return : 저장된 entity
 	 */
-	private Order saveOrder(List<CartDto> cartDatas) {
+	private Order saveOrder(List<CartDto> cartDatas, String tableId) {
 		Order order = Order.builder()
+			.tableId(tableId)
 			.orderStatus(OrderStatus.PENDING)
 			.menuCnt(cartDatas.size())
 			.build();

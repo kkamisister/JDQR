@@ -2,7 +2,7 @@ package com.example.backend.order.service;
 
 import com.example.backend.order.dto.CartDto;
 import com.example.backend.common.enums.SimpleResponseMessage;
-import com.example.backend.order.dto.CartRequest;
+import com.example.backend.order.dto.CartRequest.*;
 
 public interface OrderService {
 
@@ -12,4 +12,6 @@ public interface OrderService {
 	void deleteItem(String tableId,CartDto productInfo);
 
 	SimpleResponseMessage saveWholeOrder(String tableId);
+
+	SimpleResponseMessage payForOrder(String tableId, PaymentRequestDto paymentRequestDto);
 }

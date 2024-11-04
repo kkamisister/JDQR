@@ -13,5 +13,5 @@
     - portainer/portainer-ce ⇒ Portainer의 커뮤니티 에디션 이미지를 사용해 컨테이너를 생성
 1. 외부에서 Potainer에 접속할 수 있도록 방화벽 허용
     - sudo ufw allow 55555
-2. portainer 컨테이너의 재시작이 필요하면,
+2. portainer 컨테이너의 재시작이 필요하면, 
     - sudo docker restart portainer

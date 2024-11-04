@@ -92,7 +92,6 @@ public class DishServiceImpl implements DishService {
 		Dish dish = dishRepository.findById(dishId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
 
-
 		//매뉴옵션그룹(dish_options) 테이블에서 dish_id컬럼이 dishId인 행들을 삭제
 		List<DishOptionGroup> dishOptionGroups = dishOptionGroupRepository.findByDishId(dishId);
 		for(DishOptionGroup dishOptionGroup : dishOptionGroups){
@@ -109,6 +108,22 @@ public class DishServiceImpl implements DishService {
 		return new ResponseWithMessage(HttpStatus.OK.value(), "메뉴에서 삭제되었습니다.");
 	}
 
+	@Override
+	public ResponseWithMessage updateDish(Integer userId, Integer dishId, DishInfo dishInfo) {
+		//해당하는 가게 주인이 존재하는지 찾는다.
+		Owner owner = ownerRepository.findById(userId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
 
+		//가게 주인이 수정하려는 메뉴가 db에 존재하는지 찾는다
+		Dish dish = dishRepository.findById(dishId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+
+		//기존 메뉴 삭제
+		removeDish(userId,dishId);
+		//새로운 메뉴 추가
+		addDish(userId,dishInfo);
+
+		return new ResponseWithMessage(HttpStatus.OK.value(), "메뉴가 수정되었습니다.");
+	}
 
 }

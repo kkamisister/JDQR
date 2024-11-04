@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,7 +66,7 @@ public class DishController {
 	//3. 메뉴 삭제
 	@Operation(summary = "메뉴 삭제", description = "기존 메뉴를 삭제하는 api")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "메뉴 추가 성공"),
+		@ApiResponse(responseCode = "200", description = "메뉴 삭제 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@DeleteMapping("")
@@ -81,12 +82,34 @@ public class DishController {
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);
 	}
-	//4. 메뉴 수정
 
-	//5. 카테고리 추가
+	//4. 메뉴 수정
+	@Operation(summary = "메뉴 수정", description = "기존 메뉴를 수정하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "메뉴 수정 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@PutMapping("")
+	public ResponseEntity<ResponseWithMessage> updateDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId, @RequestBody DishInfo dishInfo,
+		HttpServletRequest request){
+		//4-1. 유저 확인
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		//4-2. db에 변경사항 저장
+		ResponseWithMessage responseWithMessage = dishService.updateDish(userId, dishId, dishInfo);
+
+		return ResponseEntity.status(responseWithMessage.status())
+			.body(responseWithMessage);
+	}
+
+	//5. 메뉴 검색
+
+
 
 	//6. 옵션 추가
 
 
+	//7.
 
 }

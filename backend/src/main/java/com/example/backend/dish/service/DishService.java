@@ -10,5 +10,6 @@ public interface DishService {
 
 	ResponseWithMessage addDish(Integer userId, DishInfo dishInfo);
 	ResponseWithMessage removeDish(Integer userId, Integer dishId);
+	ResponseWithMessage updateDish(Integer userId, Integer dishId, DishInfo dishInfo);
 
 }

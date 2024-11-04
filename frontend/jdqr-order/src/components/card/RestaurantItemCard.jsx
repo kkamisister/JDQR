@@ -37,8 +37,8 @@ const RestaurantItemCard = ({
       <Avatar // 1. 식당 이미지
         sx={{
           borderRadius: "10px",
-          width: 60,
-          height: 60,
+          width: 55,
+          height: 55,
         }}
       />
       <Stack // 2. 텍스트영역
@@ -82,14 +82,17 @@ const RestaurantItemCard = ({
           <Chip
             label={open ? "영업중" : "영업종료"}
             sx={{
-              padding: "0px",
-              fontSize: "12px",
-              fontWeight: "bold",
+              width: "45px",
+              fontSize: "9px",
               height: "22px",
               backgroundColor: colors.background.box,
               color: open ? colors.point.red : colors.text.sub1,
+              ".MuiChip-label": {
+                padding: 0, // 내부 레이블의 패딩 제거
+              },
             }}
-          ></Chip>
+          />
+
           <Typography
             fontSize={12}
             fontWeight={600}
@@ -104,7 +107,7 @@ const RestaurantItemCard = ({
       </Stack>
       <Stack // 3. 좌석, 테이블 현황
         direction="row"
-        spacing={1.5}
+        spacing={1}
         sx={{
           justifyContent: "space-evenly",
           flex: 1,
@@ -120,19 +123,19 @@ const RestaurantItemCard = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: "65px",
-            height: "65px",
-            border: `1px solid ${colors.main.primary300}`,
+            width: "55px",
+            height: "55px",
+            border: `1px solid ${colors.text.sub3}`,
           }}
         >
           <Typography
-            fontSize={17}
+            fontSize={15}
             fontWeight={600}
             color={!open ? colors.main.primary300 : colors.text.main}
           >
             {open ? { leftSeats } : "16석"}
           </Typography>
-          <Typography fontSize={11} color={colors.text.sub1}>
+          <Typography fontSize={9} color={colors.text.sub1}>
             잔여좌석
           </Typography>
         </Stack>
@@ -146,19 +149,19 @@ const RestaurantItemCard = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: "65px",
-            height: "65px",
-            border: `1px solid ${colors.main.primary300}`,
+            width: "55px",
+            height: "55px",
+            border: `1px solid ${colors.text.sub3}`,
           }}
         >
           <Typography
-            fontSize={17}
+            fontSize={15}
             fontWeight={600}
             color={!open ? colors.main.primary300 : colors.text.main}
           >
             {open ? { leftTables } : "5T"}
           </Typography>
-          <Typography fontSize={11} color={colors.text.sub1}>
+          <Typography fontSize={9} color={colors.text.sub1}>
             잔여테이블
           </Typography>
         </Stack>

@@ -16,6 +16,7 @@ const RestaurantList = () => {
         backgroundColor: "white",
         borderTopLeftRadius: "35px",
         borderTopRightRadius: "35px",
+        padding: "10px",
       }}
     >
       <PeopleFilter />

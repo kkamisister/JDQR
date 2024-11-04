@@ -12,7 +12,7 @@ public record CartRequest() {
 
     @Schema(name = "토스페이먼츠 결제 요청 dto", description = "토스페이먼츠 결제 시도 시 필요한 정보를 담고 있는 request dto")
     @Builder
-    public record TossPaymentRequestDto(
+    public record SimpleTossPaymentRequestDto(
         String paymentKey,
         Integer amount
     ) {
@@ -29,7 +29,4 @@ public record CartRequest() {
     ) {
 
     }
-
-
-
 }

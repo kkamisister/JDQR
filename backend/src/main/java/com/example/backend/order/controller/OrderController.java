@@ -88,16 +88,6 @@ public class OrderController {
 			.body(responseWithData);
 	}
 
-	@Operation(summary = "SSE 구독 요청", description = "SSE연결을 요청하는 api")
-	@GetMapping("/cart/subscribe")
-	public SseEmitter subscribe(HttpServletRequest request){
-
-		String tableId = (String)request.getAttribute("tableId");
-		log.warn("tableId : {}",tableId);
-
-		return notificationService.subscribe(tableId);
-	}
-
 	@Operation(summary = "장바구니 항목 담기", description = "장바구니에 항목을 담는 api")
 	@MessageMapping("/cart/add")
 	public void addItemToCart(@Payload CartDto productInfo, @Header("simpSessionAttributes") Map<String,Object> attributes){

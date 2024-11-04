@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.backend.common.dto.CommonResponse.ResponseWithMessage;
 import com.example.backend.common.dto.CommonResponse.ResponseWithData;
@@ -34,7 +35,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class DishServiceImpl implements DishService {
-
 	private final DishRepository dishRepository;
 	private final DishCategoryRepository dishCategoryRepository;
 	private final OwnerRepository ownerRepository;
@@ -44,6 +44,7 @@ public class DishServiceImpl implements DishService {
 	private final DishOptionGroupRepository dishOptionGroupRepository;
 
 	@Override
+	@Transactional
 	public ResponseWithMessage addDish(Integer userId, DishInfo dishInfo) {
 
 		//해당하는 가게 주인이 존재하는지 찾는다.
@@ -64,25 +65,28 @@ public class DishServiceImpl implements DishService {
 
 		// dishTag 엔티티 생성
 		for(int tagId : dishInfo.tagIds()){
-
-			Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new JDQRException(ErrorCode.TAG_NOT_FOUND));
+			Tag tag = tagRepository.findById(tagId)
+				.orElseThrow(() -> new JDQRException(ErrorCode.TAG_NOT_FOUND));
 			DishTag dishTag = DishTag.of(tag, savedDish);
 			dishTagRepository.save(dishTag);
 
 		}
 
 		// 메뉴에 대한 옵션그룹 엔티티를 생성
-		OptionGroup optionGroup = optionGroupRepository.findById(dishInfo.optionGroupId())
-			.orElseThrow(() -> new JDQRException(ErrorCode.OPTIONGROUP_NOT_FOUND));
+		for(int optionGroupId : dishInfo.optionIds()){
+			OptionGroup optionGroup = optionGroupRepository.findById(optionGroupId)
+				.orElseThrow(() -> new JDQRException(ErrorCode.OPTIONGROUP_NOT_FOUND));
+			DishOptionGroup dishOptionGroup = DishOptionGroup.of(savedDish,optionGroup);
+			dishOptionGroupRepository.save(dishOptionGroup);
+		}
 
-		DishOptionGroup dishOptionGroup = DishOptionGroup.of(savedDish,optionGroup);
-
-		dishOptionGroupRepository.save(dishOptionGroup);
 
 		return new ResponseWithMessage(HttpStatus.OK.value(), "메뉴목록에 추가했습니다");
 	}
 
+
 	@Override
+	@Transactional
 	public ResponseWithMessage removeDish(Integer userId, Integer dishId) {
 		//해당하는 가게 주인이 존재하는지 찾는다.
 		Owner owner = ownerRepository.findById(userId)
@@ -109,7 +113,9 @@ public class DishServiceImpl implements DishService {
 	}
 
 	@Override
+	@Transactional
 	public ResponseWithMessage updateDish(Integer userId, Integer dishId, DishInfo dishInfo) {
+
 		//해당하는 가게 주인이 존재하는지 찾는다.
 		Owner owner = ownerRepository.findById(userId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
@@ -118,10 +124,52 @@ public class DishServiceImpl implements DishService {
 		Dish dish = dishRepository.findById(dishId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
 
-		//기존 메뉴 삭제
-		removeDish(userId,dishId);
-		//새로운 메뉴 추가
-		addDish(userId,dishInfo);
+		//메뉴의 정보(이름, 가격, 설명)를 수정한다.
+		dish.setName(dishInfo.dishName());
+		dish.setPrice(dishInfo.price());
+		dish.setDescription(dishInfo.description());
+
+		//메뉴의 정보(이미지)를 수정한다.
+		String imageUrl = "";
+		dish.setImage(imageUrl);
+
+		//메뉴의 정보(카테고리)를 수정한다.
+		Integer dishCategoryId = dishInfo.dishCategoryId();
+		if(dishCategoryId != null && dishCategoryId > 0){
+			DishCategory dishCategory = dishCategoryRepository.findById(dishInfo.dishCategoryId())
+				.orElseThrow(() -> new JDQRException(ErrorCode.FUCKED_UP_QR));
+			dish.setDishCategory(dishCategory);
+		}
+
+		//메뉴의 정보(태그)를 수정한다.
+		//메뉴id가 dishId인 기존의 dishTag 삭제
+		List<DishTag> existingTags = dishTagRepository.findByDishId(dishId);
+		for(DishTag dishTag : existingTags){
+			dishTagRepository.delete(dishTag);
+		}
+		//새로운 dishTag 추가
+		for(int tagId : dishInfo.tagIds()){
+			Tag tag = tagRepository.findById(tagId)
+				.orElseThrow(() -> new JDQRException(ErrorCode.TAG_NOT_FOUND));
+			DishTag newDishTag = DishTag.of(tag, dish);
+			dishTagRepository.save(newDishTag);
+		}
+
+		//메뉴의 정보(옵션그룹)를 수정한다.
+		//메뉴id가 dishId인 기존의 optionGroup 삭제
+		List<DishOptionGroup> existingOptionGroups = dishOptionGroupRepository.findByDishId(dishId);
+		for(DishOptionGroup dishOptionGroup : existingOptionGroups){
+			dishOptionGroupRepository.delete(dishOptionGroup);
+		}
+		//새로운 optionGroup 추가
+		for(int optionGroupId : dishInfo.optionIds()){
+			OptionGroup optionGroup = optionGroupRepository.findById(optionGroupId)
+				.orElseThrow(() -> new JDQRException(ErrorCode.OPTIONGROUP_NOT_FOUND));
+			DishOptionGroup newDishOptionGroup = DishOptionGroup.of(dish, optionGroup);
+			dishOptionGroupRepository.save(newDishOptionGroup);
+		}
+
+		dishRepository.save(dish);
 
 		return new ResponseWithMessage(HttpStatus.OK.value(), "메뉴가 수정되었습니다.");
 	}

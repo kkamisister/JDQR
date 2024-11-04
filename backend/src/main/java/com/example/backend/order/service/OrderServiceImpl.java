@@ -5,6 +5,9 @@ import static com.example.backend.order.dto.CartResponse.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -29,6 +32,8 @@ import com.example.backend.order.repository.OrderItemOptionRepository;
 import com.example.backend.order.repository.OrderItemRepository;
 import com.example.backend.order.repository.OrderRepository;
 import com.example.backend.order.repository.PaymentRepository;
+
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.backend.common.exception.ErrorCode;
@@ -95,6 +100,8 @@ public class OrderServiceImpl implements OrderService {
 	 * @param productInfo
 	 */
 	@Override
+	@Transactional
+	@RedLock(key = "'table:' + #tableId", waitTime = 5000L,leaseTime = 1000L)
 	public void addItem(String tableId,CartDto productInfo) {
 
 		// 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
@@ -104,19 +111,20 @@ public class OrderServiceImpl implements OrderService {
 		// 2. 테이블 장바구니에 물품을 담는다
 		//<tableId,<userId,<hashCode,항목>>>
 		String key = "table::"+tableId;
-		log.warn("userID : {}",productInfo.getUserId());
+		// log.warn("userID : {}",productInfo.getUserId());
 		Map<Integer,CartDto> cachedCartData = redisHashRepository.getCartDatas(key,productInfo.getUserId());
-		log.warn("cachedCartData : {}",cachedCartData);
+		// log.warn("cachedCartData : {}",cachedCartData);
 		if(!ObjectUtils.isEmpty(cachedCartData)){ // 1. 기존에 동일한 물품이 있어서 거기에 더해지는 경우 -> 지금 담는 hashCode와 비교하여 동일한 것을 찾아서 추가
 
 			CartDto cartData = cachedCartData.get(productInfo.hashCode());
 			int currentQuantity = cartData.getQuantity();
 			int newQuantity = currentQuantity + productInfo.getQuantity();
-			log.warn("newQuantity : {}",newQuantity);
+			if(newQuantity < 0)newQuantity = 0;
+			// log.warn("newQuantity : {}",newQuantity);
 
 			cartData.setQuantity(newQuantity);
-			log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
-			log.warn("cartData : {}",cartData);
+			// log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
+			// log.warn("cartData : {}",cartData);
 			cachedCartData.put(productInfo.hashCode(), cartData);
 
 			redisHashRepository.saveHashData(key, cartData.getUserId(), cachedCartData,20L);
@@ -138,10 +146,42 @@ public class OrderServiceImpl implements OrderService {
 		// 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
 		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
-		// 3-4. 최종적으로 전송할 데이터
-		CartInfo sendData = CartInfo.of(allCartDatas,table.getName(),subscriberSize);
 
-		notificationService.sentToClient(tableId,sendData);
+		// 3-4. 최종적으로 전송할 데이터
+		List<CartDto> cartList = allCartDatas.values().stream()
+			.flatMap(map -> map.values().stream())
+			.collect(Collectors.toList());
+
+		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize);
+
+		// notificationService.sentToClient(tableId,sendData);
+		messagingTemplate.convertAndSend("/sub/cart/"+tableId,sendData);
+	}
+	private final SimpMessagingTemplate messagingTemplate;
+
+	/**
+	 * tableName으로 qrCode를 찾아서, 해당 코드에 token을 더한 주소를 반환
+	 * @param tableId
+	 * @return
+	 */
+	@Override
+	public String redirectUrl(String tableId,String uuid) {
+		//1. table을 찾는다
+		Table table = tableRepository.findById(tableId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.FUCKED_UP_QR));
+
+		log.warn("table : {}",table);
+
+		// 현재 url이 유효하지 않다면 예외를 반환한다
+		String targetUrl = GenerateLink.AUTH_PREFIX + "/"+tableId+"/"+uuid;
+		if(!targetUrl.equals(table.getQrCode())){
+			throw new JDQRException(ErrorCode.FUCKED_UP_QR);
+		}
+
+		//2. table의 링크에 token을 생성한다
+		String authLink = generateLink.createAuthLink(table.getId());
+
+		return authLink;
 	}
 
 	/**
@@ -150,6 +190,7 @@ public class OrderServiceImpl implements OrderService {
 	 * @param productInfo
 	 */
 	@Override
+	// @RedLock(key = "'table:' + #tableId",waitTime = 5000L, leaseTime = 1000L)
 	public void deleteItem(String tableId, CartDto productInfo) {
 
 		// 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
@@ -159,20 +200,20 @@ public class OrderServiceImpl implements OrderService {
 		// 2. 해당 유저의 장바구니에서 제거한다
 		//<tableId,<userId,<hashCode,항목>>>
 		String key = "table::"+tableId;
-		log.warn("userID : {}",productInfo.getUserId());
+		// log.warn("userID : {}",productInfo.getUserId());
 
 		// 유저가 담은 <hashCode,품목> 의 맵을 가지고온다
 		Map<Integer,CartDto> cachedCartData = redisHashRepository.getCartDatas(key,productInfo.getUserId());
-		log.warn("cachedCartData : {}",cachedCartData);
+		// log.warn("cachedCartData : {}",cachedCartData);
 
-		log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
+		// log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
 		CartDto findData = cachedCartData.getOrDefault(productInfo.hashCode(), null);
-		log.warn("findData : {}",findData);
+		// log.warn("findData : {}",findData);
 
 		if(!ObjectUtils.isEmpty(findData)){
 			// 해당 유저의 장바구니에 품목이 있다면 삭제한다
 			cachedCartData.remove(productInfo.hashCode());
-			log.warn("cachedCardData After : {}",cachedCartData);
+			// log.warn("cachedCardData After : {}",cachedCartData);
 			redisHashRepository.saveHashData(key,productInfo.getUserId(),cachedCartData,20L);
 		}
 		else{
@@ -183,7 +224,7 @@ public class OrderServiceImpl implements OrderService {
 		// 3-1. 현재 테이블의 장바구니를 가지고온다.
 		// 맵은 (userId,해당 유저가 담은 항목들) 의 형식
 		Map<String, Map<Integer,CartDto>> allCartDatas = redisHashRepository.getAllCartDatas(tableId);
-		log.warn("allCartDatas : {}",allCartDatas);
+		// log.warn("allCartDatas : {}",allCartDatas);
 
 		// 3-2. 현재 테이블과 연결된 사람수를 받아온다
 		int subscriberSize = notificationService.getSubscriberSize(tableId);
@@ -192,9 +233,14 @@ public class OrderServiceImpl implements OrderService {
 		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
 		// 3-4. 최종적으로 전송할 데이터
-		CartInfo sendData = CartInfo.of(allCartDatas,table.getName(),subscriberSize);
+		List<CartDto> cartList = allCartDatas.values().stream()
+			.flatMap(map -> map.values().stream())
+			.collect(Collectors.toList());
 
-		notificationService.sentToClient(tableId,sendData);
+		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize);
+
+		// notificationService.sentToClient(tableId,sendData);
+		messagingTemplate.convertAndSend("/sub/cart/"+tableId,sendData);
 	}
 
 	/**

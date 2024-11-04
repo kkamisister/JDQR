@@ -1,6 +1,7 @@
 package com.example.backend.order.controller;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 import com.example.backend.order.dto.CartRequest.*;
@@ -9,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import com.example.backend.common.dto.CommonResponse.*;
 import com.example.backend.common.enums.SimpleResponseMessage;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +43,6 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderController {
 
 	private final OrderService orderService;
-	private final NotificationService notificationService;
 
 	@Operation(summary = "인증 토큰 발급", description = "토큰을 발급한 url을 반환하는 api")
 	@ApiResponses(value = {
@@ -96,20 +99,20 @@ public class OrderController {
 	}
 
 	@Operation(summary = "장바구니 항목 담기", description = "장바구니에 항목을 담는 api")
-	@PostMapping("/cart/item")
-	public void addItemToCart(@RequestBody CartDto productInfo,HttpServletRequest request){
+	@MessageMapping("/cart/add")
+	public void addItemToCart(@Payload CartDto productInfo, @Header("simpSessionAttributes") Map<String,Object> attributes){
 
-		String tableId = (String)request.getAttribute("tableId");
+		String tableId = (String)attributes.get("tableId");
 		log.warn("테이블 id : {}",tableId);
 		orderService.addItem(tableId,productInfo);
 	}
 
 
 	@Operation(summary = "장바구니 항목 제거", description = "장바구니 항목을 제거하는 api")
-	@PutMapping("/cart/item")
-	public void deleteItem(@RequestBody CartDto productInfo,HttpServletRequest request){
+	@MessageMapping("/cart/delete")
+	public void deleteItem(@Payload CartDto productInfo,@Header("simpSessionAttributes") Map<String,Object> attributes){
 
-		String tableId = (String)request.getAttribute("tableId");
+		String tableId = (String)attributes.get("tableId");
 		log.warn("테이블 id : {}",tableId);
 		orderService.deleteItem(tableId,productInfo);
 

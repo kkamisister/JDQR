@@ -63,6 +63,8 @@ public class NotificationService {
 		else emitters.put(topicId,sseEmitters);
 		});
 
+		// //dummy data 전송
+		// sentToClient(topicId,"connected");
 		return emitter;
 	}
 

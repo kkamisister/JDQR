@@ -34,12 +34,8 @@ export default function DishList({ dishes }) {
         height: "100%",
       }}
     >
-      <DishSearchBar id="dish-search-bar" />
-      <DishTab
-        id="dish-tab"
-        dishCategories={categories}
-        onTabClick={handleCategoryClick}
-      />
+      <DishSearchBar />
+      <DishTab dishCategories={categories} onTabClick={handleCategoryClick} />
       <Box
         id="scrollable-dish-list"
         sx={{

@@ -40,16 +40,21 @@ export default function DishHeader() {
         </Button>
       </Stack>
       <Button
+        disabled
         sx={{
           bgcolor: colors.background.white,
-          color: colors.text.sub1,
           border: "solid",
           borderColor: colors.background.box,
           p: 1,
         }}
       >
-        <Typography fontWeight="bold">{`${7}명`}</Typography>이 함께 주문하고
-        있어요!
+        <Typography
+          color={colors.text.sub1}
+          fontWeight="bold"
+        >{`${7}명`}</Typography>
+        <Typography color={colors.text.sub1}>
+          이 함께 주문하고 있어요!
+        </Typography>
       </Button>
     </Stack>
   );

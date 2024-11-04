@@ -1,5 +1,6 @@
 package com.example.backend.table.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -33,6 +34,17 @@ public class TableRepositoryImpl implements TableRepository {
 		query.addCriteria(Criteria.where("_id").is(id));
 
 		return Optional.ofNullable(mongoTemplate.findOne(query,Table.class));
+	}
+
+	@Override
+	public List<Table> findByRestaurantId(int restaurantId) {
+
+		Query query = new Query();
+
+		query.addCriteria(Criteria.where("restaurand_id").is(restaurantId));
+
+		return mongoTemplate.find(query,Table.class);
+
 	}
 
 	@Override

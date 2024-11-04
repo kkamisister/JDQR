@@ -1,6 +1,7 @@
 package com.example.backend.etc.entity;
 
 import com.example.backend.common.entity.BaseEntity;
+import com.example.backend.etc.dto.RestaurantProfileDto;
 import com.example.backend.owner.entity.Owner;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -38,7 +39,25 @@ public class Restaurant extends BaseEntity {
     private Double longitude;
     @Column(name = "industry")
     private String industry;
-
+    @Column(name = "image")
+    private String image;
     @Column(name = "registration_number")
     private String registrationNumber;
+    @Column(name = "open")
+    private Boolean open;
+
+    public static Restaurant of(RestaurantProfileDto profile,Owner owner){
+        return Restaurant.builder()
+            .owner(owner)
+            .name(profile.getRestaurantName())
+            .address(profile.getAddress())
+            .phoneNumber(profile.getPhoneNumber())
+            .latitude(profile.getLat())
+            .longitude(profile.getLng())
+            .industry(profile.getIndustry())
+            .image(profile.getImage())
+            .registrationNumber(profile.getRegistrationNumber())
+            .open(Boolean.FALSE)
+            .build();
+    }
 }

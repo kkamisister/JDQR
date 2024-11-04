@@ -25,6 +25,8 @@ public enum ErrorCode {
 
 	// 토큰 관련 에러
 	TOKEN_REISSUE_FAIL(HttpStatus.BAD_REQUEST,"토큰 재발급에 문제가 발생했습니다"),
+	TOKEN_IS_NOT_VALID(HttpStatus.UNAUTHORIZED, "인증에 실패했습니다"),
+	TOKEN_IS_EXPIRED(HttpStatus.BAD_REQUEST, "토큰이 만료되었습니다"),
 
 	// validation 관련 에러
 	// 내부 로직이 잘못된 경우

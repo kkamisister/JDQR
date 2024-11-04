@@ -1,0 +1,7 @@
+1. Docker 설치
+
+https://velog.io/@osk3856/Docker-Ubuntu-22.04-Docker-Installation
+
+2. Docker-compose 설치
+
+https://soyoung-new-challenge.tistory.com/73

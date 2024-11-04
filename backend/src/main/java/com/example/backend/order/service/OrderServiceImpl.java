@@ -6,21 +6,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.example.backend.common.annotation.RedLock;
 import com.example.backend.common.enums.SimpleResponseMessage;
+import com.example.backend.common.util.RandomUtil;
+import com.example.backend.common.util.TimeUtil;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.Option;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.OptionRepository;
-import com.example.backend.order.dto.CartRequest;
+import com.example.backend.order.dto.CartRequest.*;
+import com.example.backend.order.dto.OrderRequest.*;
 import com.example.backend.order.entity.Order;
 import com.example.backend.order.entity.OrderItem;
 import com.example.backend.order.entity.OrderItemOption;
+import com.example.backend.order.entity.Payment;
 import com.example.backend.order.enums.OrderStatus;
 import com.example.backend.order.enums.PaymentMethod;
+import com.example.backend.order.enums.PaymentStatus;
 import com.example.backend.order.repository.OrderItemOptionRepository;
 import com.example.backend.order.repository.OrderItemRepository;
 import com.example.backend.order.repository.OrderRepository;
+import com.example.backend.order.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
 
 import com.example.backend.common.exception.ErrorCode;
@@ -51,6 +59,7 @@ public class OrderServiceImpl implements OrderService {
 	private final OrderItemOptionRepository orderItemOptionRepository;
 	private final DishRepository dishRepository;
 	private final OptionRepository optionRepository;
+	private final PaymentRepository paymentRepository;
 	/**
 	 * tableName으로 qrCode를 찾아서, 해당 코드에 token을 더한 주소를 반환
 	 * @param tableId
@@ -228,23 +237,192 @@ public class OrderServiceImpl implements OrderService {
 
 	/**
 	 * 결제 방식에 따라 결제를 수행한 후, 성공 여부를 반환하는 api
-	 * @param tableId : 결제를 시도하는 고객의 tableId
+	 *
+	 * @param tableId           : 결제를 시도하는 고객의 tableId
 	 * @param paymentRequestDto : 결제에 필요한 정보를 담고 있는 request dto
 	 * @return : 결제 성공 여부를 담은 메시지
 	 */
 	@Override
-	public SimpleResponseMessage payForOrder(String tableId, CartRequest.PaymentRequestDto paymentRequestDto) {
+	@Transactional
+	public InitialPaymentResponseDto payForOrder(String tableId, PaymentRequestDto paymentRequestDto) {
 		// 1. 결제 방식을 확인한다
 		PaymentMethod paymentMethod = paymentRequestDto.type();
 
 		// 2. 해당 테이블의 가장 최근 order를 확인하고, 결제 방식을 업데이트시킨다
-		// 2-1. 테이블의 가장 최근 order 가져오기
-		orderRepository.find
+		updatePaymentMethodOfOrder(tableId, paymentMethod);
+
+		// 3. paymentMethod 에 따라 다르게 재고 관리를 시행
+		Payment payment;
+		Order order = orderRepository.findMostRecentOrder(tableId);
+		// 3-1. paymentMethod 가 MONEY_DIVIDE 일 경우
+		if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
+			Integer totalPurchaseAmount = getTotalPurchaseAmount(order);
+			payment = createBasePaymentForMoneyDivide(order, totalPurchaseAmount, paymentRequestDto);
+		}
+		// 3-2. paymentMethod 가 MENU_DIVIDE 일 경우
+		else {
+			payment = createBasePaymentForMenuDivide(order, paymentRequestDto);
+		}
 
 
+		return InitialPaymentResponseDto.builder()
+			.tossOrderId(payment.getTossOrderId())
+			.amount(payment.getAmount())
+			.build();
+	}
+
+	/**
+	 * 메뉴별 결제를 할 경우에 해당 결제 정보가 담긴 payment entity를 추가한다.
+	 * 동시성 처리를 위해 Lock 적용
+	 *
+	 * @param order               : 결제를 하기를 원하는 order entity
+	 * @param paymentRequestDto : 결제 정보가 담긴 record
+	 */
+	@Transactional
+	protected Payment createBasePaymentForMenuDivide(Order order, PaymentRequestDto paymentRequestDto) {
+		List<OrderItemRequestDto> orderItemRequestDtos = paymentRequestDto.orderItemInfos();
+		List<Integer> orderItemIds = orderItemRequestDtos.stream()
+			.map(OrderItemRequestDto::orderItemId)
+			.toList();
+
+		List<OrderItem> orderItems = orderItemRepository.findAllById(orderItemIds);
+
+		Map<Integer, OrderItem> orderItemMap = orderItems.stream()
+			.collect(Collectors.toMap(OrderItem::getId, orderItem -> orderItem));
+
+		// orderItemRequestDto에 적혀 있는 숫자만큼 orderItem의 정보를 업데이트
+		// 중간에 orderItem의 남아 있는 수량보다, 현재 결제하려고 시도하는 수량이 많을 경우 error throw
+		Integer purchasePrice = orderItemRequestDtos.stream()
+			.map(orderItemRequestDto -> {
+				OrderItem orderItem = orderItemMap.get(orderItemRequestDto.orderItemId());
+				int remainQuantity = orderItem.getQuantity() - orderItem.getPaidQuantity();
+
+				if (remainQuantity < orderItemRequestDto.quantity()) {
+					throw new JDQRException(ErrorCode.EXCEED_MENU_PURCHASE_AMOUNT);
+				}
+
+				return orderItem.getOrderPrice() * orderItemRequestDto.quantity();
+			})
+			.reduce(0, Integer::sum);
+
+		String tossOrderId = generateOrderId();
+
+		Payment payment = Payment.builder()
+			.tossOrderId(tossOrderId)
+			.amount(purchasePrice)
+			.order(order)
+			.paymentStatus(PaymentStatus.PENDING)
+			.build();
+
+		// payment entity 저장 후 반환
+		return paymentRepository.save(payment);
+	}
+
+	/**
+	 * N빵 결제를 할 경우에 해당 결제 정보가 담긴 payment Entity를 추가한다.
+	 * 동시성 처리를 위해 Lock 적용
+	 *
+	 * @param order               : 결제를 하기를 원하는 order entity
+	 * @param totalPurchaseAmount : 총 주문 금액
+	 * @param paymentRequestDto : 결제 정보가 담긴 record
+	 */
+	@Transactional
+	@RedLock(key = "'payment'")
+    protected Payment createBasePaymentForMoneyDivide(Order order, Integer totalPurchaseAmount, PaymentRequestDto paymentRequestDto) {
+		// 1. 현재 결제가 된 총 금액을 구한다.
+		Integer curPaidAmount = getCurPaidAmount(order);
+
+		// 결제할 금액 구하기
+		int paymentAmount = totalPurchaseAmount * paymentRequestDto.serveNum() / paymentRequestDto.peopleNum();
+
+		if (curPaidAmount + paymentAmount > totalPurchaseAmount) {
+			throw new JDQRException(ErrorCode.EXCEED_TOTAL_PURCHASE_AMOUNT);
+		}
+
+		// 2. 금액을 바탕으로, payment entity를 추가한다.
+		// 2-1. orderId 생성
+		String tossOrderId = generateOrderId();
+
+		// 2-2. payment entity 생성
+		Payment payment = Payment.builder()
+			.amount(paymentAmount)
+			.tossOrderId(tossOrderId)
+			.paymentStatus(PaymentStatus.PENDING)
+			.order(order)
+			.build();
+
+		// 3. entity 저장
+		return paymentRepository.save(payment);
+	}
+
+	/**
+	 * @return : toss 결제 api에서 사용하는 주문번호를 반환하는 메서드
+	 */
+	private String generateOrderId() {
+		return String.format("%s%s",
+			TimeUtil.convertEpochToDateString(TimeUtil.getCurrentTimeMillisUtc(), "yyMMdd"),
+			RandomUtil.generateRandomString());
+	}
+
+	/**
+	 * 주문 기준으로, 현재 결제가 완료된 금액을 구해서 반환한다.
+	 * @param order : 조회하기를 원하는 order entity
+	 * @return : 총 결제 금액
+	 */
+	private Integer getCurPaidAmount(Order order) {
+		return  paymentRepository.findAllByOrder(order).stream()
+			.filter(payment -> payment.getPaymentStatus().equals(PaymentStatus.PENDING))
+			.map(Payment::getAmount)
+			.reduce(0, Integer::sum);
+	}
+
+	/**
+	 * @param order : 현재 집계하기를 원하는 order id
+	 * @return : 해당 테이블에서 구메한 메뉴들의 가격의 총합
+	 */
+	private Integer getTotalPurchaseAmount(Order order) {
+		if (!order.getOrderStatus().equals(OrderStatus.PENDING)) throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
 
 
-		return null;
+		List<OrderItem> orderItems = orderItemRepository.findAllByOrder(order).stream()
+			.filter(orderItem -> orderItem.getOrderStatus().equals(OrderStatus.PENDING))
+			.toList();
+
+		return orderItems.stream()
+			.map(orderItem -> orderItem.getOrderPrice() * orderItem.getQuantity())
+			.reduce(0, Integer::sum);
+	}
+
+	/**
+	 * 현재 테이블의 결제 방식을 주어진 결제 방식으로 변경한다.
+	 * 만일 이미 결제 방식이 저장되어 있고, 이것이 주어진 결제 방식과 다를 경우, 에러 발생
+	 *
+	 * @param tableId : 주문하는 테이블의 id
+	 * @param paymentMethod : 결제하기를 원하는 결제방식
+	 */
+	@Transactional
+	@RedLock(key = "'order_status'")
+    protected void updatePaymentMethodOfOrder(String tableId, PaymentMethod paymentMethod) {
+		// 1. 테이블의 가장 최근 order 가져오기
+		Order order = orderRepository.findMostRecentOrder(tableId);
+		if (!order.getOrderStatus().equals(OrderStatus.PENDING)) throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
+
+		// 2. 테이블을 확인 후 결제 방식(payment_method column)을 업데이트하기
+		PaymentMethod oldPaymentMethod = order.getPaymentMethod();
+
+		// 2-1. 결제 방식이 아직 정해지지 않았을 경우
+		if (oldPaymentMethod.equals(PaymentMethod.UNDEFINED)) {
+			order.setPaymentMethod(paymentMethod);
+			orderRepository.save(order);
+		}
+		// 2-2. 결제 방식이 정해진 경우
+		// oldPaymentMethod는 항상 paymentMethod와 동일해야 한다
+		// 다를 경우 에러를 반환
+		else {
+			if (!oldPaymentMethod.equals(paymentMethod)) {
+				throw new JDQRException(ErrorCode.PAYMENT_METHOD_NOT_VALID);
+			}
+		}
 	}
 
 	/**

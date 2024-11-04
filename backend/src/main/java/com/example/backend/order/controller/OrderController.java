@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import com.example.backend.order.dto.CartRequest.*;
+import com.example.backend.order.dto.CartResponse.*;
 import org.springframework.http.ResponseEntity;
 import com.example.backend.common.dto.CommonResponse.*;
 import com.example.backend.common.enums.SimpleResponseMessage;
@@ -73,15 +74,15 @@ public class OrderController {
 
 	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")
 	@PostMapping("/payment")
-	public ResponseWithMessage payForOrder(HttpServletRequest request, PaymentRequestDto paymentRequestDto) {
-
-		//
+	public ResponseEntity<ResponseWithData<InitialPaymentResponseDto>> payForOrder(HttpServletRequest request, PaymentRequestDto paymentRequestDto) {
 		String tableId = (String)request.getAttribute("tableId");
-//		String userId = (String)request.getAttribute("userId");
 
-		SimpleResponseMessage message = orderService.payForOrder(tableId, paymentRequestDto);
+		InitialPaymentResponseDto initialPaymentResponseDto = orderService.payForOrder(tableId, paymentRequestDto);
 
-		return new ResponseWithMessage(HttpStatus.OK.value(), message.getMessage());
+		ResponseWithData<InitialPaymentResponseDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(), "부분결제 요청에 성공하였습니다", initialPaymentResponseDto);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
 	}
 
 	@Operation(summary = "SSE 구독 요청", description = "SSE연결을 요청하는 api")
@@ -116,12 +117,15 @@ public class OrderController {
 
 
 	@PostMapping("/")
-	public ResponseWithMessage saveOrder(HttpServletRequest request){
+	public ResponseEntity<ResponseWithMessage> saveOrder(HttpServletRequest request){
 		String tableId = (String)request.getAttribute("tableId");
 
 		SimpleResponseMessage message = orderService.saveWholeOrder(tableId);
 
-		return new ResponseWithMessage(HttpStatus.OK.value(), message.getMessage());
+		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(), message.getMessage());
+
+		return ResponseEntity.status(responseWithMessage.status())
+			.body(responseWithMessage);
 	}
 
 }

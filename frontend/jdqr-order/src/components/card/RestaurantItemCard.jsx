@@ -53,11 +53,23 @@ const RestaurantItemCard = ({
           spacing={1}
           sx={{ flex: 1, alignItems: "center" }}
         >
-          <Typography fontSize={17} fontWeight={700}>
+          <Typography
+            fontSize={17}
+            fontWeight={700}
+            sx={{
+              whiteSpace: "nowrap",
+            }}
+          >
             츄라우미
             {/* {restaurantName} */}
           </Typography>
-          <Typography fontSize={14} color={colors.text.sub1}>
+          <Typography
+            fontSize={14}
+            color={colors.text.sub1}
+            sx={{
+              whiteSpace: "nowrap",
+            }}
+          >
             이자카야
             {/* {restaurantCategories} */}
           </Typography>
@@ -78,14 +90,25 @@ const RestaurantItemCard = ({
               color: open ? colors.point.red : colors.text.sub1,
             }}
           ></Chip>
-          <Typography fontSize={12} fontWeight={600} color={colors.text.sub1}>
+          <Typography
+            fontSize={12}
+            fontWeight={600}
+            color={colors.text.sub1}
+            sx={{
+              whiteSpace: "nowrap",
+            }}
+          >
             최대 6인 테이블
           </Typography>
         </Stack>
       </Stack>
       <Stack // 3. 좌석, 테이블 현황
         direction="row"
-        spacing={1}
+        spacing={1.5}
+        sx={{
+          justifyContent: "space-evenly",
+          flex: 1,
+        }}
       >
         <Stack
           direction="column"

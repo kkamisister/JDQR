@@ -1,0 +1,17 @@
+1. Potainer 데이터를 저장할 디렉토리 생성
+    - mkdir -p /data/portainer
+2. Potainer컨테이너의 데이터를 저장할 Docker 볼륨 생성
+    - docker volume create portainer_data
+3. Potainer 컨테이너 실행
+- docker run -d -p 55555:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
+    - -d ⇒ 컨테이너를 백그라운드에서 실행
+    - -p 55555:9000 ⇒ 호스트의 55555번 포트를 컨테이너의 9000번 포트에 매핑. 웹브라우저에서 http://호스트ip:55555 시, 포테이너 접근가능
+    - --name = portainer ⇒ 컨테이너 이름을 portainer로 지정
+    - --restart=always ⇒ Docker 데몬이 재시작되면 Portainer 컨테이너가 자동 재시작되도록 설정
+    - -v /var/run/docker.sock:/var/run/docker.sock ⇒ 호스트의 Docker 소켓파일을 portainer 컨테이너 내부의 동일경로로 마운트. 이를 통해 portainer가 호스트의 docker데몬에 직접 접근하고 제어가능.
+    - -v portainer_data:/data ⇒ portainer_data 볼륨을 컨테이너 안의  /data 디렉토리에 마운트. 컨테이너 안에서 /data 디렉토리에 저장되는 내용은 portainer_data볼륨에도 저장되어 컨테이너가 죽어도 소실x
+    - portainer/portainer-ce ⇒ Portainer의 커뮤니티 에디션 이미지를 사용해 컨테이너를 생성
+1. 외부에서 Potainer에 접속할 수 있도록 방화벽 허용
+    - sudo ufw allow 55555
+2. portainer 컨테이너의 재시작이 필요하면,
+    - sudo docker restart portainer

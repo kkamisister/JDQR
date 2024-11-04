@@ -18,10 +18,7 @@ public class RestaurantCategory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
-    private Restaurant restaurant;
-
+    @Column(name = "name")
     private String name;
 
     @Enumerated(EnumType.STRING)

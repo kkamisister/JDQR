@@ -2,8 +2,13 @@ import { Stack, Button, Typography } from "@mui/material";
 import { colors } from "../../constants/colors";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { useNavigate } from "react-router-dom";
 
 export default function DishHeader() {
+  const navigate = useNavigate();
+  const goToCart = () => {
+    navigate("/cart");
+  };
   return (
     <Stack
       spacing={2}
@@ -28,6 +33,7 @@ export default function DishHeader() {
         </Button>
         <Button
           startIcon={<ShoppingCartIcon />}
+          onClick={goToCart}
           sx={{
             bgcolor: colors.main.primary500,
             color: colors.text.white,

@@ -110,7 +110,7 @@ const DishPage = () => {
         scrollbarWidth: "none",
       }}
     >
-      <Header tableName={mockData.data.tableName} />
+      <Header title={mockData.data.tableName} />
       <DishHeader />
       <DishList dishes={mockData.data.dishes} />
     </Box>

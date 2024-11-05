@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum RedirectUrl {
 
-	FRONT("http://localhost:3000/tableToken");
+	FRONT("http://localhost:3000");
 
 	private final String explain;
 }

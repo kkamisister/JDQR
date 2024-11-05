@@ -35,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class DishServiceImpl implements DishService {
+
 	private final DishRepository dishRepository;
 	private final DishCategoryRepository dishCategoryRepository;
 	private final OwnerRepository ownerRepository;
@@ -103,9 +104,7 @@ public class DishServiceImpl implements DishService {
 		}
 		//메뉴태그(dish_tag) 테이블에서 dis_id컬럼이 dishId인 행들을 삭제
 		List<DishTag> dishTags = dishTagRepository.findByDishId(dishId);
-		for (DishTag dishTag : dishTags) {
-			dishTagRepository.delete(dishTag);
-		}
+		dishTagRepository.deleteAll(dishTags);
 		//메뉴(dish) 테이블에서 id컬럼이 dishId인 행 삭제
 		dishRepository.delete(dish);
 

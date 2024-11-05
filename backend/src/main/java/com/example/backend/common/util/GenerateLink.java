@@ -43,7 +43,7 @@ public class GenerateLink {
 		String accessToken = tokenProvider.generateQrAccessToken(tableId, tokenExpiredDate);
 		tokenProvider.generateQrRefreshToken(tableId,tokenExpiredDate,accessToken);
 
-		return RedirectUrl.FRONT.getExplain() +"?token="+accessToken;
+		return RedirectUrl.FRONT.getExplain()+"?tableId="+tableId+"&token="+accessToken;
 	}
 
 }

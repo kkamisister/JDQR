@@ -2,27 +2,33 @@ package com.example.backend.order.service;
 
 import static com.example.backend.order.dto.CartResponse.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.IntStream;
+import java.util.stream.Collectors;
 import java.util.Map;
 
+import com.example.backend.common.annotation.RedLock;
+import com.example.backend.common.client.toss.TossWebClient;
+import com.example.backend.common.client.toss.dto.TossPaymentRequestDto;
+import com.example.backend.common.client.toss.dto.TossPaymentResponseDto;
 import com.example.backend.common.enums.SimpleResponseMessage;
+import com.example.backend.common.enums.UseStatus;
+import com.example.backend.common.util.RandomUtil;
+import com.example.backend.common.util.TimeUtil;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.Option;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.OptionRepository;
-import com.example.backend.order.entity.Order;
-import com.example.backend.order.entity.OrderItem;
-import com.example.backend.order.entity.OrderItemOption;
+import com.example.backend.order.dto.CartRequest.*;
+import com.example.backend.order.dto.OrderRequest.*;
+import com.example.backend.order.entity.*;
 import com.example.backend.order.enums.OrderStatus;
-import com.example.backend.order.repository.OrderItemOptionRepository;
-import com.example.backend.order.repository.OrderItemRepository;
-import com.example.backend.order.repository.OrderRepository;
+import com.example.backend.order.enums.PaymentMethod;
+import com.example.backend.order.enums.PaymentStatus;
+import com.example.backend.order.repository.*;
+
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.backend.common.exception.ErrorCode;
@@ -53,6 +59,11 @@ public class OrderServiceImpl implements OrderService {
 	private final OrderItemOptionRepository orderItemOptionRepository;
 	private final DishRepository dishRepository;
 	private final OptionRepository optionRepository;
+	private final PaymentRepository paymentRepository;
+	private final PaymentDetailRepository paymentDetailRepository;
+	private final SimpMessagingTemplate messagingTemplate;
+	private final TossWebClient tossWebClient;
+
 	/**
 	 * tableName으로 qrCode를 찾아서, 해당 코드에 token을 더한 주소를 반환
 	 * @param tableId
@@ -88,6 +99,8 @@ public class OrderServiceImpl implements OrderService {
 	 * @param productInfo
 	 */
 	@Override
+	@Transactional
+	@RedLock(key = "'table:' + #tableId", waitTime = 5000L,leaseTime = 1000L)
 	public void addItem(String tableId,CartDto productInfo) {
 
 		// 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
@@ -97,19 +110,20 @@ public class OrderServiceImpl implements OrderService {
 		// 2. 테이블 장바구니에 물품을 담는다
 		//<tableId,<userId,<hashCode,항목>>>
 		String key = "table::"+tableId;
-		log.warn("userID : {}",productInfo.getUserId());
+		// log.warn("userID : {}",productInfo.getUserId());
 		Map<Integer,CartDto> cachedCartData = redisHashRepository.getCartDatas(key,productInfo.getUserId());
-		log.warn("cachedCartData : {}",cachedCartData);
+		// log.warn("cachedCartData : {}",cachedCartData);
 		if(!ObjectUtils.isEmpty(cachedCartData)){ // 1. 기존에 동일한 물품이 있어서 거기에 더해지는 경우 -> 지금 담는 hashCode와 비교하여 동일한 것을 찾아서 추가
 
 			CartDto cartData = cachedCartData.get(productInfo.hashCode());
 			int currentQuantity = cartData.getQuantity();
 			int newQuantity = currentQuantity + productInfo.getQuantity();
-			log.warn("newQuantity : {}",newQuantity);
+			if(newQuantity < 0)newQuantity = 0;
+			// log.warn("newQuantity : {}",newQuantity);
 
 			cartData.setQuantity(newQuantity);
-			log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
-			log.warn("cartData : {}",cartData);
+			// log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
+			// log.warn("cartData : {}",cartData);
 			cachedCartData.put(productInfo.hashCode(), cartData);
 
 			redisHashRepository.saveHashData(key, cartData.getUserId(), cachedCartData,20L);
@@ -131,11 +145,18 @@ public class OrderServiceImpl implements OrderService {
 		// 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
 		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
-		// 3-4. 최종적으로 전송할 데이터
-		CartInfo sendData = CartInfo.of(allCartDatas,table.getName(),subscriberSize);
 
-		notificationService.sentToClient(tableId,sendData);
+		// 3-4. 최종적으로 전송할 데이터
+		List<CartDto> cartList = allCartDatas.values().stream()
+			.flatMap(map -> map.values().stream())
+			.collect(Collectors.toList());
+
+		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize);
+
+		// notificationService.sentToClient(tableId,sendData);
+		messagingTemplate.convertAndSend("/sub/cart/"+tableId,sendData);
 	}
+
 
 	/**
 	 * 테이블의 장바구니에서 productInfo를 가진 품목을 제거한다
@@ -143,6 +164,7 @@ public class OrderServiceImpl implements OrderService {
 	 * @param productInfo
 	 */
 	@Override
+	// @RedLock(key = "'table:' + #tableId",waitTime = 5000L, leaseTime = 1000L)
 	public void deleteItem(String tableId, CartDto productInfo) {
 
 		// 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
@@ -152,20 +174,20 @@ public class OrderServiceImpl implements OrderService {
 		// 2. 해당 유저의 장바구니에서 제거한다
 		//<tableId,<userId,<hashCode,항목>>>
 		String key = "table::"+tableId;
-		log.warn("userID : {}",productInfo.getUserId());
+		// log.warn("userID : {}",productInfo.getUserId());
 
 		// 유저가 담은 <hashCode,품목> 의 맵을 가지고온다
 		Map<Integer,CartDto> cachedCartData = redisHashRepository.getCartDatas(key,productInfo.getUserId());
-		log.warn("cachedCartData : {}",cachedCartData);
+		// log.warn("cachedCartData : {}",cachedCartData);
 
-		log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
+		// log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
 		CartDto findData = cachedCartData.getOrDefault(productInfo.hashCode(), null);
-		log.warn("findData : {}",findData);
+		// log.warn("findData : {}",findData);
 
 		if(!ObjectUtils.isEmpty(findData)){
 			// 해당 유저의 장바구니에 품목이 있다면 삭제한다
 			cachedCartData.remove(productInfo.hashCode());
-			log.warn("cachedCardData After : {}",cachedCartData);
+			// log.warn("cachedCardData After : {}",cachedCartData);
 			redisHashRepository.saveHashData(key,productInfo.getUserId(),cachedCartData,20L);
 		}
 		else{
@@ -176,7 +198,7 @@ public class OrderServiceImpl implements OrderService {
 		// 3-1. 현재 테이블의 장바구니를 가지고온다.
 		// 맵은 (userId,해당 유저가 담은 항목들) 의 형식
 		Map<String, Map<Integer,CartDto>> allCartDatas = redisHashRepository.getAllCartDatas(tableId);
-		log.warn("allCartDatas : {}",allCartDatas);
+		// log.warn("allCartDatas : {}",allCartDatas);
 
 		// 3-2. 현재 테이블과 연결된 사람수를 받아온다
 		int subscriberSize = notificationService.getSubscriberSize(tableId);
@@ -185,9 +207,14 @@ public class OrderServiceImpl implements OrderService {
 		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
 		// 3-4. 최종적으로 전송할 데이터
-		CartInfo sendData = CartInfo.of(allCartDatas,table.getName(),subscriberSize);
+		List<CartDto> cartList = allCartDatas.values().stream()
+			.flatMap(map -> map.values().stream())
+			.collect(Collectors.toList());
 
-		notificationService.sentToClient(tableId,sendData);
+		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize);
+
+		// notificationService.sentToClient(tableId,sendData);
+		messagingTemplate.convertAndSend("/sub/cart/"+tableId,sendData);
 	}
 
 	/**
@@ -214,7 +241,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		// 1. orders table에 데이터를 추가한다
-		Order order = saveOrder(cartDatas);
+		Order order = saveOrder(cartDatas, tableId);
 
 		// 2. order_items에 데이터를 추가한다
 		List<OrderItem> orderItems = saveOrderItems(order, cartDatas);
@@ -226,6 +253,336 @@ public class OrderServiceImpl implements OrderService {
 		redisHashRepository.removeKey(tableId);
 
 		return SimpleResponseMessage.ORDER_SUCCESS;
+	}
+
+	/**
+	 * 결제 방식에 따라 결제를 수행한 후, 성공 여부를 반환하는 api
+	 *
+	 * @param tableId           : 결제를 시도하는 고객의 tableId
+	 * @param paymentRequestDto : 결제에 필요한 정보를 담고 있는 request dto
+	 * @return : 결제 성공 여부를 담은 메시지
+	 */
+	@Override
+	@Transactional
+	public InitialPaymentResponseDto payForOrder(String tableId, PaymentRequestDto paymentRequestDto) {
+		// 1. 결제 방식을 확인한다
+		PaymentMethod paymentMethod = paymentRequestDto.type();
+
+		// 2. 해당 테이블의 가장 최근 order를 확인하고, 결제 방식을 업데이트시킨다
+		updatePaymentMethodOfOrder(tableId, paymentMethod);
+
+		// 3. paymentMethod 에 따라 다르게 재고 관리를 시행
+		Payment payment;
+		Order order = orderRepository.findMostRecentOrder(tableId);
+		// 3-1. paymentMethod 가 MONEY_DIVIDE 일 경우
+		if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
+			Integer totalPurchaseAmount = getTotalPurchaseAmount(order);
+			payment = createBasePaymentForMoneyDivide(order, totalPurchaseAmount, paymentRequestDto);
+		}
+		// 3-2. paymentMethod 가 MENU_DIVIDE 일 경우
+		else {
+			payment = createBasePaymentForMenuDivide(order, paymentRequestDto);
+		}
+
+
+		return InitialPaymentResponseDto.builder()
+			.tossOrderId(payment.getTossOrderId())
+			.amount(payment.getAmount())
+			.build();
+	}
+
+	/**
+	 * 클라이언트에서 toss 결제 위젯으로 성공적으로 결제를 한 뒤, 반환되는 parameter들을 받아 결제 완료 처리를 한다.
+	 * 해당 결제 내역에 맞게 DB의 상태를 변경 후, 토스 결제 확정 api를 호출
+	 *
+	 * @param tableId                      : 결제를 시도한 table의 id
+	 * @param tossOrderId                  : toss 주문번호
+	 * @param status                       : 결제 결과
+	 * @param simpleTossPaymentRequestDto : toss paymentKey + amount(결제 금액)
+	 * @return
+	 */
+	@Override
+	@Transactional
+	public SimpleResponseMessage finishPayment(String tableId, String tossOrderId, String status, SimpleTossPaymentRequestDto simpleTossPaymentRequestDto) {
+		if (status.equals("success")) {
+
+			// 1. 주어진 결제 내역에 맞게 DB의 상태를 변경
+			SimpleResponseMessage simpleResponseMessage = updatePaymentStatusToSuccess(tossOrderId, simpleTossPaymentRequestDto);
+
+			// DB 업데이트가 성공적으로 동작하지 않은 경우, Error Message 반환
+			if (!simpleResponseMessage.equals(SimpleResponseMessage.PAYMENT_SUCCESS)) return simpleResponseMessage;
+
+			// 2. toss confirm api 호출
+			TossPaymentRequestDto tossPaymentRequestDto = TossPaymentRequestDto.from(simpleTossPaymentRequestDto, tossOrderId);
+			TossPaymentResponseDto tossPaymentResponseDto = tossWebClient.requestPayment(tossPaymentRequestDto);
+
+			// toss api가 실패할 경우 -> 에러 던지기
+			if (!tossPaymentResponseDto.getSuccess()) throw new JDQRException(ErrorCode.TOSS_CONFIRM_ERROR);
+
+			// 3. 주문에 대한 결제가 모두 끝났는지를 체크
+			//    모두 끝났을 경우, 테이블의 상태를 AVAILABLE로 변경
+			if(checkOrderIsFinished(tossOrderId)) {
+				Table table = tableRepository.findById(tableId)
+					.orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
+				table.setStatus(UseStatus.AVAILABLE);
+				tableRepository.save(table);
+
+				return SimpleResponseMessage.WHOLE_PAYMENT_SUCCESS;
+			}
+
+			return SimpleResponseMessage.PAYMENT_SUCCESS;
+		}
+		else {
+			return SimpleResponseMessage.PAYMENT_FAILED;
+		}
+	}
+
+	/**
+	 * {tossOrderId}에 해당하는 주문의 결제가 모두 끝났는지를 판단한다.
+	 *
+	 * @param tossOrderId : 테이블의 가장 최신 주문 id
+	 */
+	private boolean checkOrderIsFinished(String tossOrderId) {
+		// 주문한 금액의 총합과 결제한 금액의 총합이 서로 동일할 경우, 결제가 모두 끝났다고 판단
+		Payment payment = paymentRepository.findByTossOrderId(tossOrderId);
+		Order order = payment.getOrder();
+		return getTotalPurchaseAmount(order).equals(getCurPaidAmount(order));
+	}
+
+	@Transactional
+	@RedLock(key = "'payment'")
+    protected SimpleResponseMessage updatePaymentStatusToSuccess(String tossOrderId, SimpleTossPaymentRequestDto tossPaymentSimpleResponseDto) {
+		Payment payment = paymentRepository.findByTossOrderId(tossOrderId);
+
+		// validation 로직
+		// 클라이언트에서 결제 amount를 임의로 조작하는 것을 막기 위해, 서버에 저장해 둔 amount와 body에 들어온 amount를 비교
+		if (!payment.getAmount().equals(tossPaymentSimpleResponseDto.amount())) {
+			payment.setPaymentStatus(PaymentStatus.CANCELLED);
+			paymentRepository.save(payment);
+			return SimpleResponseMessage.PAYMENT_CANCELLED_EXCEED_PURCHASE_AMOUNT;
+		}
+
+		// 이미 처리된 결제인 경우
+		if (!payment.getPaymentStatus().equals(PaymentStatus.PENDING)) return SimpleResponseMessage.PAYMENT_ALREADY_PAID;
+
+		// 1. 우리 DB의 상태 업데이트
+		// 현재 결제의 결제 방식 확인
+		Order order = payment.getOrder();
+		PaymentMethod paymentMethod = order.getPaymentMethod();
+
+		// 1-1. 결제 방식이 MONEY_DIVIDE 방식일 경우
+		if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
+			Integer totalPurchaseAmount = getTotalPurchaseAmount(order);
+			Integer curPaidAmount = getCurPaidAmount(order);
+
+			// 주문한 금액보다 더 많은 양의 금액을 결제하려고 시도하는 경우
+			if (curPaidAmount + payment.getAmount() > totalPurchaseAmount) {
+				// 현재 결제 상태를 취소 상태로 바꾼다
+				payment.setPaymentStatus(PaymentStatus.CANCELLED);
+				paymentRepository.save(payment);
+				return SimpleResponseMessage.PAYMENT_CANCELLED_EXCEED_PURCHASE_AMOUNT;
+			}
+		}
+		// 1-2. 결제 방식이 MENU_DIVIDE 방식일 경우
+		else {
+			List<PaymentDetail> paymentDetails = paymentDetailRepository.findAllByPayment(payment);
+
+			List<OrderItem> orderItems = new ArrayList<>();
+			for (PaymentDetail paymentDetail : paymentDetails) {
+				OrderItem orderItem = paymentDetail.getOrderItem();
+
+				// 주문한 메뉴보다 더 많은 양의 메뉴를 결제하려고 시도하는 경우
+				if (orderItem.getPaidQuantity() + paymentDetail.getQuantity() > orderItem.getQuantity()) {
+					payment.setPaymentStatus(PaymentStatus.CANCELLED);
+					paymentRepository.save(payment);
+					return SimpleResponseMessage.PAYMENT_CANCELLED_EXCEED_MENU_AMOUNT;
+				}
+
+				orderItems.add(orderItem);
+			}
+
+			for (int i=0; i<orderItems.size(); i++) {
+				OrderItem orderItem = orderItems.get(i);
+				PaymentDetail paymentDetail = paymentDetails.get(i);
+				orderItem.setPaidQuantity(orderItem.getPaidQuantity() + paymentDetail.getQuantity());
+				orderItems.add(orderItem);
+			}
+
+			// orderItems 업데이트
+			orderItemRepository.saveAll(orderItems);
+		}
+
+		// 결제 상태 성공으로 변경
+		payment.setPaymentStatus(PaymentStatus.PAID);
+		// payment 업데이트
+		paymentRepository.save(payment);
+
+		return SimpleResponseMessage.PAYMENT_SUCCESS;
+	}
+
+	/**
+	 * 메뉴별 결제를 할 경우에 해당 결제 정보가 담긴 payment entity를 추가한다.
+	 * 동시성 처리를 위해 Lock 적용
+	 *
+	 * @param order               : 결제를 하기를 원하는 order entity
+	 * @param paymentRequestDto : 결제 정보가 담긴 record
+	 */
+	@Transactional
+	protected Payment createBasePaymentForMenuDivide(Order order, PaymentRequestDto paymentRequestDto) {
+		List<OrderItemRequestDto> orderItemRequestDtos = paymentRequestDto.orderItemInfos();
+		List<Integer> orderItemIds = orderItemRequestDtos.stream()
+			.map(OrderItemRequestDto::orderItemId)
+			.toList();
+
+		List<OrderItem> orderItems = orderItemRepository.findAllById(orderItemIds);
+
+		Map<Integer, OrderItem> idToOrderItemMap = orderItems.stream()
+			.collect(Collectors.toMap(OrderItem::getId, orderItem -> orderItem));
+
+		// orderItemRequestDto에 적혀 있는 숫자만큼 orderItem의 정보를 업데이트
+		// 중간에 orderItem의 남아 있는 수량보다, 현재 결제하려고 시도하는 수량이 많을 경우 error throw
+		Integer purchasePrice = orderItemRequestDtos.stream()
+			.map(orderItemRequestDto -> {
+				OrderItem orderItem = idToOrderItemMap.get(orderItemRequestDto.orderItemId());
+				int remainQuantity = orderItem.getQuantity() - orderItem.getPaidQuantity();
+
+				if (remainQuantity < orderItemRequestDto.quantity()) {
+					throw new JDQRException(ErrorCode.EXCEED_MENU_PURCHASE_AMOUNT);
+				}
+
+				return orderItem.getOrderPrice() * orderItemRequestDto.quantity();
+			})
+			.reduce(0, Integer::sum);
+
+		String tossOrderId = generateOrderId();
+
+		Payment payment = Payment.builder()
+			.tossOrderId(tossOrderId)
+			.amount(purchasePrice)
+			.order(order)
+			.paymentStatus(PaymentStatus.PENDING)
+			.build();
+
+		// payment entity 저장 후 반환
+		Payment savedPayment = paymentRepository.save(payment);
+
+		List<PaymentDetail> paymentDetails = orderItemRequestDtos.stream()
+			.map(orderItemRequestDto -> PaymentDetail.builder()
+				.payment(payment)
+				.orderItem(idToOrderItemMap.get(orderItemRequestDto.orderItemId()))
+				.quantity(orderItemRequestDto.quantity())
+				.build())
+			.toList();
+
+		paymentDetailRepository.saveAll(paymentDetails);
+
+		return savedPayment;
+	}
+
+	/**
+	 * N빵 결제를 할 경우에 해당 결제 정보가 담긴 payment Entity를 추가한다.
+	 * 동시성 처리를 위해 Lock 적용
+	 *
+	 * @param order               : 결제를 하기를 원하는 order entity
+	 * @param totalPurchaseAmount : 총 주문 금액
+	 * @param paymentRequestDto : 결제 정보가 담긴 record
+	 */
+	@Transactional
+    protected Payment createBasePaymentForMoneyDivide(Order order, Integer totalPurchaseAmount, PaymentRequestDto paymentRequestDto) {
+		// 1. 현재 결제가 된 총 금액을 구한다.
+		Integer curPaidAmount = getCurPaidAmount(order);
+
+		// 결제할 금액 구하기
+		int paymentAmount = totalPurchaseAmount * paymentRequestDto.serveNum() / paymentRequestDto.peopleNum();
+
+		if (curPaidAmount + paymentAmount > totalPurchaseAmount) {
+			throw new JDQRException(ErrorCode.EXCEED_TOTAL_PURCHASE_AMOUNT);
+		}
+
+		// 2. 금액을 바탕으로, payment entity를 추가한다.
+		// 2-1. orderId 생성
+		String tossOrderId = generateOrderId();
+
+		// 2-2. payment entity 생성
+		Payment payment = Payment.builder()
+			.amount(paymentAmount)
+			.tossOrderId(tossOrderId)
+			.paymentStatus(PaymentStatus.PENDING)
+			.order(order)
+			.build();
+
+		// 3. entity 저장
+		return paymentRepository.save(payment);
+	}
+
+	/**
+	 * @return : toss 결제 api에서 사용하는 주문번호를 반환하는 메서드
+	 */
+	private String generateOrderId() {
+		return String.format("%s-%s",
+			TimeUtil.convertEpochToDateString(TimeUtil.getCurrentTimeMillisUtc(), "yyMMdd"),
+			RandomUtil.generateRandomString());
+	}
+
+	/**
+	 * 주문 기준으로, 현재 결제가 완료된 금액을 구해서 반환한다.
+	 * @param order : 조회하기를 원하는 order entity
+	 * @return : 총 결제 금액
+	 */
+	private Integer getCurPaidAmount(Order order) {
+		return  paymentRepository.findAllByOrder(order).stream()
+			.filter(payment -> payment.getPaymentStatus().equals(PaymentStatus.PAID))
+			.map(Payment::getAmount)
+			.reduce(0, Integer::sum);
+	}
+
+	/**
+	 * @param order : 현재 집계하기를 원하는 order id
+	 * @return : 해당 테이블에서 구메한 메뉴들의 가격의 총합
+	 */
+	private Integer getTotalPurchaseAmount(Order order) {
+		if (!order.getOrderStatus().equals(OrderStatus.PENDING)) throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
+
+
+		List<OrderItem> orderItems = orderItemRepository.findAllByOrder(order).stream()
+			.filter(orderItem -> orderItem.getOrderStatus().equals(OrderStatus.PENDING))
+			.toList();
+
+		return orderItems.stream()
+			.map(orderItem -> orderItem.getOrderPrice() * orderItem.getQuantity())
+			.reduce(0, Integer::sum);
+	}
+
+	/**
+	 * 현재 테이블의 결제 방식을 주어진 결제 방식으로 변경한다.
+	 * 만일 이미 결제 방식이 저장되어 있고, 이것이 주어진 결제 방식과 다를 경우, 에러 발생
+	 *
+	 * @param tableId : 주문하는 테이블의 id
+	 * @param paymentMethod : 결제하기를 원하는 결제방식
+	 */
+	@Transactional
+	@RedLock(key = "'order_status'")
+    protected void updatePaymentMethodOfOrder(String tableId, PaymentMethod paymentMethod) {
+		// 1. 테이블의 가장 최근 order 가져오기
+		Order order = orderRepository.findMostRecentOrder(tableId);
+		if (!order.getOrderStatus().equals(OrderStatus.PENDING)) throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
+
+		// 2. 테이블을 확인 후 결제 방식(payment_method column)을 업데이트하기
+		PaymentMethod oldPaymentMethod = order.getPaymentMethod();
+
+		// 2-1. 결제 방식이 아직 정해지지 않았을 경우
+		if (oldPaymentMethod.equals(PaymentMethod.UNDEFINED)) {
+			order.setPaymentMethod(paymentMethod);
+			orderRepository.save(order);
+		}
+		// 2-2. 결제 방식이 정해진 경우
+		// oldPaymentMethod는 항상 paymentMethod와 동일해야 한다
+		// 다를 경우 에러를 반환
+		else {
+			if (!oldPaymentMethod.equals(paymentMethod)) {
+				throw new JDQRException(ErrorCode.PAYMENT_METHOD_NOT_VALID);
+			}
+		}
 	}
 
 	/**
@@ -306,10 +663,12 @@ public class OrderServiceImpl implements OrderService {
 	 * 유저들이 담은 메뉴들의 정보를 바탕으로, orders table에 데이터를 저장한다
 	 *
 	 * @param cartDatas : 유저들이 담은 메뉴들의 정보
+	 * @param tableId
 	 * @return : 저장된 entity
 	 */
-	private Order saveOrder(List<CartDto> cartDatas) {
+	private Order saveOrder(List<CartDto> cartDatas, String tableId) {
 		Order order = Order.builder()
+			.tableId(tableId)
 			.orderStatus(OrderStatus.PENDING)
 			.menuCnt(cartDatas.size())
 			.build();

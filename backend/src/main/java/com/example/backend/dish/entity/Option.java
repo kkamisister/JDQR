@@ -13,16 +13,15 @@ import lombok.*;
 @Table(name = "options")
 public class Option extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "option_group_id")
-    private OptionGroup optionGroup;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "option_group_id")
+	private OptionGroup optionGroup;
 
-    private String name;
-    private Integer price;
-    private Boolean mandatory;
+	private String name;
+	private Integer price;
+	private Boolean mandatory;
 }
-

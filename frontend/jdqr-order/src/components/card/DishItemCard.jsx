@@ -2,9 +2,17 @@ import { Box, Stack, Typography } from "@mui/material";
 import { colors } from "../../constants/colors";
 import DishTagChip from "../chip/DishTagChip";
 
-const DishItemCard = ({ dish, sx }) => {
+const DishItemCard = ({
+  dish,
+  onClick,
+  hasImage = true,
+  hasOption = false,
+  children,
+  sx,
+}) => {
   return (
     <Stack
+      onClick={onClick}
       direction="row"
       spacing={2}
       sx={{
@@ -38,7 +46,7 @@ const DishItemCard = ({ dish, sx }) => {
             {dish.dishName}
           </Typography>
           <Box>
-            {dish.tags.length > 0 &&
+            {dish.tags &&
               dish.tags.map((tag, index) => (
                 <DishTagChip key={index} label={tag} />
               ))}
@@ -52,6 +60,17 @@ const DishItemCard = ({ dish, sx }) => {
         >
           {dish.description}
         </Typography>
+        {hasOption && (
+          <Typography
+            sx={{
+              fontSize: "12px",
+              color: colors.text.sub2,
+            }}
+          >
+            치즈추가, 씬도우로 변경
+          </Typography>
+        )}
+
         <Typography
           sx={{
             fontSize: "16px",
@@ -59,18 +78,21 @@ const DishItemCard = ({ dish, sx }) => {
         >
           {dish.price.toLocaleString()}원
         </Typography>
+        {children}
       </Stack>
-      <Box
-        component="img"
-        alt={dish.dishName}
-        src="https://cdn.dominos.co.kr/admin/upload/goods/20230619_F33836Pn.jpg"
-        sx={{
-          width: 120,
-          height: 120,
-          borderRadius: "8px", // 곡률 조절
-          objectFit: "cover",
-        }}
-      />
+      {hasImage && (
+        <Box
+          component="img"
+          alt={dish.dishName}
+          src="https://cdn.dominos.co.kr/admin/upload/goods/20230619_F33836Pn.jpg"
+          sx={{
+            width: 120,
+            height: 120,
+            borderRadius: "8px", // 곡률 조절
+            objectFit: "cover",
+          }}
+        />
+      )}
     </Stack>
   );
 };

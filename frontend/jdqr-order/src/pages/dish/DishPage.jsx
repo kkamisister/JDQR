@@ -46,6 +46,35 @@ const DishPage = () => {
               description: "불닭볶음면보다 매운 피자🔥",
               imageUrl: "https://example.com/image2.jpg",
               tags: ["시그니처"],
+
+              options: [
+                {
+                  optionId: 1,
+                  optionName: "도우 변경",
+                  choices: [
+                    {
+                      choiceId: 1,
+                      choiceName: "치즈 추가",
+                      price: 2000,
+                    },
+                    {
+                      choiceId: 2,
+                      choiceName: "고구마 무스 추가",
+                      price: 2000,
+                    },
+                    {
+                      choiceId: 3,
+                      choiceName: "치즈 크러스트로 변경",
+                      price: 4000,
+                    },
+                    {
+                      choiceId: 4,
+                      choiceName: "골드 크러스트로 변경",
+                      price: 5000,
+                    },
+                  ],
+                },
+              ],
             },
             {
               dishId: 3,
@@ -83,21 +112,6 @@ const DishPage = () => {
     },
   };
 
-  const mockDish = {
-    categoryId: 1,
-    categoryName: "인기 메뉴",
-    items: [
-      {
-        dishId: 3,
-        dishName: "치즈볼",
-        price: 3000,
-        description: "쫄깃하고 고소한 치즈볼",
-        imageUrl: "https://example.com/image5.jpg",
-        tags: [],
-      },
-    ],
-  };
-
   return (
     <Box
       sx={{
@@ -110,7 +124,7 @@ const DishPage = () => {
         scrollbarWidth: "none",
       }}
     >
-      <Header tableName={mockData.data.tableName} />
+      <Header title={mockData.data.tableName} />
       <DishHeader />
       <DishList dishes={mockData.data.dishes} />
     </Box>

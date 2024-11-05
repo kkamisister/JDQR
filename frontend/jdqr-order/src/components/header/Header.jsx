@@ -1,9 +1,17 @@
 import AppBar from "@mui/material/AppBar";
-import { Box, Typography, Toolbar, Chip } from "@mui/material";
+import { Box, Typography, Toolbar, Chip, IconButton } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import { colors } from "../../constants/colors"; // named export인지 확인
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { colors } from "../../constants/colors";
+import { useNavigate } from "react-router-dom";
 
-export default function Header({ tableName }) {
+export default function Header({ title, BackPage = false }) {
+  const navigate = useNavigate();
+
+  const backToPrevPage = () => {
+    navigate(-1);
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -14,11 +22,17 @@ export default function Header({ tableName }) {
         }}
       >
         <Toolbar>
-          <LocationOnIcon
-            sx={{
-              color: colors.point.blue,
-            }}
-          />
+          {BackPage ? (
+            <IconButton onClick={backToPrevPage}>
+              <ChevronLeftIcon sx={{ color: colors.text.sub1 }} />
+            </IconButton>
+          ) : (
+            <LocationOnIcon
+              sx={{
+                color: colors.point.blue,
+              }}
+            />
+          )}
           <Typography
             sx={{
               color: colors.text.main,
@@ -26,7 +40,7 @@ export default function Header({ tableName }) {
               flexGrow: 1,
             }}
           >
-            {tableName}
+            {title}
           </Typography>
           <Chip
             label="3번 테이블"

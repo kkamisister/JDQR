@@ -1,7 +1,14 @@
 import React from 'react';
 import { Button } from '@mui/material';
 import { darken } from '@mui/system';
-const FlatButton = ({ text, color }) => {
+import { colors } from 'constants/colors';
+const FlatButton = ({
+	text,
+	color,
+	fontColor = colors.text.white,
+	sx,
+	onClick,
+}) => {
 	return (
 		<Button
 			variant="contained"
@@ -13,9 +20,12 @@ const FlatButton = ({ text, color }) => {
 				'&:hover': {
 					backgroundColor: darken(color, 0.2), // hover 시 색상도 설정 가능
 				},
+				color: fontColor,
 				fontSize: '20px',
-				fontWeight: '500',
-			}}>
+				fontWeight: '600',
+				...sx,
+			}}
+			onClick={onClick}>
 			{text}
 		</Button>
 	);

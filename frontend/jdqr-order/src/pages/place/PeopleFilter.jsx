@@ -24,7 +24,7 @@ const PeopleFilter = () => {
   const isCheckboxDisabled = activeIndex === null
 
   return (
-    <Stack direction="column" spacing={1}>
+    <Stack direction="column" spacing={1} height="70px">
       <Stack
         direction="row"
         spacing={2}

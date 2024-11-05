@@ -1,5 +1,7 @@
 package com.example.backend.dish.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 
 import com.example.backend.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -12,16 +14,18 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "options")
 public class Option extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    @Column(name = "name")
+    private String name;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "option_group_id")
-	private OptionGroup optionGroup;
+    @Column(name = "mandatory")
+    private Boolean mandatory;
 
-	private String name;
-	private Integer price;
-	private Boolean mandatory;
+    @Builder.Default
+    @OneToMany(mappedBy = "option",cascade = CascadeType.REMOVE)
+    private List<Choice> choices = new ArrayList<>();
+
 }

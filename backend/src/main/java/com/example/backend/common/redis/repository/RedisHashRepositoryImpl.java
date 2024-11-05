@@ -1,5 +1,7 @@
 package com.example.backend.common.redis.repository;
 
+import static com.example.backend.common.enums.OnlineUser.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.example.backend.common.enums.OnlineUser;
 import com.example.backend.common.util.JsonUtil;
 import com.example.backend.order.dto.CartDto;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -89,5 +92,14 @@ public class RedisHashRepositoryImpl implements RedisHashRepository{
 	@Override
 	public void removeKey(String key) {
 		redisTemplate.opsForValue().getAndDelete(key);
+	}
+
+	@Override
+	public Integer getCurrentUserCnt(String key) {
+
+		// 현재 온라인 사용자 수 가져오기
+		Integer currentCount = (Integer)redisTemplate.opsForHash().get(ONLINE_USER.getExplain(), key);
+
+		return currentCount;
 	}
 }

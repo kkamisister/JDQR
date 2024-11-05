@@ -32,9 +32,7 @@ const HeaderBox = () => {
 			sx={{
 				justifyContent: 'space-between',
 				alignItems: 'center',
-				paddingLeft: '20px',
-				paddingRight: '20px',
-				height: '100px',
+				padding: '10px 20px 10px 20px',
 				backgroundColor: colors.background.box,
 			}}>
 			<Typography variant="h4" sx={{ fontWeight: 'bold' }}>

@@ -47,6 +47,9 @@ public enum ErrorCode {
 	// 외부 api 호출시 500번대 에러 발생
 	WEBCLIENT_500_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "외부 api 호출 도중 500번대 에러가 발생하였습니다"),
 
+	// S3 관련 에러
+	S3_IMAGE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S3 업로드 도중 에러가 발생하였습니다"),
+
 	// 테스트용 에러
 	FUCKED_UP_QR(HttpStatus.BAD_REQUEST,"되었습니다");
 

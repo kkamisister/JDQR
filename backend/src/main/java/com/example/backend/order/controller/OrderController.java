@@ -16,14 +16,11 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.example.backend.common.enums.UseCookie;
-import com.example.backend.notification.service.NotificationService;
 import com.example.backend.order.dto.CartDto;
 import com.example.backend.order.service.OrderService;
 
@@ -73,6 +70,30 @@ public class OrderController {
 		response.addCookie(cookie); // 응답에 쿠키 추가
 
 		return ResponseEntity.ok().build();
+	}
+
+	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")
+	@PostMapping("/{tossOrderId}/payment/{status}")
+	public ResponseEntity<ResponseWithMessage> finishPayment(HttpServletRequest request,
+																  @PathVariable String tossOrderId,
+																  @PathVariable String status,
+																  @RequestBody SimpleTossPaymentRequestDto simpleTossPaymentRequestDto) {
+
+		String tableId = (String)request.getAttribute("tableId");
+
+		SimpleResponseMessage simpleResponseMessage = orderService.finishPayment(tableId, tossOrderId, status, simpleTossPaymentRequestDto);
+
+		int httpStatus;
+		if (simpleResponseMessage.equals(SimpleResponseMessage.PAYMENT_SUCCESS) || simpleResponseMessage.equals(SimpleResponseMessage.WHOLE_PAYMENT_SUCCESS)) {
+			httpStatus = HttpStatus.OK.value();
+		}
+		else {
+			httpStatus = HttpStatus.BAD_REQUEST.value();
+		}
+		ResponseWithMessage responseWithMessage = new ResponseWithMessage(httpStatus, simpleResponseMessage.getMessage());
+
+		return ResponseEntity.status(responseWithMessage.status())
+			.body(responseWithMessage);
 	}
 
 	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")

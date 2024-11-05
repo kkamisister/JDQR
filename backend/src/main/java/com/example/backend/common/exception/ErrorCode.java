@@ -25,6 +25,7 @@ public enum ErrorCode {
 	PAYMENT_METHOD_NOT_VALID(HttpStatus.BAD_REQUEST, "잘못된 결제 방식으로 결제를 시도하였습니다"),
 	EXCEED_TOTAL_PURCHASE_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액이 총 주문 금액을 초과하였습니다"),
 	EXCEED_MENU_PURCHASE_AMOUNT(HttpStatus.BAD_REQUEST, "이미 결제된 메뉴에 대해 결제를 시도하였습니다"),
+	TOSS_CONFIRM_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "토스 확정 api 호출 중 에러가 발생하였습니다"),
 
 	// 옵션관련 에러
 	OPTIONGROUP_NOT_FOUND(HttpStatus.BAD_REQUEST,"옵션그룹이 존재하지 않습니다"),

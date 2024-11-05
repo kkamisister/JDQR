@@ -15,4 +15,6 @@ public interface OrderService {
 	SimpleResponseMessage saveWholeOrder(String tableId);
 
 	InitialPaymentResponseDto payForOrder(String tableId, PaymentRequestDto paymentRequestDto);
+
+	SimpleResponseMessage finishPayment(String tableId, String tossOrderId, String status, SimpleTossPaymentRequestDto tossPaymentSimpleResponseDto);
 }

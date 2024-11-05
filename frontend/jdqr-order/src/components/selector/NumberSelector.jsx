@@ -2,47 +2,54 @@ import { Box, IconButton, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { colors } from "../../constants/colors";
+import { useState } from "react";
 
-export default function NumberSelector({ value = 1, setValue, sx }) {
-  const handleIncrease = () => setValue(value + 1);
-  const handleDecrease = () => setValue(value > 1 ? value - 1 : 1);
+export default function NumberSelector({ value = 1, fontSize, sx }) {
+  const [selectorValue, setValue] = useState(value);
+  const handleIncrease = () => setValue(selectorValue + 1);
+  const handleDecrease = () =>
+    setValue(selectorValue > 1 ? selectorValue - 1 : 1);
 
   return (
     <Stack
       direction="row"
       alignItems="center"
-      justifyContent="center"
+      justifyContent="space-evenly"
       sx={{
         ...sx,
         bgcolor: sx?.bgcolor || colors.background.box,
         width: sx?.width || "90px",
         borderRadius: 2,
-        py: 0.5,
+        height: sx?.height || "25px",
       }}
     >
       <IconButton
         onClick={handleDecrease}
         sx={{ p: 0, color: colors.text.sub1 }}
       >
-        <RemoveIcon />
+        <RemoveIcon sx={{ width: "16px" }} />
       </IconButton>
 
-      <Typography
+      <Box
         sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           color: colors.text.main,
           bgcolor: colors.background.white,
           width: "40%",
           borderRadius: 2,
-          textAlign: "center",
+          height: "80%",
+          fontSize: fontSize || "12px",
         }}
       >
-        {value}
-      </Typography>
+        {selectorValue}
+      </Box>
       <IconButton
         onClick={handleIncrease}
         sx={{ p: 0, color: colors.text.sub1 }}
       >
-        <AddIcon />
+        <AddIcon sx={{ width: "16px" }} />
       </IconButton>
     </Stack>
   );

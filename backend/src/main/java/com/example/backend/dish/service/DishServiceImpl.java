@@ -52,7 +52,6 @@ public class DishServiceImpl implements DishService {
 	private final RedisHashRepository redisHashRepository;
 	private final DishTagRepository dishTagRepository;
 	private final DishOptionRepository dishOptionRepository;
-	private final String ONLINE_USER_COUNT_KEY = "UserCount:";
 
 	/**
 	 * 음식점의 메뉴판을 조회하는 메서드
@@ -74,7 +73,7 @@ public class DishServiceImpl implements DishService {
 		List<Dish> dishes = dishRepository.findDishesByRestaurant(restaurant);
 
 		//4. 현재 메뉴판을 보고있는 사람 수를 찾는다
-		Integer currentUserCnt = redisHashRepository.getCurrentUserCnt(ONLINE_USER_COUNT_KEY+tableId);
+		Integer currentUserCnt = redisHashRepository.getCurrentUserCnt(tableId);
 
 		Map<Integer,String> idToNameMap = new HashMap<>();
 		for(Dish dish : dishes) {

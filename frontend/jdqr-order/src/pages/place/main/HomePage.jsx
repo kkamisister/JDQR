@@ -1,5 +1,5 @@
 import React from "react"
-import KakaoMap from "../../components/map/KakaoMap"
+import KakaoMap from "../../../components/map/KakaoMap"
 import RestaurantList from "./RestaurantList"
 import RestaurantSearchBar from "./RestaurantSearchBar"
 

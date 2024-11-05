@@ -1,8 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/place/HomePage";
-import DishPage from "./pages/dish/DishPage";
-import CartPage from "./pages/cart/CartPage";
-import { SnackbarProvider } from "notistack";
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import HomePage from "./pages/place/main/HomePage"
+import DishPage from "./pages/dish/DishPage"
+import CartPage from "./pages/cart/CartPage"
+import { SnackbarProvider } from "notistack"
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </SnackbarProvider>
-  );
+  )
 }
 
-export default App;
+export default App

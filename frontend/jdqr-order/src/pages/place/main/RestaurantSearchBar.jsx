@@ -1,7 +1,7 @@
 import React from "react"
 import { Stack, TextField, InputAdornment } from "@mui/material"
 import SearchIcon from "@mui/icons-material/Search"
-import { colors } from "../../constants/colors"
+import { colors } from "../../../constants/colors"
 
 const RestaurantSearchBar = () => {
   return (

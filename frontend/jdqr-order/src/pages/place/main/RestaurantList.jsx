@@ -1,8 +1,8 @@
 import React, { useState } from "react"
 import { Box, Divider, Stack } from "@mui/material"
-import RestaurantItemCard from "../../components/card/RestaurantItemCard"
+import RestaurantItemCard from "../../../components/card/RestaurantItemCard"
 import PeopleFilter from "./PeopleFilter"
-import { colors } from "../../constants/colors"
+import { colors } from "../../../constants/colors"
 
 const RestaurantList = () => {
   return (

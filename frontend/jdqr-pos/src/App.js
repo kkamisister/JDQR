@@ -10,6 +10,11 @@ import DishPage from 'pages/dish/DishPage';
 import RestaurantPage from 'pages/restaurant/RestaurantPage';
 import DefaultLayout from 'layouts/DefaultLayout';
 import EmployeePage from 'pages/employee/EmployeePage';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+const theme = createTheme({
+	fontFamily: 'Pretendard',
+});
 const queryClient = new QueryClient();
 
 function ErrorFallback({ error }) {
@@ -18,33 +23,37 @@ function ErrorFallback({ error }) {
 
 const App = () => {
 	return (
-		<ErrorBoundary FallbackComponent={ErrorFallback}>
-			<SnackbarProvider autoHideDuration={2000}>
-				<QueryClientProvider client={queryClient}>
-					<BrowserRouter>
-						<Routes>
-							<Route index element={<LoginPage />} />
-							<Route element={<DefaultLayout />}>
-								<Route path="/table" element={<TablePage />} />
-								<Route path="/dish" element={<DishPage />} />
-								<Route path="/employee" element={<EmployeePage />} />
+		<ThemeProvider theme={theme}>
+			<ErrorBoundary FallbackComponent={ErrorFallback}>
+				<SnackbarProvider autoHideDuration={2000}>
+					<QueryClientProvider client={queryClient}>
+						<BrowserRouter>
+							<Routes>
+								<Route index element={<LoginPage />} />
+								<Route element={<DefaultLayout />}>
+									<Route path="/table" element={<TablePage />} />
+									<Route path="/dish" element={<DishPage />} />
+									<Route path="/employee" element={<EmployeePage />} />
+									<Route
+										path="/restaurant"
+										element={<RestaurantPage />}
+									/>
+								</Route>
 								<Route
-									path="/restaurant"
-									element={<RestaurantPage />}
+									path="*"
+									element={
+										<ErrorPage
+											message={'페이지를 찾을 수 없습니다'}
+										/>
+									}
 								/>
-							</Route>
-							<Route
-								path="*"
-								element={
-									<ErrorPage message={'페이지를 찾을 수 없습니다'} />
-								}
-							/>
-						</Routes>
-					</BrowserRouter>
-					<ReactQueryDevtools />
-				</QueryClientProvider>
-			</SnackbarProvider>
-		</ErrorBoundary>
+							</Routes>
+						</BrowserRouter>
+						<ReactQueryDevtools />
+					</QueryClientProvider>
+				</SnackbarProvider>
+			</ErrorBoundary>
+		</ThemeProvider>
 	);
 };
 

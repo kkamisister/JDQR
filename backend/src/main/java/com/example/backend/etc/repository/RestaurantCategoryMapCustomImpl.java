@@ -5,6 +5,7 @@ import static com.example.backend.etc.entity.QRestaurantCategory.*;
 import static com.example.backend.etc.entity.QRestaurantCategoryMap.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.example.backend.common.repository.Querydsl4RepositorySupport;
 import com.example.backend.etc.entity.QRestaurant;
@@ -21,6 +22,15 @@ public class RestaurantCategoryMapCustomImpl extends Querydsl4RepositorySupport 
 			.join(restaurantCategoryMap.restaurant, restaurant).fetchJoin()
 			.join(restaurantCategoryMap.restaurantCategory, restaurantCategory).fetchJoin()
 			.where(restaurant.id.in(restaurantIds))
+			.fetch();
+	}
+
+	@Override
+	public List<RestaurantCategoryMap> findByRestaurantId(Integer restaurantId) {
+		return selectFrom(restaurantCategoryMap)
+			.join(restaurantCategoryMap.restaurantCategory, restaurantCategory).fetchJoin()
+			.where(restaurantCategoryMap.restaurant.id.eq(restaurantId))
+			.orderBy(restaurantCategory.id.asc())
 			.fetch();
 	}
 }

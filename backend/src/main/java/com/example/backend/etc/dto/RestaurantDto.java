@@ -26,6 +26,7 @@ public class RestaurantDto {
 	private List<RestaurantCategoryDto> restaurantCategories;
 	private int restTableNum;
 	private int restSeatNum;
+	private int maxPeopleNum;
 	private String address;
 	private String image;
 	private double lat;

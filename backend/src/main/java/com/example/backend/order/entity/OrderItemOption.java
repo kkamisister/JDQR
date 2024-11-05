@@ -1,7 +1,7 @@
 package com.example.backend.order.entity;
 
 import com.example.backend.common.entity.BaseEntity;
-import com.example.backend.dish.entity.Option;
+import com.example.backend.dish.entity.Choice;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,5 +23,5 @@ public class OrderItemOption extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "option_id")
-    private Option option;
+    private Choice choice;
 }

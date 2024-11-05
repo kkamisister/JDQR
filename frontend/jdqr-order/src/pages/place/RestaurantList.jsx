@@ -1,25 +1,48 @@
-import React from "react"
-import { Stack } from "@mui/material"
+import React, { useState } from "react"
+import { Box, Divider, Stack } from "@mui/material"
 import RestaurantItemCard from "../../components/card/RestaurantItemCard"
 import PeopleFilter from "./PeopleFilter"
+import { colors } from "../../constants/colors"
 
 const RestaurantList = () => {
   return (
     <Stack
+      direction="column"
       spacing={2}
       sx={{
-        zIndex: 1,
-        position: "absolute",
+        position: "sticky",
         bottom: 0,
         width: "100%",
-        // height: "60%",
-        backgroundColor: "white",
+        backgroundColor: colors.background.white,
         borderTopLeftRadius: "35px",
         borderTopRightRadius: "35px",
         padding: "10px",
+        overflowY: "auto",
       }}
     >
+      <Stack
+        sx={{
+          height: "20px",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Box
+          sx={{
+            height: "5px",
+            width: "50px",
+            backgroundColor: colors.background.box,
+            margin: "0 auto",
+          }}
+        />
+      </Stack>
       <PeopleFilter />
+      <Divider
+        sx={{
+          borderColor: colors.background.box,
+          height: "1px",
+        }}
+      />
       <RestaurantItemCard />
       <RestaurantItemCard />
       <RestaurantItemCard />

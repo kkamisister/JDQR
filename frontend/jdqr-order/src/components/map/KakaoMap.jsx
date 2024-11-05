@@ -3,7 +3,6 @@ import { Stack, Button } from "@mui/material"
 import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk"
 import activeMapmarker from "../../assets/images/mapmarker1.png"
 import inactiveMapmarker from "../../assets/images/mapmarker2.png"
-import zIndex from "@mui/material/styles/zIndex"
 
 const { kakao } = window
 
@@ -43,8 +42,9 @@ const KakaoMap = () => {
           lng: 127.03956684373539,
         }}
         style={{
+          top: 0,
           width: "100%",
-          height: "45vh",
+          height: "60vh",
         }}
         level={3}
         draggable={true}

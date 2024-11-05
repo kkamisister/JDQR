@@ -1,0 +1,230 @@
+cf) ./gradlew clean build ⇒ 기존의 빌드 산출물들을 지우고 다시 빌드한다.
+
+cf) build가 완료되면, build/libs 디렉토리 아래에 .jar파일이 생성된다.
+
+1. /home/ubuntu/.env 파일 생성
+    - sudo vi .env
+    - sudo chown jenkins:jenkins /home/ubuntu/.env
+    - sudo chmod 644 /home/ubuntu/.env
+2. 우분투 유저그룹에 Jenkins 유저를 추가 ⇒ 해당 단계를 스킵하면 .env파일의 권한을 777로 줘도 권한 에러가 발생할 수 있음
+    - sudo usermod -aG ubuntu jenkins
+3. 도커 유저그룹에 Jenkins 유저를 추가
+    - sudo usermod -aG docker jenkins
+
+> **Dockerfile 및 docker-compose.yml**
+> 
+
+```yaml
+# docker-compose.yml
+
+services:
+  app:
+    image: openjdk:17-jdk-slim
+    container_name: springboot-app
+    volumes:
+      - ./backend/build/libs/backend-0.0.1-SNAPSHOT.jar:/app.jar
+    ports:
+      - "8080:8080"
+    command: ["java", "-jar", "/app.jar"]
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - TZ=Asia/Seoul
+    depends_on:
+      - redis
+    restart: always
+
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data:/data
+    restart: always
+
+```
+
+### Jenkins 파이프라인
+
+> **Backend 배포 구성**
+> 
+- **Build**
+    
+    ```bash
+    pipeline{
+        agent any
+        
+        stages{
+            
+            stage('shutdown old process') {
+                steps {
+                    sh """
+                        #!/bin/bash
+                        ls -al
+                        
+                        # docker 내리기
+                        echo "Stop docker container..."
+                        docker compose -f /home/ubuntu/docker-compose.yml down
+                    """    
+                }
+            }
+            
+            stage('gitlab clone (BE)') {
+                steps {
+                    script {
+                        git branch: 'be-develop', credentialsId: 'a608', 
+                        url: 'https://lab.ssafy.com/s11-final/S11P31A608.git'
+                    }
+                }
+            }
+            
+            stage('build (BE)') {
+                steps {
+                    dir("./backend") {
+                        sh """
+                            chmod +x ./gradlew
+                            ./gradlew clean build
+                        """
+                    }
+                }
+            }
+            
+            stage('restart docker') {
+                steps {
+                    sh """
+                        # 다시 docker-compose 실행
+                        echo "Starting Docker Compose..."
+                        docker compose -f /home/ubuntu/docker-compose.yml up -d
+                        
+                        echo "Docker Compose started successfully."
+                    """
+                }
+            }
+        }
+        
+        post {
+            always {
+                script {
+                    def message
+                    if (currentBuild.result == 'SUCCESS') {
+                        message = "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
+                        mattermostSend (color: 'good',
+                            message: message,
+                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
+                            channel: 'jenkins_build'
+                        )
+                    } else if (currentBuild.result == 'FAILURE') {
+                        message = "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)\n"
+                            mattermostSend (color: 'danger',
+                            message: message,
+                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
+                            channel: 'jenkins_build'
+                        )
+                    } else {
+                        message = "빌드 상태: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
+                        mattermostSend (
+                            message: message,
+                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
+                            channel: 'jenkins_build'
+                        )
+                    }
+                }
+            }
+        }
+    }
+    ```
+    
+
+> **FrontEnd 배포 구성**
+> 
+- **Build**
+    
+    ```bash
+    pipeline{
+        agent any
+        
+        tools {
+            nodejs 'nodejs-20.15.0'
+        }
+        
+        stages{
+            
+            stage('delete previous build') {
+                steps {
+                    sh """
+                        #!/bin/bash
+                        whoami
+                        rm -rf /usr/share/nginx/html/build
+                    """    
+                }
+            }
+            
+            
+            stage('gitlab clone (FE)') {
+                steps {
+                    script {
+                        git branch: 'fe-develop', credentialsId: 'a608', 
+                        url: 'https://lab.ssafy.com/s11-final/S11P31A608.git'
+                    }
+                }
+            }
+    
+            stage('build (FE)') {
+                steps {
+                    dir("./frontend/mutualrisk") {
+                        sh """ 
+                            node --version  # 올바른 Node.js 버전이 출력되는지 확인
+                            yarn install
+                            CI=false yarn build
+                        """
+                    }
+                }
+            }
+            
+            
+            stage('move build files to nginx static') {
+                steps {
+                    sh """
+                        pwd
+                        ls -al
+                        mv frontend/mutualrisk/build /usr/share/nginx/html/
+                        cp -r /usr/share/nginx/html/stockImage /usr/share/nginx/html/build
+                        echo "Deploy React App success."
+                    """
+                }
+            }
+        }
+        
+        post {
+            always {
+                script {
+                    def message
+                    if (currentBuild.result == 'SUCCESS') {
+                        message = "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
+                        mattermostSend (color: 'good',
+                            message: message,
+                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
+                            channel: 'jenkins_build'
+                        )
+                    } else if (currentBuild.result == 'FAILURE') {
+                        message = "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)\n"
+                            mattermostSend (color: 'danger',
+                            message: message,
+                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
+                            channel: 'jenkins_build'
+                        )
+                    } else {
+                        message = "빌드 상태: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
+                        mattermostSend (
+                            message: message,
+                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
+                            channel: 'jenkins_build'
+                        )
+                    }
+                }
+            }
+        }
+    }
+    ```
+
+    

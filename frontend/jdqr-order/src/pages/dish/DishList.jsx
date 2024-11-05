@@ -87,6 +87,7 @@ export default function DishList({ dishes }) {
     const updatedCart = [...existingCart, cartItem];
     // 세션 스토리지에 저장
     sessionStorage.setItem("cartList", JSON.stringify(updatedCart));
+
     // /cart로 리다이렉트
     window.location.href = "/cart";
   };

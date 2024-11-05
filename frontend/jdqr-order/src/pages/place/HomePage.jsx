@@ -5,11 +5,41 @@ import RestaurantSearchBar from "./RestaurantSearchBar"
 
 const HomePage = () => {
   return (
-    <div>
-      <RestaurantSearchBar />
-      <KakaoMap />
-      <RestaurantList />
-    </div>
+    <>
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+        }}
+      >
+        <RestaurantSearchBar />
+      </div>
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: -1,
+        }}
+      >
+        <KakaoMap />
+      </div>
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          marginTop: "105px",
+          overflowY: "auto",
+        }}
+      >
+        <RestaurantList />
+      </div>
+    </>
   )
 }
 

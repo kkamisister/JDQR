@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.backend.common.enums.EntityStatus;
 import com.example.backend.common.enums.UseStatus;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
@@ -139,7 +140,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 	public RestaurantProfileDto getRestaurant(Integer restaurantId, Integer userId) {
 
 		//1. 점주를 조회한다
-		Owner owner = ownerRepository.findById(userId)
+		ownerRepository.findById(userId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
 
 		//2. 식당을 조회한다
@@ -198,7 +199,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 		int restSeatNum = 0;
 		int maxPeopleNum = 0;
 		for(Table table : tables){
-			if(table.getStatus().equals(UseStatus.AVAILABLE)){
+			if(table.getUseStatus().equals(UseStatus.AVAILABLE)){
 				restTableNum++;
 				restSeatNum += table.getPeople();
 				maxPeopleNum = Math.max(maxPeopleNum,table.getPeople());
@@ -344,7 +345,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 			boolean isAvailable = false;
 			for(Table table : findTables){
 				// 우선 모든 테이블을 순회하면서, (남은 좌석 수, 남은 테이블 수)를 카운팅한다
-				if(table.getStatus().equals(UseStatus.AVAILABLE)){
+				if(table.getUseStatus().equals(UseStatus.AVAILABLE)){
 					restTableNum++;
 					restSeatNum += table.getPeople();
 					//함께앉기를 고려하여, 그 인원을 수용할 수 있는 테이블의 수를 카운팅한다

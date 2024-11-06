@@ -12,4 +12,5 @@ public interface TableService {
 	void deleteTable(String tableId,Integer userId);
 	void updateTable(TableInfo tableInfo,Integer userId);
 	QRInfo createQR(String tableId,Integer userId);
+	void getAllTables(Integer userId);
 }

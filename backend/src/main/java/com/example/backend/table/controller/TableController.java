@@ -37,6 +37,21 @@ public class TableController {
 		@ApiResponse(responseCode = "200", description = "QR 생성 완료"),
 	})
 	@PostMapping("/qr")
+	public ResponseEntity<?> getAllTables(HttpServletRequest request){
+
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		// tableService.getAllTables(userId);
+		return null;
+	}
+
+
+	@Operation(summary = "QR 생성", description = "QR을 재생성하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "QR 생성 완료"),
+	})
+	@PostMapping("/qr")
 	public ResponseEntity<ResponseWithData<QRInfo>> createQR(@RequestParam("tableId") String tableId,HttpServletRequest request){
 
 		String id = (String)request.getAttribute("userId");

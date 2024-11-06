@@ -1,5 +1,7 @@
 package com.example.backend.order.repository;
 
+import java.util.List;
+
 import com.example.backend.order.entity.Order;
 
 public interface OrderRepositoryCustom {

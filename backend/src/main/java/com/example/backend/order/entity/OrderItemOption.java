@@ -22,6 +22,6 @@ public class OrderItemOption extends BaseEntity {
     private OrderItem orderItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "option_id")
+    @JoinColumn(name = "choice_id")
     private Choice choice;
 }

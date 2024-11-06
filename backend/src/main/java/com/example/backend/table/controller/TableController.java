@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,13 +39,38 @@ public class TableController {
 		@ApiResponse(responseCode = "200", description = "전체 테이블 조회완료"),
 	})
 	@GetMapping("")
-	public ResponseEntity<?> getAllTables(HttpServletRequest request){
+	public ResponseEntity<ResponseWithData<TableResultDto>> getAllTables(HttpServletRequest request){
 
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
-		tableService.getAllTables(userId);
-		return null;
+		TableResultDto tableResultDto = tableService.getAllTables(userId);
+
+		ResponseWithData<TableResultDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(),
+			"테이블 조회에 성공하였습니다.",tableResultDto);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
+	}
+
+	@Operation(summary = "테이블 상세 조회", description = "테이블을 상세 조회하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "상세 테이블 조회완료"),
+	})
+	@GetMapping("{tableId}")
+	public ResponseEntity<ResponseWithData<TableDetailInfo>> getTable(@PathVariable("tableId")  String tableId,
+		HttpServletRequest request){
+
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		TableDetailInfo tableDetailInfo = tableService.getTable(tableId, userId);
+
+		ResponseWithData<TableDetailInfo> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(),
+			"테이블 상세조회에 성공하였습니다.",tableDetailInfo);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
 	}
 
 

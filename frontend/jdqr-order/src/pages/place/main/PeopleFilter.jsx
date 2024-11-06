@@ -1,7 +1,7 @@
 import React, { useState } from "react"
-import { colors } from "../../constants/colors"
+import { colors } from "../../../constants/colors"
 import { Button, Checkbox, Stack, Typography } from "@mui/material"
-import PeopleFilterButton from "../../components/button/PeopleFilterButton"
+import PeopleFilterButton from "../../../components/button/PeopleFilterButton"
 
 const PeopleFilter = () => {
   const [activeIndex, setActiveIndex] = useState(null)

@@ -8,4 +8,5 @@ import com.example.backend.etc.entity.RestaurantCategoryMap;
 
 public interface RestaurantCategoryMapRepository extends JpaRepository<RestaurantCategoryMap, Integer>, RestaurantCategoryMapCustom{
 
+
 }

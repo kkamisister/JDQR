@@ -1,6 +1,6 @@
 package com.example.backend.etc.service;
 
-import static com.example.backend.etc.dto.RestaurantRequest.*;
+import static com.example.backend.etc.dto.RestaurantResponse.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +14,19 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.backend.common.enums.UseStatus;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
+import com.example.backend.dish.dto.DishResponse.DishDataDto;
+import com.example.backend.dish.dto.DishResponse.DishDetailInfo;
+import com.example.backend.dish.dto.DishResponse.DishDetailSummaryInfo;
+import com.example.backend.dish.dto.OptionDto;
+import com.example.backend.dish.entity.Choice;
+import com.example.backend.dish.entity.Dish;
+import com.example.backend.dish.entity.DishOption;
+import com.example.backend.dish.entity.DishTag;
+import com.example.backend.dish.entity.Option;
+import com.example.backend.dish.entity.Tag;
+import com.example.backend.dish.repository.DishOptionRepository;
+import com.example.backend.dish.repository.DishRepository;
+import com.example.backend.dish.repository.DishTagRepository;
 import com.example.backend.etc.dto.RestaurantCategoryDto;
 import com.example.backend.etc.dto.RestaurantDto;
 import com.example.backend.etc.dto.RestaurantProfileDto;
@@ -43,7 +56,9 @@ public class RestaurantServiceImpl implements RestaurantService {
 	private final RestaurantCategoryMapRepository restaurantCategoryMapRepository;
 	private final TableRepository tableRepository;
 	private final OwnerRepository ownerRepository;
-
+	private final DishRepository dishRepository;
+	private final DishOptionRepository dishOptionRepository;
+	private final DishTagRepository dishTagRepository;
 	/**
 	 * 유저의 화면범위에 존재하는 가맹점을 반환하는 메서드
 	 * @param minLat
@@ -156,6 +171,154 @@ public class RestaurantServiceImpl implements RestaurantService {
 	}
 
 	/**
+	 * 가맹점의 상세정보를 조회하는 메서드
+	 * @param restaurantId
+	 */
+	@Override
+	public RestaurantDetailInfo getRestaurantDetail(Integer restaurantId) {
+
+		//1. 식당을 조회한다
+		Restaurant restaurant = restaurantRepository.findById(restaurantId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
+
+		//2.식당과 카테고리를 이어주는 연결엔티티를 가지고온다
+		List<RestaurantCategoryMap> restaurantCategoryMapList = restaurantCategoryMapRepository.findByRestaurantId(restaurantId);
+		List<RestaurantCategoryDto> restaurantCategories = new ArrayList<>();
+		for(RestaurantCategoryMap restaurantCategoryMap : restaurantCategoryMapList) {
+
+			RestaurantCategory restaurantCategory = restaurantCategoryMap.getRestaurantCategory();
+			RestaurantCategoryDto from = RestaurantCategoryDto.from(restaurantCategory);
+			restaurantCategories.add(from);
+		}
+
+		//3. 테이블 정보를 받아온다
+		List<Table> tables = tableRepository.findByRestaurantId(restaurantId);
+
+		int restTableNum = 0;
+		int restSeatNum = 0;
+		int maxPeopleNum = 0;
+		for(Table table : tables){
+			if(table.getStatus().equals(UseStatus.AVAILABLE)){
+				restTableNum++;
+				restSeatNum += table.getPeople();
+				maxPeopleNum = Math.max(maxPeopleNum,table.getPeople());
+			}
+		}
+
+		// 식당정보 생성
+		RestaurantDto restaurantDto = getRestaurantDto(restaurantId, restaurant,
+			restaurantCategories, restTableNum, restSeatNum, maxPeopleNum);
+
+		// dishInfo를 생성해야한다
+
+		// 우선 dishCategoires 필요
+
+		List<Dish> dishes = dishRepository.findDishesByRestaurant(restaurant);
+
+		// <카테고리ID,카테고리이름> 의 맵을 생성한다
+		Map<Integer,String> idToCategoryNameMap = new HashMap<>();
+		for(Dish dish : dishes){
+			int categoryId = dish.getDishCategory().getId();
+			String categoryName = dish.getDishCategory().getName();
+
+			if(!idToCategoryNameMap.containsKey(categoryId)){
+				idToCategoryNameMap.put(categoryId,categoryName);
+			}
+		}
+
+		// dishCategories
+		List<String> dishCategories = idToCategoryNameMap.values().stream()
+			.map(String::toString).toList();
+
+		// 카테고리에 속한 음식정보 맵을 생성한다
+		Map<Integer, List<DishDetailInfo>> idToDishDetailInfoMap = createIdToDishDetailMap(
+			dishes);
+
+		// dishes를 생성한다
+		List<DishDetailSummaryInfo> dishDetailSummaryInfos = new ArrayList<>();
+		for(Map.Entry<Integer,List<DishDetailInfo>> entry : idToDishDetailInfoMap.entrySet()){
+
+			int categoryId = entry.getKey();
+			String categoryName = idToCategoryNameMap.get(categoryId);
+			List<DishDetailInfo> dishDetailInfos = entry.getValue();
+
+			DishDetailSummaryInfo dishSummaryInfo = DishDetailSummaryInfo.builder()
+				.dishCategoryId(categoryId)
+				.dishCategoryName(categoryName)
+				.items(dishDetailInfos)
+				.build();
+
+			dishDetailSummaryInfos.add(dishSummaryInfo);
+		}
+
+		//dishInfo를 생성한다
+		DishDataDto dishDataDto = DishDataDto.of(dishCategories,dishDetailSummaryInfos);
+
+		//dishInfo와 restaurantDto 마지막 DTO에 담아 반환한다
+		RestaurantDetailInfo restaurantDetailInfo = RestaurantDetailInfo.of(restaurantDto, dishDataDto);
+
+		return restaurantDetailInfo;
+	}
+
+	private static RestaurantDto getRestaurantDto(Integer restaurantId, Restaurant restaurant,
+		List<RestaurantCategoryDto> restaurantCategories, int restTableNum, int restSeatNum, int maxPeopleNum) {
+		RestaurantDto restaurantDto = RestaurantDto.builder()
+			.id(restaurantId)
+			.restaurantName(restaurant.getName())
+			.restaurantCategories(restaurantCategories)
+			.restTableNum(restTableNum)
+			.restSeatNum(restSeatNum)
+			.maxPeopleNum(maxPeopleNum)
+			.address(restaurant.getAddress())
+			.image(restaurant.getImage())
+			.lat(restaurant.getLatitude())
+			.lng(restaurant.getLongitude())
+			.open(restaurant.getOpen())
+			.build();
+		return restaurantDto;
+	}
+
+	private Map<Integer, List<DishDetailInfo>> createIdToDishDetailMap(List<Dish> dishes) {
+		// <카테고리ID, 카테고리 속 메뉴정보> 의 맵을 생성한다
+		Map<Integer,List<DishDetailInfo>> idToDishDetailInfoMap = new HashMap<>();
+		for(Dish dish : dishes){
+
+			int dishCategoryId = dish.getDishCategory().getId();
+
+			// 메뉴의 옵션들을 가지고온다
+			List<DishOption> dishOptions = dishOptionRepository.findByDishId(dish.getId());
+
+			List<OptionDto> optionDtos = new ArrayList<>();
+			for(DishOption dishOption : dishOptions){
+
+				Option option = dishOption.getOption();
+				List<Choice> choices = option.getChoices();
+				OptionDto optionDto = OptionDto.of(option, choices);
+
+				optionDtos.add(optionDto);
+			}
+
+			// 메뉴의 태그들을 가지고온다
+			List<DishTag> dishTags = dishTagRepository.findTagsByDish(dish);
+			List<String> tags = dishTags.stream().map(DishTag::getTag)
+				.map(Tag::getName).toList();
+
+			// 5. 반환 DTO
+			DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish,optionDtos,tags);
+
+			if(!idToDishDetailInfoMap.containsKey(dishCategoryId)){
+				List<DishDetailInfo> dishDetailInfos = new ArrayList<>();
+				dishDetailInfos.add(dishDetailInfo);
+				idToDishDetailInfoMap.put(dishCategoryId, dishDetailInfos);
+			}
+			else{
+				idToDishDetailInfoMap.get(dishCategoryId).add(dishDetailInfo);
+			}
+		}
+		return idToDishDetailInfoMap;
+	}
+
+	/**
 	 * 조건에 맞는 식당을 선별하여 정보를 반환하는 메서드
 	 * @param people
 	 * @param together
@@ -175,15 +338,15 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 			List<Table> findTables = tableRepository.findByRestaurantId(restaurantId);
 			// 남은 테이블 수, 남은 좌석 수, 최대 몇 인 테이블인지 반환
-			int restTable = 0;
-			int restSeat = 0;
+			int restTableNum = 0;
+			int restSeatNum = 0;
 			int maxPeopleNum = 0;
 			boolean isAvailable = false;
 			for(Table table : findTables){
 				// 우선 모든 테이블을 순회하면서, (남은 좌석 수, 남은 테이블 수)를 카운팅한다
 				if(table.getStatus().equals(UseStatus.AVAILABLE)){
-					restTable++;
-					restSeat += table.getPeople();
+					restTableNum++;
+					restSeatNum += table.getPeople();
 					//함께앉기를 고려하여, 그 인원을 수용할 수 있는 테이블의 수를 카운팅한다
 					if(table.getPeople() >= people)isAvailable = true;
 					maxPeopleNum = Math.max(maxPeopleNum, table.getPeople());
@@ -191,7 +354,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 			}
 
 			// 인원수가 기본값이 아닌 경우, 남은 좌석 수가 인원수보다 적고 열지 않았으면 해당 식당을 건너뜀
-			if((people > 0 && restSeat < people) && !restaurant.getOpen()){
+			if((people > 0 && restSeatNum < people) && !restaurant.getOpen()){
 				continue;
 			}
 
@@ -200,18 +363,11 @@ public class RestaurantServiceImpl implements RestaurantService {
 				continue;
 			}
 
-			RestaurantDto restaurantDto = RestaurantDto.builder()
-				.id(restaurantId)
-				.restaurantName(restaurant.getName())
-				.restaurantCategories(IdToRestaurantCategoryMap.get(restaurantId))
-				.restSeatNum(restSeat)
-				.restTableNum(restTable)
-				.address(restaurant.getAddress())
-				.image(restaurant.getImage())
-				.lat(restaurant.getLatitude())
-				.lng(restaurant.getLongitude())
-				.open(restaurant.getOpen())
-				.build();
+			// 식당정보 생성
+			List<RestaurantCategoryDto> restaurantCategories = IdToRestaurantCategoryMap.get(restaurantId);
+
+			RestaurantDto restaurantDto = getRestaurantDto(restaurantId, restaurant,
+				restaurantCategories, restTableNum, restSeatNum, maxPeopleNum);
 
 			restaurantDtos.add(restaurantDto);
 		}

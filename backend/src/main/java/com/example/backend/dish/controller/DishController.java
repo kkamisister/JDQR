@@ -1,30 +1,20 @@
 package com.example.backend.dish.controller;
 
-import static com.example.backend.dish.dto.DishResponse.*;
 import static com.example.backend.common.dto.CommonResponse.*;
 
-
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.backend.common.dto.CommonResponse;
-import com.example.backend.common.dto.CommonResponse.ResponseWithData;
-import com.example.backend.dish.dto.DishRequest;
-import com.example.backend.dish.dto.DishRequest.DishInfo;
 import com.example.backend.dish.dto.DishResponse;
+import com.example.backend.dish.dto.DishResponse.DishDetailInfo;
 import com.example.backend.dish.dto.DishResponse.DishSummaryResultDto;
-import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.service.DishService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,80 +26,45 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/dish")
 @Slf4j
-@Tag(name = "메뉴설정 관련 API", description = "메뉴 설정 관련 Controller입니다")
+@Tag(name = "손님 메뉴관련 API", description = "손님의 메뉴관련 Controller입니다")
 public class DishController {
 
 	private final DishService dishService;
 
-	//1. 전체 메뉴 조회
-
-
-	//2. 메뉴 추가
-	@Operation(summary = "메뉴 추가", description = "새로운 메뉴를 추가하는 api")
+	@Operation(summary = "메뉴판 조회", description = "메뉴판을 조회하는 api")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "메뉴 추가 성공"),
+		@ApiResponse(responseCode = "200", description = "메뉴판 조회 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	@PostMapping("")
-	public ResponseEntity<ResponseWithMessage> addDish(@RequestBody DishInfo dishInfo,HttpServletRequest request){
-		//2-1. 유저 확인
-		String id = (String)request.getAttribute("userId");
-		Integer userId = Integer.valueOf(id);
+	@GetMapping("")
+	public ResponseEntity<ResponseWithData<DishSummaryResultDto>> getAllDishes(HttpServletRequest request){
 
-		//2-2. db에 변경사항 저장
-		ResponseWithMessage responseWithMessage = dishService.addDish(userId, dishInfo);
+		String tableId = (String)request.getAttribute("tableId");
 
-		return ResponseEntity.status(responseWithMessage.status())
-			.body(responseWithMessage);
+		DishSummaryResultDto allDishes = dishService.getAllDishes(tableId);
+
+		ResponseWithData<DishSummaryResultDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(),"메뉴판 조회에 성공하였습니다",allDishes);
+
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
 	}
 
-	//3. 메뉴 삭제
-	@Operation(summary = "메뉴 삭제", description = "기존 메뉴를 삭제하는 api")
+	@Operation(summary = "메뉴상세 조회", description = "메뉴를 상세 조회하는 api")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "메뉴 삭제 성공"),
+		@ApiResponse(responseCode = "200", description = "메뉴 조회 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	@DeleteMapping("")
-	public ResponseEntity<ResponseWithMessage> deleteDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId,
-		HttpServletRequest request){
-		//3-1. 유저 확인
-		String id = (String)request.getAttribute("userId");
-		Integer userId = Integer.valueOf(id);
+	@GetMapping("{dishId}")
+	public ResponseEntity<ResponseWithData<DishDetailInfo>> getDish(@PathVariable("dishId") Integer dishId,HttpServletRequest request){
 
-		//3-2. db에 변경사항 저장
-		ResponseWithMessage responseWithMessage = dishService.removeDish(userId, dishId);
+		String tableId = (String)request.getAttribute("tableId");
+		DishDetailInfo dish = dishService.getDish(dishId, tableId);
 
-		return ResponseEntity.status(responseWithMessage.status())
-			.body(responseWithMessage);
+		ResponseWithData<DishDetailInfo> dishDetailInfoResponseWithData = new ResponseWithData<>(HttpStatus.OK.value(),
+			"메뉴 상세조회에 성공하였습니다",dish);
+
+		return ResponseEntity.status(dishDetailInfoResponseWithData.status())
+			.body(dishDetailInfoResponseWithData);
 	}
-
-	//4. 메뉴 수정
-	@Operation(summary = "메뉴 수정", description = "기존 메뉴를 수정하는 api")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "메뉴 수정 성공"),
-		@ApiResponse(responseCode = "500", description = "서버 에러")
-	})
-	@PutMapping("")
-	public ResponseEntity<ResponseWithMessage> updateDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId, @RequestBody DishInfo dishInfo,
-		HttpServletRequest request){
-		//4-1. 유저 확인
-		String id = (String)request.getAttribute("userId");
-		Integer userId = Integer.valueOf(id);
-
-		//4-2. db에 변경사항 저장
-		ResponseWithMessage responseWithMessage = dishService.updateDish(userId, dishId, dishInfo);
-
-		return ResponseEntity.status(responseWithMessage.status())
-			.body(responseWithMessage);
-	}
-
-	//5. 메뉴 검색
-
-
-
-	//6. 옵션 추가
-
-
-	//7.
-
 }

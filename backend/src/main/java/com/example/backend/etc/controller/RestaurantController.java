@@ -1,5 +1,7 @@
 package com.example.backend.etc.controller;
 
+import static com.example.backend.etc.dto.RestaurantResponse.*;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.backend.common.dto.CommonResponse.ResponseWithData;
 import com.example.backend.common.dto.CommonResponse.ResponseWithMessage;
 import com.example.backend.etc.dto.RestaurantProfileDto;
+import com.example.backend.etc.dto.RestaurantResponse;
 import com.example.backend.etc.dto.RestaurantResponse.RestaurantInfo;
 import com.example.backend.etc.service.RestaurantService;
 
@@ -33,47 +36,6 @@ public class RestaurantController {
 
 	private final RestaurantService restaurantService;
 
-	@Operation(summary = "사업장 조회", description = "사업장을 조회하는 api")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "조회 완료"),
-	})
-	@GetMapping("/restaurant/{id}")
-	public ResponseEntity<ResponseWithData<RestaurantProfileDto>> getRestaurant(@PathVariable("id") Integer restaurantId,
-		HttpServletRequest request) {
-
-		String id = (String)request.getAttribute("userId");
-		Integer userId = Integer.valueOf(id);
-
-		RestaurantProfileDto restaurant = restaurantService.getRestaurant(restaurantId, userId);
-
-		ResponseWithData<RestaurantProfileDto> responseWithData = new ResponseWithData<>(
-			HttpStatus.OK.value(), "사업장 조회에 성공하였습니다.", restaurant);
-
-		return ResponseEntity.status(responseWithData.status())
-			.body(responseWithData);
-	}
-
-
-	@Operation(summary = "사업장 등록", description = "사업장을 등록하는 api")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "조회 완료"),
-	})
-	@PostMapping("/restaurant")
-	public ResponseEntity<ResponseWithMessage> createRestaurant(@RequestBody RestaurantProfileDto restaurantProfile,
-		HttpServletRequest request) {
-
-		String id = (String)request.getAttribute("userId");
-		Integer userId = Integer.valueOf(id);
-
-		restaurantService.createRestaurant(restaurantProfile,userId);
-
-		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(),
-			"사업장 정보 설정에 성공하였습니다");
-
-		return ResponseEntity.status(responseWithMessage.status())
-			.body(responseWithMessage);
-	}
-
 
 	@Operation(summary = "가맹점 위치 조회", description = "유저의 화면범위에 있는 가맹점을 조회하는 api")
 	@ApiResponses(value = {
@@ -91,6 +53,23 @@ public class RestaurantController {
 
 		ResponseWithData<RestaurantInfo> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(),
 			"가맹점 조회에 성공하였습니다.", restaurant);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
+	}
+
+
+	@Operation(summary = "가맹점 상세 조회", description = "가맹점의 상세정보를 조회하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "조회 완료"),
+	})
+	@GetMapping("/restaurant/{restaurantId}")
+	public ResponseEntity<ResponseWithData<RestaurantDetailInfo>> getRestaurantDetail(@PathVariable("restaurantId") Integer restaurantId){
+
+		RestaurantDetailInfo restaurantDetail = restaurantService.getRestaurantDetail(restaurantId);
+
+		ResponseWithData<RestaurantDetailInfo> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(),
+			"식당 상세정보 조회에 성공하였습니다", restaurantDetail);
 
 		return ResponseEntity.status(responseWithData.status())
 			.body(responseWithData);

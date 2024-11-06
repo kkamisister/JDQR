@@ -41,7 +41,7 @@ public class TableRepositoryImpl implements TableRepository {
 
 		Query query = new Query();
 
-		query.addCriteria(Criteria.where("restaurand_id").is(restaurantId));
+		query.addCriteria(Criteria.where("restaurant_id").is(restaurantId));
 
 		return mongoTemplate.find(query,Table.class);
 

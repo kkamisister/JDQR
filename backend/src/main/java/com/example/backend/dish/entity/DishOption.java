@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +21,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class DishOptionGroup extends BaseEntity {
+@Table(name = "dish_options")
+public class DishOption extends BaseEntity {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -30,14 +32,14 @@ public class DishOptionGroup extends BaseEntity {
 	private Dish dish;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "option_group_id")
-	private OptionGroup optionGroup;
+	@JoinColumn(name = "option_id")
+	private Option option;
 
-	public static DishOptionGroup of(Dish dish, OptionGroup optionGroup) {
+	public static DishOption of(Dish dish, Option option) {
 
-		return DishOptionGroup.builder()
+		return DishOption.builder()
 			.dish(dish)
-			.optionGroup(optionGroup)
+			.option(option)
 			.build();
 
 	}

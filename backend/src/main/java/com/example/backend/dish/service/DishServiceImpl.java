@@ -1,176 +1,179 @@
 package com.example.backend.dish.service;
 
-import java.util.List;
+import static com.example.backend.dish.dto.DishResponse.*;
 
-import org.springframework.http.HttpStatus;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.backend.common.dto.CommonResponse.ResponseWithMessage;
-import com.example.backend.common.dto.CommonResponse.ResponseWithData;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
-import com.example.backend.dish.dto.DishRequest;
-import com.example.backend.dish.dto.DishRequest.DishInfo;
+import com.example.backend.common.redis.repository.RedisHashRepository;
 import com.example.backend.dish.dto.DishResponse;
+import com.example.backend.dish.dto.DishResponse.DishSimpleInfo;
 import com.example.backend.dish.dto.DishResponse.DishSummaryInfo;
-import com.example.backend.dish.dto.DishResponse.DishSummaryResultDto;
+import com.example.backend.dish.dto.OptionDto;
+import com.example.backend.dish.entity.Choice;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.DishCategory;
-import com.example.backend.dish.entity.DishOptionGroup;
+import com.example.backend.dish.entity.DishOption;
 import com.example.backend.dish.entity.DishTag;
-import com.example.backend.dish.entity.OptionGroup;
+import com.example.backend.dish.entity.Option;
 import com.example.backend.dish.entity.Tag;
 import com.example.backend.dish.repository.DishCategoryRepository;
-import com.example.backend.dish.repository.DishOptionGroupRepository;
+import com.example.backend.dish.repository.DishOptionRepository;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.DishTagRepository;
-import com.example.backend.dish.repository.OptionGroupRepository;
-import com.example.backend.dish.repository.TagRepository;
-import com.example.backend.owner.entity.Owner;
-import com.example.backend.owner.repository.OwnerRepository;
+import com.example.backend.etc.entity.Restaurant;
+import com.example.backend.etc.repository.RestaurantRepository;
+import com.example.backend.table.entity.Table;
+import com.example.backend.table.repository.TableRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
+@Slf4j
 public class DishServiceImpl implements DishService {
 
+	private final TableRepository tableRepository;
+	private final RestaurantRepository restaurantRepository;
 	private final DishRepository dishRepository;
-	private final DishCategoryRepository dishCategoryRepository;
-	private final OwnerRepository ownerRepository;
+	private final RedisHashRepository redisHashRepository;
 	private final DishTagRepository dishTagRepository;
-	private final TagRepository tagRepository;
-	private final OptionGroupRepository optionGroupRepository;
-	private final DishOptionGroupRepository dishOptionGroupRepository;
+	private final DishOptionRepository dishOptionRepository;
 
+	/**
+	 * 음식점의 메뉴판을 조회하는 메서드
+	 * @param tableId
+	 * @return
+	 */
 	@Override
-	@Transactional
-	public ResponseWithMessage addDish(Integer userId, DishInfo dishInfo) {
+	public DishSummaryResultDto getAllDishes(String tableId) {
 
-		//해당하는 가게 주인이 존재하는지 찾는다.
-		Owner owner = ownerRepository.findById(userId)
-			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
+		//1. 해당 테이블이 존재하는지 조회한다
+		Table table = tableRepository.findById(tableId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
-		//이제 dish를 만들어야 한다..
-		//우선 dishCategory를 가지고 와야한다
-		DishCategory dishCategory = dishCategoryRepository.findById(dishInfo.dishCategoryId())
-			.orElseThrow(() -> new JDQRException(ErrorCode.FUCKED_UP_QR));
+		//2. 식당을 조회한다
+		Restaurant restaurant = restaurantRepository.findById(table.getRestaurantId())
+			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
 
-		// s3에서 저장 한 후 반환된 imageUrl
-		String imageUrl = "";
+		//3. 식당의 메뉴를 조회한다
+		List<Dish> dishes = dishRepository.findDishesByRestaurant(restaurant);
 
-		Dish dish = Dish.of(dishInfo,dishCategory,imageUrl);
+		//4. 현재 메뉴판을 보고있는 사람 수를 찾는다
+		Integer currentUserCnt = redisHashRepository.getCurrentUserCnt(tableId);
 
-		Dish savedDish = dishRepository.save(dish);
-
-		// dishTag 엔티티 생성
-		for(int tagId : dishInfo.tagIds()){
-			Tag tag = tagRepository.findById(tagId)
-				.orElseThrow(() -> new JDQRException(ErrorCode.TAG_NOT_FOUND));
-			DishTag dishTag = DishTag.of(tag, savedDish);
-			dishTagRepository.save(dishTag);
-
+		Map<Integer,String> idToNameMap = new HashMap<>();
+		for(Dish dish : dishes) {
+			DishCategory dishCategory = dish.getDishCategory();
+			idToNameMap.put(dishCategory.getId(), dishCategory.getName());
 		}
 
-		// 메뉴에 대한 옵션그룹 엔티티를 생성
-		for(int optionGroupId : dishInfo.optionIds()){
-			OptionGroup optionGroup = optionGroupRepository.findById(optionGroupId)
-				.orElseThrow(() -> new JDQRException(ErrorCode.OPTIONGROUP_NOT_FOUND));
-			DishOptionGroup dishOptionGroup = DishOptionGroup.of(savedDish,optionGroup);
-			dishOptionGroupRepository.save(dishOptionGroup);
+		Map<Integer,List<DishSimpleInfo>> idToSimpleInfoMap = new HashMap<>();
+		for(Dish dish : dishes){
+
+			DishCategory dishCategory = dish.getDishCategory();
+			// dishCategory정보 추출
+			int dishCategoryId = dishCategory.getId();
+
+			// itmes 항목 채우기
+			// 우선, 메뉴의 태그를 가져와야한다
+			List<DishTag> dishTags = dishTagRepository.findTagsByDish(dish);
+			List<String> tags = dishTags.stream().map(DishTag::getTag)
+				.map(Tag::getName).toList();
+
+			DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags);
+
+			// 카테고리 별 SimpleInfo정보를 추가한다
+			if(!idToSimpleInfoMap.containsKey(dishCategoryId)){
+				List<DishSimpleInfo> dishSimpleInfoList = new ArrayList<>();
+				dishSimpleInfoList.add(dishSimpleInfo);
+				idToSimpleInfoMap.put(dishCategoryId,dishSimpleInfoList);
+			}
+			else idToSimpleInfoMap.get(dishCategoryId).add(dishSimpleInfo);
 		}
 
+		// 정보를 생성한다
+		List<DishSummaryInfo> dishSummaryInfoList = new ArrayList<>();
+		for(Map.Entry<Integer,List<DishSimpleInfo>> entry : idToSimpleInfoMap.entrySet()){
 
-		return new ResponseWithMessage(HttpStatus.OK.value(), "메뉴목록에 추가했습니다");
+			int dishCategoryId = entry.getKey();
+			String dishCategoryName = idToNameMap.get(dishCategoryId);
+			List<DishSimpleInfo> dishSimpleInfoList = entry.getValue();
+
+			DishSummaryInfo dishSummaryInfo = DishSummaryInfo.builder()
+				.dishCategoryId(dishCategoryId)
+				.dishCategoryName(dishCategoryName)
+				.items(dishSimpleInfoList)
+				.build();
+			dishSummaryInfoList.add(dishSummaryInfo);
+		}
+		List<String> dishCategories = idToNameMap.values().stream().map(String::toString).toList();
+
+		// 반환 DTO
+		DishSummaryResultDto dishSummaryResultDto = DishSummaryResultDto.builder()
+			.tableId(tableId)
+			.tableName(table.getName())
+			.peopleCount(currentUserCnt)
+			.dishCategories(dishCategories)
+			.dishes(dishSummaryInfoList)
+			.build();
+
+		return dishSummaryResultDto;
 	}
 
-
+	/**
+	 * 음식점의 상세메뉴를 조회하는 메서드
+	 * @param dishId
+	 * @param tableId
+	 * @return
+	 */
 	@Override
-	@Transactional
-	public ResponseWithMessage removeDish(Integer userId, Integer dishId) {
-		//해당하는 가게 주인이 존재하는지 찾는다.
-		Owner owner = ownerRepository.findById(userId)
-			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
+	public DishDetailInfo getDish(Integer dishId, String tableId) {
 
-		//가게 주인이 없애려는 메뉴가 db에 존재하는지 찾는다
+		//1. 테이블을 조회한다
+		Table table = tableRepository.findById(tableId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
+
+		//2. 메뉴를 찾아온다
 		Dish dish = dishRepository.findById(dishId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
 
-		//매뉴옵션그룹(dish_options) 테이블에서 dish_id컬럼이 dishId인 행들을 삭제
-		List<DishOptionGroup> dishOptionGroups = dishOptionGroupRepository.findByDishId(dishId);
-		for(DishOptionGroup dishOptionGroup : dishOptionGroups){
-			dishOptionGroupRepository.delete(dishOptionGroup);
-		}
-		//메뉴태그(dish_tag) 테이블에서 dis_id컬럼이 dishId인 행들을 삭제
-		List<DishTag> dishTags = dishTagRepository.findByDishId(dishId);
-		dishTagRepository.deleteAll(dishTags);
-		//메뉴(dish) 테이블에서 id컬럼이 dishId인 행 삭제
-		dishRepository.delete(dish);
+		//3. 메뉴의 옵션들을 가지고온다
+		List<DishOption> dishOptions = dishOptionRepository.findByDishId(dishId);
 
-		return new ResponseWithMessage(HttpStatus.OK.value(), "메뉴에서 삭제되었습니다.");
-	}
+		List<OptionDto> optionDtos = new ArrayList<>();
+		for(DishOption dishOption : dishOptions){
 
-	@Override
-	@Transactional
-	public ResponseWithMessage updateDish(Integer userId, Integer dishId, DishInfo dishInfo) {
+			Option option = dishOption.getOption();
+			List<Choice> choices = option.getChoices();
+			OptionDto optionDto = OptionDto.of(option, choices);
 
-		//해당하는 가게 주인이 존재하는지 찾는다.
-		Owner owner = ownerRepository.findById(userId)
-			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
-
-		//가게 주인이 수정하려는 메뉴가 db에 존재하는지 찾는다
-		Dish dish = dishRepository.findById(dishId)
-			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
-
-		//메뉴의 정보(이름, 가격, 설명)를 수정한다.
-		dish.setName(dishInfo.dishName());
-		dish.setPrice(dishInfo.price());
-		dish.setDescription(dishInfo.description());
-
-		//메뉴의 정보(이미지)를 수정한다.
-		String imageUrl = "";
-		dish.setImage(imageUrl);
-
-		//메뉴의 정보(카테고리)를 수정한다.
-		Integer dishCategoryId = dishInfo.dishCategoryId();
-		if(dishCategoryId != null && dishCategoryId > 0){
-			DishCategory dishCategory = dishCategoryRepository.findById(dishInfo.dishCategoryId())
-				.orElseThrow(() -> new JDQRException(ErrorCode.FUCKED_UP_QR));
-			dish.setDishCategory(dishCategory);
+			optionDtos.add(optionDto);
 		}
 
-		//메뉴의 정보(태그)를 수정한다.
-		//메뉴id가 dishId인 기존의 dishTag 삭제
-		List<DishTag> existingTags = dishTagRepository.findByDishId(dishId);
-		for(DishTag dishTag : existingTags){
-			dishTagRepository.delete(dishTag);
-		}
-		//새로운 dishTag 추가
-		for(int tagId : dishInfo.tagIds()){
-			Tag tag = tagRepository.findById(tagId)
-				.orElseThrow(() -> new JDQRException(ErrorCode.TAG_NOT_FOUND));
-			DishTag newDishTag = DishTag.of(tag, dish);
-			dishTagRepository.save(newDishTag);
-		}
+		// 4. 메뉴의 태그들을 가지고온다
+		List<DishTag> dishTags = dishTagRepository.findTagsByDish(dish);
+		List<String> tags = dishTags.stream().map(DishTag::getTag)
+			.map(Tag::getName).toList();
 
-		//메뉴의 정보(옵션그룹)를 수정한다.
-		//메뉴id가 dishId인 기존의 optionGroup 삭제
-		List<DishOptionGroup> existingOptionGroups = dishOptionGroupRepository.findByDishId(dishId);
-		for(DishOptionGroup dishOptionGroup : existingOptionGroups){
-			dishOptionGroupRepository.delete(dishOptionGroup);
-		}
-		//새로운 optionGroup 추가
-		for(int optionGroupId : dishInfo.optionIds()){
-			OptionGroup optionGroup = optionGroupRepository.findById(optionGroupId)
-				.orElseThrow(() -> new JDQRException(ErrorCode.OPTIONGROUP_NOT_FOUND));
-			DishOptionGroup newDishOptionGroup = DishOptionGroup.of(dish, optionGroup);
-			dishOptionGroupRepository.save(newDishOptionGroup);
-		}
+		// 5. 반환 DTO
+		DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish,optionDtos,tags);
 
-		dishRepository.save(dish);
+		return dishDetailInfo;
 
-		return new ResponseWithMessage(HttpStatus.OK.value(), "메뉴가 수정되었습니다.");
 	}
 
 }

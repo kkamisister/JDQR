@@ -17,9 +17,9 @@ import com.example.backend.common.enums.UseStatus;
 import com.example.backend.common.util.RandomUtil;
 import com.example.backend.common.util.TimeUtil;
 import com.example.backend.dish.entity.Dish;
-import com.example.backend.dish.entity.Option;
+import com.example.backend.dish.entity.Choice;
 import com.example.backend.dish.repository.DishRepository;
-import com.example.backend.dish.repository.OptionRepository;
+import com.example.backend.dish.repository.ChoiceRepository;
 import com.example.backend.order.dto.CartRequest.*;
 import com.example.backend.order.dto.OrderRequest.*;
 import com.example.backend.order.entity.*;
@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
 	private final OrderItemRepository orderItemRepository;
 	private final OrderItemOptionRepository orderItemOptionRepository;
 	private final DishRepository dishRepository;
-	private final OptionRepository optionRepository;
+	private final ChoiceRepository choiceRepository;
 	private final PaymentRepository paymentRepository;
 	private final PaymentDetailRepository paymentDetailRepository;
 	private final SimpMessagingTemplate messagingTemplate;
@@ -100,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	@Override
 	@Transactional
-	@RedLock(key = "'table:' + #tableId", waitTime = 5000L,leaseTime = 1000L)
+	// @RedLock(key = "'table:' + #tableId", waitTime = 5000L,leaseTime = 1000L)
 	public void addItem(String tableId,CartDto productInfo) {
 
 		// 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
@@ -145,6 +145,7 @@ public class OrderServiceImpl implements OrderService {
 		// 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
 		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
+		log.warn("table : {}",table);
 
 		// 3-4. 최종적으로 전송할 데이터
 		List<CartDto> cartList = allCartDatas.values().stream()
@@ -154,6 +155,7 @@ public class OrderServiceImpl implements OrderService {
 		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize);
 
 		// notificationService.sentToClient(tableId,sendData);
+		log.warn("sendData : {}",sendData);
 		messagingTemplate.convertAndSend("/sub/cart/"+tableId,sendData);
 	}
 
@@ -617,12 +619,12 @@ public class OrderServiceImpl implements OrderService {
 
 	// orderItem과 해당 orderItem에 포함된 optionId 리스트를 이용해서, orderItemOption 리스트를 만드는 메서드
 	private List<OrderItemOption> getOrderItemOptions(OrderItem orderItem, List<Integer> optionIds) {
-		List<Option> options = optionRepository.findAllById(optionIds);
+		List<Choice> choices = choiceRepository.findAllById(optionIds);
 
-		return options.stream()
-			.map(option -> OrderItemOption.builder()
+		return choices.stream()
+			.map(choice -> OrderItemOption.builder()
 				.orderItem(orderItem)
-				.option(option)
+				.choice(choice)
 				.build())
 			.toList();
 	}

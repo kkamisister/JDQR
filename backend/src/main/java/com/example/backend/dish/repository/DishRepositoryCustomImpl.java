@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.example.backend.common.repository.Querydsl4RepositorySupport;
 import com.example.backend.dish.entity.Dish;
+import com.example.backend.dish.entity.DishCategory;
 import com.example.backend.dish.entity.QDish;
 import com.example.backend.dish.entity.QDishCategory;
 import com.example.backend.etc.entity.Restaurant;
@@ -17,6 +18,13 @@ public class DishRepositoryCustomImpl extends Querydsl4RepositorySupport impleme
 		return selectFrom(dish)
 			.join(dish.dishCategory, dishCategory).fetchJoin()
 			.where(dishCategory.restaurant.eq(restaurant))
+			.fetch();
+	}
+	@Override
+	public List<Dish> findDishesByKeyword(Restaurant restaurant, String keyword) {
+		return selectFrom(dish)
+			.join(dish.dishCategory, dishCategory).fetchJoin()
+			.where(dishCategory.restaurant.eq(restaurant).and(dish.name.containsIgnoreCase(keyword)))
 			.fetch();
 	}
 }

@@ -7,4 +7,5 @@ import com.example.backend.etc.entity.Restaurant;
 
 public interface DishRepositoryCustom {
 	List<Dish> findDishesByRestaurant(Restaurant restaurant);
+	List<Dish> findDishesByKeyword(Restaurant restaurant, String keyword);
 }

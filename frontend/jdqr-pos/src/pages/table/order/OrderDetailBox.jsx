@@ -35,6 +35,7 @@ const OrderDetailBox = ({ table }) => {
 								justifyContent: 'space-between',
 								alignItems: 'center',
 							}}
+							key={dish.dishName + dish.quantity}
 							direction="row">
 							<Box>{`${dish.dishName} x${dish.quantity}`}</Box>
 							<Box>

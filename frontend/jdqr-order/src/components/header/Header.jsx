@@ -45,7 +45,7 @@ export default function Header({ title, BackPage = false }) {
           <Chip
             label="3번 테이블"
             sx={{
-              bgcolor: colors.text.sub2,
+              bgcolor: colors.main.primary500,
               borderRadius: "10px",
               color: colors.text.white,
             }}

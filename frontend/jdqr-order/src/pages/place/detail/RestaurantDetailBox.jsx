@@ -6,7 +6,7 @@ const RestaurantDetailBox = () => {
   return (
     <MapListContainer
       sx={{
-        backgroundColor: "black",
+        backgroundColor: "white",
         height: "50vh",
       }}
     >

@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.example.backend.common.enums.EntityStatus;
 import com.example.backend.dish.entity.Dish;
+import com.example.backend.dish.entity.DishOption;
+import com.example.backend.dish.repository.DishOptionRepository;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.order.entity.Order;
@@ -46,6 +48,7 @@ public class TableServiceImpl implements TableService{
 	private final OrderRepository orderRepository;
 	private final OrderItemRepository orderItemRepository;
 	private final DishRepository dishRepository;
+	private final DishOptionRepository dishOptionRepository;
 	/**
 	 * 요청받은 테이블의 정보를, userId를 가진 점주를 찾아 등록한다
 	 * @param tableInfo
@@ -155,7 +158,6 @@ public class TableServiceImpl implements TableService{
 	 */
 	@Override
 	public void getAllTables(Integer userId) {
-
 		//1. 점주를 조회한다
 		Owner owner = ownerRepository.findById(userId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
@@ -178,6 +180,14 @@ public class TableServiceImpl implements TableService{
 
 					// 해당 주문에 있는 모든 Dish를 가지고온다
 					List<Dish> dishes = dishRepository.findAllByOrder(order);
+
+					for(Dish dish : dishes){
+
+						List<DishOption> options = dishOptionRepository.findByDish(dish);
+
+
+					}
+
 
 
 

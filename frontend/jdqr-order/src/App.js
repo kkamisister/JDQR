@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import HomePage from "./pages/place/HomePage"
 import RestaurantDetailPage from "./pages/place/detail/RestaurantDetailPage"
 import DishPage from "./pages/dish/DishPage"
 import CartPage from "./pages/cart/CartPage"
 import PaymentPage from "./pages/payment/PaymentPage"
 import { SnackbarProvider } from "notistack"
+import HomePage from "./pages/place/main/HomePage"
 
 function App() {
   return (

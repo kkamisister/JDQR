@@ -33,8 +33,6 @@ const RestaurantDetailPage = () => {
           bottom: 0,
           left: 0,
           right: 0,
-          marginTop: "105px",
-          overflowY: "auto",
         }}
       >
         <RestaurantDetailBox />

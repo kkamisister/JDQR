@@ -2,11 +2,11 @@ import React from "react"
 import { Stack } from "@mui/material"
 import { colors } from "../../constants/colors"
 
-const MapListContainer = ({ children, sx, height }) => {
+const MapListContainer = ({ children, sx, height, spacing }) => {
   return (
     <Stack
       direction="column"
-      spacing={2}
+      spacing={spacing}
       sx={{
         position: "relative", // 기존 "sticky"에서 변경
         width: "100%",

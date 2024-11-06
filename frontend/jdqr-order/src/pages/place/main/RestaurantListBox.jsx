@@ -7,7 +7,7 @@ import MapListContainer from "../../../components/container/MapListContainer"
 
 const RestaurantListBox = () => {
   return (
-    <MapListContainer>
+    <MapListContainer spacing={2}>
       <Stack
         sx={{
           height: "20px",

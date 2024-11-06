@@ -3,17 +3,20 @@ package com.example.backend.dish.repository;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.awt.*;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.example.backend.common.config.QuerydslConfig;
+import com.example.backend.config.ContainerSupport;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.DishCategory;
 import com.example.backend.etc.entity.Restaurant;
@@ -26,8 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 @ActiveProfiles("test")
 @DataJpaTest
 @Import({QuerydslConfig.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Slf4j
-class DishRepositoryTest {
+class DishRepositoryTest extends ContainerSupport {
 
 	@Autowired
 	private OwnerRepository ownerRepository;

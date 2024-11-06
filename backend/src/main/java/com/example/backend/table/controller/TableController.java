@@ -7,6 +7,7 @@ import static com.example.backend.table.dto.TableResponse.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,17 +33,17 @@ public class TableController {
 
 	private final TableService tableService;
 
-	@Operation(summary = "QR 생성", description = "QR을 재생성하는 api")
+	@Operation(summary = "전체 테이블 조회", description = "전체 테이블을 조회하는 api")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "QR 생성 완료"),
+		@ApiResponse(responseCode = "200", description = "전체 테이블 조회완료"),
 	})
-	@PostMapping("/qr")
+	@GetMapping("")
 	public ResponseEntity<?> getAllTables(HttpServletRequest request){
 
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
-		// tableService.getAllTables(userId);
+		tableService.getAllTables(userId);
 		return null;
 	}
 

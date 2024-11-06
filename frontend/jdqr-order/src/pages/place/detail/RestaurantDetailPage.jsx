@@ -1,29 +1,45 @@
 import React from "react"
-import { Stack } from "@mui/material"
-import MapListContainer from "../../../components/container/MapListContainer"
-import RestaurantInfo from "./RestaurantInfo"
+import BackButton from "../../../components/button/BackButton"
+import KakaoMap from "../../../components/map/KakaoMap"
+import RestaurantDetailBox from "./RestaurantDetailBox"
 
 const RestaurantDetailPage = () => {
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        marginTop: "105px",
-        overflowY: "auto",
-      }}
-    >
-      <MapListContainer
-        sx={{
-          backgroundColor: "white",
-          height: "50vh",
+    <>
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
         }}
       >
-        <RestaurantInfo />
-      </MapListContainer>
-    </div>
+        <BackButton />
+      </div>
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: -1,
+        }}
+      >
+        <KakaoMap />
+      </div>
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          marginTop: "105px",
+          overflowY: "auto",
+        }}
+      >
+        <RestaurantDetailBox />
+      </div>
+    </>
   )
 }
 

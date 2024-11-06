@@ -31,13 +31,13 @@ spring:
 
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
 
 
-#  mongodb:
-#    uri: mongodb://ssafy:zeroticket607@j11a607.p.ssafy.io:27017/
-#    database: product
+  #  mongodb:
+  #    uri: mongodb://ssafy:zeroticket607@j11a607.p.ssafy.io:27017/
+  #    database: product
 
   logging.level:
     org.hibernate.SQL: debug
@@ -60,3 +60,15 @@ external:
     toss: test_sk_Z61JOxRQVEGdzZDnPgkQ8W0X9bAq
   url:
     toss: https://api.tosspayments.com
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY_ID}
+      secretKey: ${AWS_SECRET_ACCESS_KEY}
+    s3:
+      bucketName: ${AWS_S3_BUCKET_NAME}
+    region:
+      static: ${AWS_REGION_STATIC}
+    stack:
+      auto: false

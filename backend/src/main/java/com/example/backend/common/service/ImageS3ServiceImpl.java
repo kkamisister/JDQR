@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -28,20 +29,24 @@ public class ImageS3ServiceImpl implements ImageS3Service{
 
     @Override
     public String uploadImageToS3(MultipartFile image) { //이미지를 S3에 업로드하고 이미지의 url을 반환
-        String originName = image.getOriginalFilename(); //원본 이미지 이름
-        String ext = originName.substring(originName.lastIndexOf(".")); //확장자
-        String changedName = changedImageName(originName); //새로 생성된 이미지 이름
-        ObjectMetadata metadata = new ObjectMetadata(); //메타데이터
-        metadata.setContentType("image/"+ext);
         try {
+            byte[] fileContent = image.getBytes();
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(fileContent);
+
+            String originName = image.getOriginalFilename(); //원본 이미지 이름
+            String ext = originName.substring(originName.lastIndexOf(".")); //확장자
+            String changedName = changedImageName(originName); //새로 생성된 이미지 이름
+            ObjectMetadata metadata = new ObjectMetadata(); //메타데이터
+            metadata.setContentLength(fileContent.length);
+            metadata.setContentType("image/"+ext);
+
             PutObjectResult putObjectResult = amazonS3.putObject(new PutObjectRequest(
                 bucketName, changedName, image.getInputStream(), metadata
             ).withCannedAcl(CannedAccessControlList.PublicRead));
 
+            return amazonS3.getUrl(bucketName, changedName).toString(); //데이터베이스에 저장할 이미지가 저장된 주소
         } catch (IOException e) {
             throw new JDQRException(ErrorCode.S3_IMAGE_UPLOAD_ERROR); //커스텀 예외 던짐.
         }
-        return amazonS3.getUrl(bucketName, changedName).toString(); //데이터베이스에 저장할 이미지가 저장된 주소
-
     }
 }

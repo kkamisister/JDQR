@@ -326,7 +326,7 @@ public class OrderServiceImpl implements OrderService {
 			if(checkOrderIsFinished(tossOrderId)) {
 				Table table = tableRepository.findById(tableId)
 					.orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
-				table.setStatus(UseStatus.AVAILABLE);
+				table.setUseStatus(UseStatus.AVAILABLE);
 				tableRepository.save(table);
 
 				return SimpleResponseMessage.WHOLE_PAYMENT_SUCCESS;

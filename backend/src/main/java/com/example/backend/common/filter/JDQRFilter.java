@@ -46,17 +46,16 @@ public class JDQRFilter extends OncePerRequestFilter {
         }
 
         // 개발 편의를 위한 임시 로직
-        // Bearer token에 "dummyAccessToken"을 입력하면, dummy user 정보로 인증된 후 넘어감
-        if (accessToken.equals("dummyAccessToken")) {
-            request.setAttribute("userId","1");
+        if (accessToken.equals("dummyAccessToken") || accessToken.equals("dummyTableToken")){
+            // Bearer token에 "dummyAccessToken"을 입력하면, dummy user 정보로 인증된 후 넘어감
+            if (accessToken.equals("dummyAccessToken")) {
+                request.setAttribute("userId","1");
+            }
+            if(accessToken.equals("dummyTableToken")){
+                request.setAttribute("tableId","6721aa9b0d22a923091eef73");
+            }
             filterChain.doFilter(request, response);
         }
-
-        if(accessToken.equals("dummyTableToken")){
-            request.setAttribute("tableId","6721aa9b0d22a923091eef73");
-            filterChain.doFilter(request,response);
-        }
-
         else {
             try{
                 if(tokenProvider.validateToken(accessToken)){

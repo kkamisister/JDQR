@@ -3,11 +3,11 @@ import { Box, Divider, Stack } from "@mui/material"
 import RestaurantItemCard from "../../../components/card/RestaurantItemCard"
 import PeopleFilter from "./PeopleFilter"
 import { colors } from "../../../constants/colors"
-import MapListBox from "../../../components/box/MapListBox"
+import MapListContainer from "../../../components/container/MapListContainer"
 
-const RestaurantList = () => {
+const RestaurantListBox = () => {
   return (
-    <MapListBox>
+    <MapListContainer>
       <Stack
         sx={{
           height: "20px",
@@ -35,8 +35,8 @@ const RestaurantList = () => {
       <RestaurantItemCard />
       <RestaurantItemCard />
       <RestaurantItemCard />
-    </MapListBox>
+    </MapListContainer>
   )
 }
 
-export default RestaurantList
+export default RestaurantListBox

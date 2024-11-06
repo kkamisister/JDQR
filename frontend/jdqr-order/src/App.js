@@ -1,31 +1,28 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import IndexPage from "./pages/Index/IndexPage";
-import Layout from "./Layout";
-import DishPage from "./pages/dish/DishPage";
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import RestaurantDetailPage from "./pages/place/detail/RestaurantDetailPage"
+import DishPage from "./pages/dish/DishPage"
+import CartPage from "./pages/cart/CartPage"
+import PaymentPage from "./pages/payment/PaymentPage"
+import { SnackbarProvider } from "notistack"
+import HomePage from "./pages/place/main/HomePage"
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <Layout>
-              <IndexPage />
-            </Layout>
-          }
-        />
-        <Route
-          path="/dish"
-          element={
-            <Layout>
-              <DishPage />
-            </Layout>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
-  );
+    <SnackbarProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/restaurant/detail/:restaurantId"
+            element={<RestaurantDetailPage />}
+          />
+          <Route path="/dish" element={<DishPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
+        </Routes>
+      </BrowserRouter>
+    </SnackbarProvider>
+  )
 }
 
-export default App;
+export default App

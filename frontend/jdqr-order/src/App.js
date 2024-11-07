@@ -11,7 +11,7 @@ function App() {
     <SnackbarProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/place" element={<HomePage />} />
           <Route
             path="/restaurant/detail/:restaurantId"
             element={<RestaurantDetailPage />}

@@ -90,7 +90,7 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "메뉴 추가 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	@PostMapping("")
+	@PostMapping("/dish")
 	public ResponseEntity<ResponseWithMessage> addDish(@RequestBody DishRequest.DishInfo dishInfo,
 		HttpServletRequest request){
 		//2-1. 유저 확인
@@ -110,7 +110,7 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "메뉴 삭제 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	@DeleteMapping("")
+	@DeleteMapping("/dish")
 	public ResponseEntity<ResponseWithMessage> deleteDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId,
 		HttpServletRequest request){
 		//3-1. 유저 확인
@@ -130,7 +130,7 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "메뉴 수정 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	@PutMapping("")
+	@PutMapping("/dish")
 	public ResponseEntity<ResponseWithMessage> updateDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId, @RequestBody DishRequest.DishInfo dishInfo,
 		HttpServletRequest request){
 		//4-1. 유저 확인

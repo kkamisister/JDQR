@@ -2,10 +2,10 @@ import { Stack, Box, Typography, Divider } from "@mui/material";
 import PaymentTab from "./PaymentTab";
 import BaseButton from "../../components/button/BaseButton";
 import DishItemCard from "../../components/card/DishItemCard";
-import MoneyDiviard from "../../components/card/DishItemCard";
 import MoneyDivideInfo from "./MoneyDivideInfo";
 import { useState } from "react";
 import { colors } from "../../constants/colors";
+import QuantitySelectDialog from "../../components/dialog/QuantitySelectDialog";
 
 const mockData = {
   orderId: 1,
@@ -67,14 +67,36 @@ export default function PaymentList() {
 
   const aggregatedDishes = aggregateDishes(mockData);
 
-  const onClick = () => {};
   const count = mockData.dishCnt;
   const totalPrice = mockData.price;
 
   const [selectedTab, setSelectedTab] = useState("함께 결제");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedDish, setSelectedDish] = useState(null);
+
+  const proceedToPayment = () => {
+    // 토스결제로넘엉감
+  };
 
   const handleTabClick = (selectedOrder) => {
     setSelectedTab(selectedOrder);
+  };
+
+  const handleDishClick = (dish) => {
+    if (selectedTab === "각자 결제" && dish.quantity > 1) {
+      setSelectedDish(dish);
+      setDialogOpen(true);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedDish(null);
+  };
+
+  const handleSelectQuantity = (quantity) => {
+    console.log("Selected quantity:", quantity);
+    // 수량 선택 후 처리할 로직 추가 가능
   };
 
   return (
@@ -87,13 +109,14 @@ export default function PaymentList() {
         <MoneyDivideInfo initTotal={1} initPortion={1} />
       )}
       {aggregatedDishes.map((dish) => (
-        <>
+        <Box
+          key={`${dish.dishId}-${dish.options
+            .map((option) => `${option.optionId}-${option.choiceId}`)
+            .join("_")}`}
+        >
           <DishItemCard
-            key={`${dish.dishId}-${dish.options
-              .map((option) => `${option.optionId}-${option.choiceId}`)
-              .join("_")}`}
             dish={dish}
-            onClick={onClick}
+            onClick={() => handleDishClick(dish)}
             hasImage={false}
             hasOption={true}
             sx={{
@@ -106,11 +129,18 @@ export default function PaymentList() {
             </Typography>
           </DishItemCard>
           <Divider variant="middle" />
-        </>
+        </Box>
       ))}
-      <BaseButton count={count} onClick={onClick}>
+      <BaseButton count={count} onClick={proceedToPayment}>
         {`${totalPrice.toLocaleString()}원 결제하기`}
       </BaseButton>
+
+      <QuantitySelectDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxQuantity={selectedDish ? selectedDish.quantity : 1}
+        onSelectQuantity={handleSelectQuantity}
+      />
     </Stack>
   );
 }

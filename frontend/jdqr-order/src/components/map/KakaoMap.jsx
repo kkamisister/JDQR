@@ -1,66 +1,56 @@
-import React, { useState } from "react"
-import { Stack, Button } from "@mui/material"
+import React, { useEffect, useState } from "react"
+import { Stack } from "@mui/material"
 import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk"
 import activeMapmarker from "../../assets/images/mapmarker1.png"
 import inactiveMapmarker from "../../assets/images/mapmarker2.png"
 
-const { kakao } = window
-
 const KakaoMap = () => {
   const [isActive, setIsActive] = useState(false)
+  const [location, setLocation] = useState({
+    lat: 37.50125774784631,
+    lng: 127.03956684373539,
+  })
 
-  useKakaoLoader()
+  const isLoaded = useKakaoLoader()
 
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function (position) {
-      const lat = position.coords.latitude
-      const lon = position.coords.longitude
-
-      const locPosition = new kakao.maps.LatLng(lat, lon)
-
-      displayMarker(locPosition)
-    })
-  } else {
-    const locPosition = new kakao.maps.LatLng(
-      37.50125774784631,
-      127.03956684373539
-    )
-
-    displayMarker(locPosition)
-  }
-
-  function displayMarker(locPosition) {
-    const marker = new kakao.maps.Marker({ locPosition })
-  }
+  useEffect(() => {
+    if (isLoaded && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          })
+        },
+        () => {
+          console.warn("Geolocation not available or permission denied.")
+        }
+      )
+    }
+  }, [isLoaded])
 
   return (
     <Stack>
       <Map
         id="map"
-        center={{
-          lat: 37.50125774784631,
-          lng: 127.03956684373539,
-        }}
+        center={location}
         style={{
           top: 0,
           width: "100%",
           height: "60vh",
         }}
         level={3}
-        draggable={true}
-        scrollwheel={true}
+        draggable
+        scrollwheel
       >
         <MapMarker
-          position={{ lat: 37.50125774784631, lng: 127.03956684373539 }}
+          position={location}
           image={{
             src: isActive ? activeMapmarker : inactiveMapmarker,
-            size: {
-              width: 80,
-              height: 60,
-            },
+            size: { width: 80, height: 60 },
           }}
-          onClick={() => setIsActive(!isActive)} // 일단 클릭 시 활성상태 전환으로 설정해둠~~c
-        ></MapMarker>
+          onClick={() => setIsActive(!isActive)}
+        />
       </Map>
     </Stack>
   )

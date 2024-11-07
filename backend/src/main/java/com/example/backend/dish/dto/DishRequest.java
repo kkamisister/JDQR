@@ -7,7 +7,7 @@ public record DishRequest() {
 	public record DishInfo(
 		String dishName,
 		int dishCategoryId,
-		String dishCategory,
+		String dishCategoryName,
 		List<Integer> optionIds,
 		int price,
 		String description,

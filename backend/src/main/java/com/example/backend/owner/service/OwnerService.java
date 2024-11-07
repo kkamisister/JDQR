@@ -2,13 +2,9 @@ package com.example.backend.owner.service;
 
 import static com.example.backend.common.dto.CommonResponse.*;
 import static com.example.backend.dish.dto.DishResponse.*;
-
-import com.example.backend.common.dto.CommonResponse;
 import com.example.backend.dish.dto.DishRequest;
-import com.example.backend.dish.dto.DishResponse;
 import com.example.backend.owner.dto.CategoryDto;
-import com.example.backend.owner.dto.OwnerResponse;
-import com.example.backend.owner.dto.OwnerResponse.CategoryResult;
+import com.example.backend.owner.dto.OwnerResponse.*;
 
 public interface OwnerService {
 
@@ -23,4 +19,5 @@ public interface OwnerService {
 	void removeCategory(Integer dishCategoryId,Integer userId);
 	CategoryResult getAllCategories(Integer userId);
 
+    WholeOptionResponseDto getWholeOptionInfo(Integer userId);
 }

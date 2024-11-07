@@ -8,8 +8,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.Objects;
 
+import com.example.backend.dish.dto.ChoiceDto;
+import com.example.backend.etc.entity.Restaurant;
+import com.example.backend.etc.repository.RestaurantRepository;
+import com.example.backend.owner.dto.OptionVo;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +35,7 @@ import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.DishTagRepository;
 import com.example.backend.dish.repository.OptionRepository;
 import com.example.backend.dish.repository.TagRepository;
-import com.example.backend.etc.entity.Restaurant;
-import com.example.backend.etc.repository.RestaurantRepository;
 import com.example.backend.owner.dto.CategoryDto;
-import com.example.backend.owner.dto.OwnerResponse;
 import com.example.backend.owner.entity.Owner;
 import com.example.backend.owner.repository.OwnerRepository;
 
@@ -182,6 +184,56 @@ public class OwnerServiceImpl implements OwnerService{
 		dishRepository.save(dish);
 
 		return new CommonResponse.ResponseWithMessage(HttpStatus.OK.value(), "메뉴가 수정되었습니다.");
+	}
+
+	@Override
+	public WholeOptionResponseDto getWholeOptionInfo(Integer userId) {
+
+		// 1. userId에 해당하는 restaurant를 찾는다.
+		Restaurant restaurant = restaurantRepository.findByOwnerId(userId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
+
+		// 2. option table과 choice table을 join하여 현재 restaurant에 해당하는 옵션 정보를 들고 온다.
+		List<OptionVo> optionVos = optionRepository.findAllOptionByRestaurant(restaurant);
+
+		// 3. optionVos를 가지고 알맞은 api 반환 형식으로 가공한다.
+		// 3-1. stream의 groupingBy를 이용해 optionId를 key로 분류한다.
+		Map<Integer, List<OptionVo>> optionGroupByOptionId = optionVos.stream()
+			.collect(Collectors.groupingBy(OptionVo::getOptionId));
+
+		// 3-2. 각 option에 대해 세부 옵션 정보를 저장한다.
+		List<OptionResponseDto> optionResponseDtos = optionGroupByOptionId.entrySet().stream()
+			.map(optionEntry -> {
+				Integer optionId = optionEntry.getKey();
+				List<OptionVo> values = optionEntry.getValue();
+
+				// 옵션 그룹에 대한 정보를 담고 있는 class
+				OptionVo baseOptionVo = values.get(0);
+
+				// 세부 옵션 정보 구하기
+				List<ChoiceDto> choiceDtos = values.stream()
+					.map(optionVo -> ChoiceDto.builder()
+						.choiceId(optionVo.getChoiceId())
+						.choiceName(optionVo.getChoiceName())
+						.price(optionVo.getPrice())
+						.build()
+					)
+					.toList();
+
+				return OptionResponseDto.builder()
+					.optionId(optionId)
+					.optionName(baseOptionVo.getOptionName())
+					.choices(choiceDtos)
+					.maxChoiceCount(baseOptionVo.getMaxChoiceCount())
+					.isMandatory(baseOptionVo.getMandatory())
+					.build();
+			})
+			.toList();
+
+		// 옵션 리스트를 바탕으로 record build 후 반환
+		return WholeOptionResponseDto.builder()
+			.options(optionResponseDtos)
+			.build();
 	}
 
 	/**

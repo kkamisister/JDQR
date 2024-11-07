@@ -10,5 +10,5 @@ public interface RestaurantRepository extends JpaRepository<Restaurant,Integer>,
 
 
 	Optional<Restaurant> findByOwner(Owner owner);
-
+	Optional<Restaurant> findByOwnerId(int ownerId);
 }

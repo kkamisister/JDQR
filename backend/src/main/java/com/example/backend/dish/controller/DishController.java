@@ -58,7 +58,7 @@ public class DishController {
 		@ApiResponse(responseCode = "200", description = "메뉴 조회 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	@GetMapping("{dishId}")
+	@GetMapping("/{dishId}")
 	public ResponseEntity<ResponseWithData<DishDetailInfo>> getDish(@PathVariable("dishId") Integer dishId,HttpServletRequest request){
 
 		String tableId = (String)request.getAttribute("tableId");
@@ -77,7 +77,7 @@ public class DishController {
 		@ApiResponse(responseCode = "200", description = "메뉴 검색 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	@GetMapping("search")
+	@GetMapping("/search")
 	public ResponseEntity<ResponseWithData<DishSearchResultDto>> searchDish(@RequestParam("keyword") @Parameter(description = "메뉴검색 키워드", required = true) String keyword,
 		@RequestParam("restaurantId") @Parameter(description = "메뉴검색 키워드", required = true) Integer restaurantId,
 		HttpServletRequest request){

@@ -57,10 +57,11 @@ public class TableController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "상세 테이블 조회완료"),
 	})
-	@GetMapping("{tableId}")
-	public ResponseEntity<ResponseWithData<TableDetailInfo>> getTable(@PathVariable("tableId")  String tableId,
+	@GetMapping("/{tableId}")
+	public ResponseEntity<ResponseWithData<TableDetailInfo>> getTable(@PathVariable("tableId") String tableId,
 		HttpServletRequest request){
 
+		log.warn("여기에오나?");
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
@@ -81,8 +82,10 @@ public class TableController {
 	@PostMapping("/qr")
 	public ResponseEntity<ResponseWithData<QRInfo>> createQR(@RequestParam("tableId") String tableId,HttpServletRequest request){
 
+		log.warn("요청들어옴!!!");
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
+
 
 		QRInfo qr = tableService.createQR(tableId, userId);
 

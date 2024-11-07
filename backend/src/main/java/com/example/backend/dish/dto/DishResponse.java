@@ -152,7 +152,7 @@ public record DishResponse() {
 	@Builder
 	@Schema(name = "메뉴 검색 결과 데이터", description = "메뉴 검색 결과를 반환하는 DTO")
 	public record DishSearchResultDto(
-		List<Dish> dishes
+		List<DishSimpleInfo> dishes
 	) {
 	}
 

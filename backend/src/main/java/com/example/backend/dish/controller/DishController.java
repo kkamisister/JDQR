@@ -83,7 +83,7 @@ public class DishController {
 		HttpServletRequest request){
 
 		DishSearchResultDto searchedDishes = dishService.getSearchedDishes(keyword, restaurantId);
-		ResponseWithData<DishSearchResultDto> searchedDishListResponseWithData = new ResponseWithData<>(HttpStatus.OK.value(),"메뉴판 조회에 성공하였습니다",searchedDishes);
+		ResponseWithData<DishSearchResultDto> searchedDishListResponseWithData = new ResponseWithData<>(HttpStatus.OK.value(),"메뉴 검색 결과 불러오기에 성공하였습니다",searchedDishes);
 
 		return ResponseEntity.status(searchedDishListResponseWithData.status())
 			.body(searchedDishListResponseWithData);

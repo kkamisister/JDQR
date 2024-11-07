@@ -191,10 +191,21 @@ public class DishServiceImpl implements DishService {
 
 		//2. keyword를 포함하고 있는 식당의 메뉴를 조회한다
 		List<Dish> dishes = dishRepository.findDishesByKeyword(restaurant, keyword);
+		List<DishSimpleInfo> dishSimpleInfos = new ArrayList<>();
+		for(Dish dish : dishes){
+
+			List<DishTag> dishTags = dishTagRepository.findTagsByDish(dish);
+			List<String> tags = dishTags.stream().map(DishTag::getTag)
+				.map(Tag::getName).toList();
+
+			DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags);
+			dishSimpleInfos.add(dishSimpleInfo);
+		}
+
 
 		// 반환 DTO
 		DishSearchResultDto dishSearchResultDto = DishSearchResultDto.builder()
-			.dishes(dishes)
+			.dishes(dishSimpleInfos)
 			.build();
 
 		return dishSearchResultDto;

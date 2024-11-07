@@ -22,6 +22,8 @@ import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.ChoiceRepository;
 import com.example.backend.order.dto.CartRequest.*;
 import com.example.backend.order.dto.OrderRequest.*;
+import com.example.backend.order.dto.OrderResponse.*;
+import com.example.backend.order.dto.OrderResponseVo;
 import com.example.backend.order.entity.*;
 import com.example.backend.order.enums.OrderStatus;
 import com.example.backend.order.enums.PaymentMethod;
@@ -337,6 +339,18 @@ public class OrderServiceImpl implements OrderService {
 		else {
 			return SimpleResponseMessage.PAYMENT_FAILED;
 		}
+	}
+
+	@Override
+	public TotalOrderInfoResponseDto getOrderInfo(String tableId) {
+		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
+
+		List<OrderResponseVo> orderResponseVos = orderRepository.findWholeOrderInfos(tableId);
+
+
+
+
+		return null;
 	}
 
 	/**

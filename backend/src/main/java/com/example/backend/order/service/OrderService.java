@@ -4,6 +4,7 @@ import com.example.backend.order.dto.CartDto;
 import com.example.backend.common.enums.SimpleResponseMessage;
 import com.example.backend.order.dto.CartRequest.*;
 import com.example.backend.order.dto.CartResponse.*;
+import com.example.backend.order.dto.OrderResponse.*;
 
 public interface OrderService {
 
@@ -17,4 +18,6 @@ public interface OrderService {
 	InitialPaymentResponseDto payForOrder(String tableId, PaymentRequestDto paymentRequestDto);
 
 	SimpleResponseMessage finishPayment(String tableId, String tossOrderId, String status, SimpleTossPaymentRequestDto tossPaymentSimpleResponseDto);
+
+    TotalOrderInfoResponseDto getOrderInfo(String tableId);
 }

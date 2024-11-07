@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.example.backend.order.dto.CartRequest.*;
 import com.example.backend.order.dto.CartResponse.*;
+import com.example.backend.order.dto.OrderResponse.*;
 import org.springframework.http.ResponseEntity;
 import com.example.backend.common.dto.CommonResponse.*;
 import com.example.backend.common.enums.SimpleResponseMessage;
@@ -140,6 +141,17 @@ public class OrderController {
 
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);
+	}
+
+	@GetMapping("/")
+	public ResponseEntity<ResponseWithData<TotalOrderInfoResponseDto>> getOrderInfo(HttpServletRequest request) {
+		String tableId = (String)request.getAttribute("tableId");
+
+		TotalOrderInfoResponseDto responseDto = orderService.getOrderInfo(tableId);
+
+		ResponseWithData<TotalOrderInfoResponseDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(), "주문 조회를 완료하였습니다", responseDto);
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
 	}
 }
 

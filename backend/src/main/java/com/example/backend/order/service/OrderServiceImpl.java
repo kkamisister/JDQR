@@ -602,7 +602,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		// orderItems와 cartDatas의 같은 위치에 있는 객체는 같은 주문을 나타냄
-		List<OrderItemOption> orderItemOptions = new ArrayList<>();
+		List<OrderItemChoice> orderItemChoices = new ArrayList<>();
 
 		for (int i = 0; i < orderItems.size(); i++) {
 			OrderItem orderItem = orderItems.get(i);
@@ -610,19 +610,19 @@ public class OrderServiceImpl implements OrderService {
 
 			List<Integer> optionIds = productInfo.getOptionIds();
 
-			orderItemOptions.addAll(getOrderItemOptions(orderItem, optionIds));
+			orderItemChoices.addAll(getOrderItemOptions(orderItem, optionIds));
 		}
 
 		// DB에 저장
-		orderItemOptionRepository.saveAll(orderItemOptions);
+		orderItemOptionRepository.saveAll(orderItemChoices);
 	}
 
 	// orderItem과 해당 orderItem에 포함된 optionId 리스트를 이용해서, orderItemOption 리스트를 만드는 메서드
-	private List<OrderItemOption> getOrderItemOptions(OrderItem orderItem, List<Integer> optionIds) {
+	private List<OrderItemChoice> getOrderItemOptions(OrderItem orderItem, List<Integer> optionIds) {
 		List<Choice> choices = choiceRepository.findAllById(optionIds);
 
 		return choices.stream()
-			.map(choice -> OrderItemOption.builder()
+			.map(choice -> OrderItemChoice.builder()
 				.orderItem(orderItem)
 				.choice(choice)
 				.build())

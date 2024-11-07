@@ -10,8 +10,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "order_item_options")
-public class OrderItemOption extends BaseEntity {
+@Table(name = "order_item_choices")
+public class OrderItemChoice extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

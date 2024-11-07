@@ -28,7 +28,7 @@ public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implem
     @Override
     public List<OrderResponseVo> findWholeOrderInfos(String tableId) {
         return select(Projections.bean(OrderResponseVo.class, order.id, dish.id, orderItem.userId,
-            dish.name, dishCategory.id, dishCategory.name, option.id,
+            dish.name, dish.price, dishCategory.id, dishCategory.name, orderItem.quantity, option.id,
             option.name, choice.id, choice.name, choice.price
         ))
             .from(order)

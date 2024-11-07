@@ -11,7 +11,6 @@ public record OrderResponse() {
     @Schema(name = "전체 주문 내역 조회 결과 반환 dto", description = "주문 내역 조회 api의 응답 결과를 담는다")
     @Builder
     public record TotalOrderInfoResponseDto(
-        Integer orderId,
         String tableName,
         Integer dishCnt,
         Integer price,
@@ -38,7 +37,7 @@ public record OrderResponse() {
         Integer dishCategoryId,
         String dishCategoryName,
         Integer dishPrice,
-        List<OptionDto> options,
+        List<OptionDetailDto> options,
         Integer quantity
     ) {
 

@@ -9,7 +9,7 @@ import lombok.ToString;
 @Setter
 @Builder
 @ToString
-public class OptionDto {
+public class OptionDetailDto {
 	private Integer optionId;
 	private String optionName;
 	private Integer choiceId;

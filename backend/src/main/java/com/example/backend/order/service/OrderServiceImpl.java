@@ -3,6 +3,7 @@ package com.example.backend.order.service;
 import static com.example.backend.order.dto.CartResponse.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import com.example.backend.dish.entity.Choice;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.ChoiceRepository;
 import com.example.backend.order.dto.CartRequest.*;
+import com.example.backend.order.dto.OptionDetailDto;
 import com.example.backend.order.dto.OrderRequest.*;
 import com.example.backend.order.dto.OrderResponse.*;
 import com.example.backend.order.dto.OrderResponseVo;
@@ -343,14 +345,82 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public TotalOrderInfoResponseDto getOrderInfo(String tableId) {
+
+		// 1. 현재 조회하기를 원하는 테이블의 정보 받아오기
 		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
+		// 2. 테이블을 join한 결과 받아오기
 		List<OrderResponseVo> orderResponseVos = orderRepository.findWholeOrderInfos(tableId);
 
+		// 3. stream의 groupingBy 옵션을 이용하여 join된 결과물을 종류별로 분리
+		// orderId -> dishId -> List<OrderResponseVo> 구조
+		Map<Integer, Map<Integer, List<OrderResponseVo>>> orderGroup = orderResponseVos.stream()
+			.collect(Collectors.groupingBy(OrderResponseVo::getOrderId,
+				Collectors.groupingBy(OrderResponseVo::getDishId)));
 
+		// 4. table과 orderResponseVos를 이용하여, TotalOrderInfoResponseDto 구하기
+		// 4-1. 담은 음식의 총 개수와 담은 음식의 총 가격을 구하기
+		int totalDishCount = orderResponseVos.size();
+		int totalPrice = orderResponseVos.stream()
+			.mapToInt(vo -> Integer.parseInt(vo.getDishPrice() + vo.getChoicePrice()))
+			.sum();
 
+		// 4-2. OrderInfoResponseDto 데이터 만들기
+		List<OrderInfoResponseDto> orderInfoResponseDtos = orderGroup.entrySet().stream()
+			.map(entry -> {
+				Integer orderId = entry.getKey();
+				Map<Integer, List<OrderResponseVo>> orderGroupByDishId = entry.getValue();
 
-		return null;
+				// 4-2-1. dishInfoResponseDtos 리스트 생성
+				List<DishInfoResponseDto> dishInfoResponseDtos = orderGroupByDishId.entrySet().stream()
+					.map(dishEntry -> {
+						Integer dishId = dishEntry.getKey();
+						List<OrderResponseVo> values = dishEntry.getValue();
+
+						// 메뉴에 대한 기본 정보를 담고 있는 class
+						OrderResponseVo baseOrder = values.get(0);
+
+						// 옵션들에 대한 정보를 담는 list 구하기
+						List<OptionDetailDto> options = values.stream()
+							.map(option -> OptionDetailDto.builder()
+								.optionId(option.getOptionId())
+								.optionName(option.getOptionName())
+								.choiceId(option.getChoiceId())
+								.choiceName(option.getChoiceName())
+								.choicePrice(option.getDishPrice())
+								.build()
+							)
+							.toList();
+
+						// baseOrder와 options를 결합하여 DishInfoResponseDto 만들기
+						return DishInfoResponseDto.builder()
+							.dishId(dishId)
+							.userId(baseOrder.getUserId())
+							.dishName(baseOrder.getDishName())
+							.dishCategoryId(baseOrder.getDishCategoryId())
+							.dishCategoryName(baseOrder.getDishCategoryName())
+							.dishPrice(baseOrder.getDishPrice())
+							.options(options)
+							.quantity(baseOrder.getQuantity())
+							.build();
+					})
+					.toList();
+
+				// orderId와 dishInfoResponseDtos를 결합
+				return OrderInfoResponseDto.builder()
+					.orderId(orderId)
+					.dishes(dishInfoResponseDtos)
+					.build();
+			})
+			.toList();
+
+		// table과 orderInfoResponseDtos를 결합
+		return TotalOrderInfoResponseDto.builder()
+			.tableName(table.getName())
+			.dishCnt(totalDishCount)
+			.price(totalPrice)
+			.orders(orderInfoResponseDtos)
+			.build();
 	}
 
 	/**

@@ -36,7 +36,7 @@ public record OrderResponse() {
         String dishName,
         Integer dishCategoryId,
         String dishCategoryName,
-        Integer dishPrice,
+        Integer price,
         List<OptionDetailDto> options,
         Integer quantity
     ) {

@@ -3,7 +3,6 @@ package com.example.backend.order.service;
 import static com.example.backend.order.dto.CartResponse.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -387,7 +386,7 @@ public class OrderServiceImpl implements OrderService {
 								.optionName(option.getOptionName())
 								.choiceId(option.getChoiceId())
 								.choiceName(option.getChoiceName())
-								.choicePrice(option.getDishPrice())
+								.price(option.getDishPrice())
 								.build()
 							)
 							.toList();
@@ -399,7 +398,7 @@ public class OrderServiceImpl implements OrderService {
 							.dishName(baseOrder.getDishName())
 							.dishCategoryId(baseOrder.getDishCategoryId())
 							.dishCategoryName(baseOrder.getDishCategoryName())
-							.dishPrice(baseOrder.getDishPrice())
+							.price(baseOrder.getDishPrice())
 							.options(options)
 							.quantity(baseOrder.getQuantity())
 							.build();

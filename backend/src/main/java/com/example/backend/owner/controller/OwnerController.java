@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -22,12 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.common.dto.CommonResponse;
 import com.example.backend.common.dto.CommonResponse.ResponseWithData;
+import com.example.backend.common.dto.CommonResponse.ResponseWithMessage;
 import com.example.backend.dish.dto.DishRequest;
 import com.example.backend.dish.dto.DishResponse;
 import com.example.backend.dish.dto.DishResponse.DishSummaryResultDto;
 import com.example.backend.dish.service.DishService;
 import com.example.backend.etc.dto.RestaurantProfileDto;
 import com.example.backend.etc.service.RestaurantService;
+import com.example.backend.owner.dto.CategoryDto;
+import com.example.backend.owner.dto.OwnerResponse;
+import com.example.backend.owner.dto.OwnerResponse.CategoryResult;
 import com.example.backend.owner.service.OwnerService;
 
 @RestController
@@ -39,7 +44,6 @@ public class OwnerController {
 	private final OwnerService ownerService;
 	private final RestaurantService restaurantService;
 
-	//1. 전체 메뉴 조회
 	@Operation(summary = "전체 메뉴 조회", description = "전체 메뉴를 조회하는 api")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "메뉴 조회 성공"),
@@ -81,21 +85,20 @@ public class OwnerController {
 
 	}
 
-	//2. 메뉴 추가
 	@Operation(summary = "메뉴 추가", description = "새로운 메뉴를 추가하는 api")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "메뉴 추가 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@PostMapping("")
-	public ResponseEntity<CommonResponse.ResponseWithMessage> addDish(@RequestBody DishRequest.DishInfo dishInfo,
+	public ResponseEntity<ResponseWithMessage> addDish(@RequestBody DishRequest.DishInfo dishInfo,
 		HttpServletRequest request){
 		//2-1. 유저 확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
 		//2-2. db에 변경사항 저장
-		CommonResponse.ResponseWithMessage responseWithMessage = ownerService.addDish(userId, dishInfo);
+		ResponseWithMessage responseWithMessage = ownerService.addDish(userId, dishInfo);
 
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);
@@ -108,14 +111,14 @@ public class OwnerController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@DeleteMapping("")
-	public ResponseEntity<CommonResponse.ResponseWithMessage> deleteDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId,
+	public ResponseEntity<ResponseWithMessage> deleteDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId,
 		HttpServletRequest request){
 		//3-1. 유저 확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
 		//3-2. db에 변경사항 저장
-		CommonResponse.ResponseWithMessage responseWithMessage = ownerService.removeDish(userId, dishId);
+		ResponseWithMessage responseWithMessage = ownerService.removeDish(userId, dishId);
 
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);
@@ -128,27 +131,82 @@ public class OwnerController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@PutMapping("")
-	public ResponseEntity<CommonResponse.ResponseWithMessage> updateDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId, @RequestBody DishRequest.DishInfo dishInfo,
+	public ResponseEntity<ResponseWithMessage> updateDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId, @RequestBody DishRequest.DishInfo dishInfo,
 		HttpServletRequest request){
 		//4-1. 유저 확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
 		//4-2. db에 변경사항 저장
-		CommonResponse.ResponseWithMessage responseWithMessage = ownerService.updateDish(userId, dishId, dishInfo);
+		ResponseWithMessage responseWithMessage = ownerService.updateDish(userId, dishId, dishInfo);
 
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);
 	}
 
-	//5. 메뉴 검색
+	@Operation(summary = "전체 메뉴 카테고리 조회", description = "전체 메뉴 카테고리를 조회하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "카테고리 조회 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@GetMapping("/dish/category")
+	public ResponseEntity<ResponseWithData<CategoryResult>> getAllCategories(HttpServletRequest request){
 
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
 
+		CategoryResult allCategories = ownerService.getAllCategories(userId);
 
-	//6. 옵션 추가
+		ResponseWithData<CategoryResult> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(), "전체 메뉴 카테고리 조회에 성공하였습니다.",
+			allCategories);
 
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
 
-	//7.
+	}
+
+	@Operation(summary = "카테고리 추가", description = "카테고리를 추가하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "카테고리 추가 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@PostMapping("/dish/category")
+	public ResponseEntity<ResponseWithMessage> createCategory(@RequestBody CategoryDto categoryDto,HttpServletRequest request){
+
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		ownerService.createCategory(categoryDto,userId);
+
+		ResponseWithMessage responseWithMessage = new ResponseWithMessage(
+			HttpStatus.OK.value(), "카테고리 추가에 성공하였습니다."
+		);
+
+		return ResponseEntity.status(responseWithMessage.status())
+			.body(responseWithMessage);
+	}
+
+	@Operation(summary = "카테고리 삭제", description = "카테고리를 추가하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "카테고리 추가 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@DeleteMapping("/dish/category")
+	public ResponseEntity<ResponseWithMessage> removeCategory(@RequestParam("dishCategoryId") Integer dishCategoryId,HttpServletRequest request){
+
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		ownerService.removeCategory(dishCategoryId,userId);
+
+		ResponseWithMessage responseWithMessage = new ResponseWithMessage(
+			HttpStatus.OK.value(), "카테고리 삭제에 성공하였습니다."
+		);
+
+		return ResponseEntity.status(responseWithMessage.status())
+			.body(responseWithMessage);
+	}
+
 	@Operation(summary = "사업장 조회", description = "사업장을 조회하는 api")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "조회 완료"),
@@ -175,7 +233,7 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "조회 완료"),
 	})
 	@PostMapping("/restaurant")
-	public ResponseEntity<CommonResponse.ResponseWithMessage> createRestaurant(@RequestBody RestaurantProfileDto restaurantProfile,
+	public ResponseEntity<ResponseWithMessage> createRestaurant(@RequestBody RestaurantProfileDto restaurantProfile,
 		HttpServletRequest request) {
 
 		String id = (String)request.getAttribute("userId");
@@ -183,7 +241,7 @@ public class OwnerController {
 
 		restaurantService.createRestaurant(restaurantProfile,userId);
 
-		CommonResponse.ResponseWithMessage responseWithMessage = new CommonResponse.ResponseWithMessage(HttpStatus.OK.value(),
+		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(),
 			"사업장 정보 설정에 성공하였습니다");
 
 		return ResponseEntity.status(responseWithMessage.status())

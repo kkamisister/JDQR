@@ -1,7 +1,7 @@
 import React from "react"
-import KakaoMap from "../../components/map/KakaoMap"
-import RestaurantList from "./RestaurantList"
-import RestaurantSearchBar from "./RestaurantSearchBar"
+import KakaoMap from "../../../components/map/KakaoMap"
+import RestaurantListBox from "./RestaurantListBox"
+import MapDefaultHeader from "../../../components/header/MapDefaultHeader"
 
 const HomePage = () => {
   return (
@@ -14,7 +14,7 @@ const HomePage = () => {
           right: 0,
         }}
       >
-        <RestaurantSearchBar />
+        <MapDefaultHeader />
       </div>
       <div
         style={{
@@ -37,7 +37,7 @@ const HomePage = () => {
           overflowY: "auto",
         }}
       >
-        <RestaurantList />
+        <RestaurantListBox />
       </div>
     </>
   )

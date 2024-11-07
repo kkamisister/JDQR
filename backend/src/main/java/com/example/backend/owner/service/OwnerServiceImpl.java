@@ -1,7 +1,14 @@
 package com.example.backend.owner.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.example.backend.dish.dto.ChoiceDto;
+import com.example.backend.etc.entity.Restaurant;
+import com.example.backend.etc.repository.RestaurantRepository;
+import com.example.backend.owner.dto.OptionVo;
+import com.example.backend.owner.dto.OwnerResponse.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +48,7 @@ public class OwnerServiceImpl implements OwnerService{
 	private final TagRepository tagRepository;
 	private final OptionRepository optionRepository;
 	private final DishOptionRepository dishOptionRepository;
+	private final RestaurantRepository restaurantRepository;
 
 	@Override
 	@Transactional
@@ -169,6 +177,44 @@ public class OwnerServiceImpl implements OwnerService{
 		dishRepository.save(dish);
 
 		return new CommonResponse.ResponseWithMessage(HttpStatus.OK.value(), "메뉴가 수정되었습니다.");
+	}
+
+	@Override
+	public WholeOptionResponseDto getWholeOptionInfo(Integer userId) {
+		Restaurant restaurant = restaurantRepository.findByOwnerId(userId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
+
+		List<OptionVo> optionVos = optionRepository.findAllOptionByRestaurant(restaurant);
+		Map<Integer, List<OptionVo>> optionGroupByOptionId = optionVos.stream()
+			.collect(Collectors.groupingBy(OptionVo::getOptionId));
+		List<OptionResponseDto> optionResponseDtos = optionGroupByOptionId.entrySet().stream()
+			.map(optionEntry -> {
+				Integer optionId = optionEntry.getKey();
+				List<OptionVo> values = optionEntry.getValue();
+				OptionVo baseOptionVo = values.get(0);
+
+				List<ChoiceDto> choiceDtos = values.stream()
+					.map(optionVo -> ChoiceDto.builder()
+						.choiceId(optionVo.getChoiceId())
+						.choiceName(optionVo.getChoiceName())
+						.price(optionVo.getPrice())
+						.build()
+					)
+					.toList();
+
+				return OptionResponseDto.builder()
+					.optionId(optionId)
+					.optionName(baseOptionVo.getOptionName())
+					.choices(choiceDtos)
+					.maxChoiceCount(baseOptionVo.getMaxChoiceCount())
+					.isMandatory(baseOptionVo.getMandatory())
+					.build();
+			})
+			.toList();
+
+		return WholeOptionResponseDto.builder()
+			.options(optionResponseDtos)
+			.build();
 	}
 
 }

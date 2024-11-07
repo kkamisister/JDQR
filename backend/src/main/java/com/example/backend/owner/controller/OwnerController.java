@@ -1,5 +1,6 @@
 package com.example.backend.owner.controller;
 
+import com.example.backend.owner.dto.OwnerResponse.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.backend.common.dto.CommonResponse;
+import com.example.backend.common.dto.CommonResponse.*;
 import com.example.backend.dish.dto.DishRequest;
 import com.example.backend.dish.service.DishService;
 import com.example.backend.etc.dto.RestaurantProfileDto;
@@ -52,14 +53,14 @@ public class OwnerController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@PostMapping("")
-	public ResponseEntity<CommonResponse.ResponseWithMessage> addDish(@RequestBody DishRequest.DishInfo dishInfo,
+	public ResponseEntity<ResponseWithMessage> addDish(@RequestBody DishRequest.DishInfo dishInfo,
 		HttpServletRequest request){
 		//2-1. 유저 확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
 		//2-2. db에 변경사항 저장
-		CommonResponse.ResponseWithMessage responseWithMessage = ownerService.addDish(userId, dishInfo);
+		ResponseWithMessage responseWithMessage = ownerService.addDish(userId, dishInfo);
 
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);
@@ -72,14 +73,14 @@ public class OwnerController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@DeleteMapping("")
-	public ResponseEntity<CommonResponse.ResponseWithMessage> deleteDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId,
+	public ResponseEntity<ResponseWithMessage> deleteDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId,
 		HttpServletRequest request){
 		//3-1. 유저 확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
 		//3-2. db에 변경사항 저장
-		CommonResponse.ResponseWithMessage responseWithMessage = ownerService.removeDish(userId, dishId);
+		ResponseWithMessage responseWithMessage = ownerService.removeDish(userId, dishId);
 
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);
@@ -92,14 +93,14 @@ public class OwnerController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@PutMapping("")
-	public ResponseEntity<CommonResponse.ResponseWithMessage> updateDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId, @RequestBody DishRequest.DishInfo dishInfo,
+	public ResponseEntity<ResponseWithMessage> updateDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId, @RequestBody DishRequest.DishInfo dishInfo,
 		HttpServletRequest request){
 		//4-1. 유저 확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
 		//4-2. db에 변경사항 저장
-		CommonResponse.ResponseWithMessage responseWithMessage = ownerService.updateDish(userId, dishId, dishInfo);
+		ResponseWithMessage responseWithMessage = ownerService.updateDish(userId, dishId, dishInfo);
 
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);
@@ -108,8 +109,23 @@ public class OwnerController {
 	//5. 메뉴 검색
 
 
+	@Operation(summary = "전체 옵션 조회", description = "전체 옵션을 조회하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "옵션 조회 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@GetMapping("/option/all")
+	// 6. 전체 옵션 조회
+	public ResponseEntity<ResponseWithData<WholeOptionResponseDto>> getWholeOptionInfo(HttpServletRequest request){
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
 
-	//6. 옵션 추가
+		WholeOptionResponseDto responseDto = ownerService.getWholeOptionInfo(userId);
+
+		ResponseWithData<WholeOptionResponseDto> response = new ResponseWithData<>(HttpStatus.OK.value(), "전체 옵션 조회를 완료하였습니다", responseDto);
+
+		return ResponseEntity.status(response.status()).body(response);
+	}
 
 
 	//7.
@@ -118,7 +134,7 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "조회 완료"),
 	})
 	@GetMapping("/restaurant/{id}")
-	public ResponseEntity<CommonResponse.ResponseWithData<RestaurantProfileDto>> getRestaurant(@PathVariable("id") Integer restaurantId,
+	public ResponseEntity<ResponseWithData<RestaurantProfileDto>> getRestaurant(@PathVariable("id") Integer restaurantId,
 		HttpServletRequest request) {
 
 		String id = (String)request.getAttribute("userId");
@@ -126,7 +142,7 @@ public class OwnerController {
 
 		RestaurantProfileDto restaurant = restaurantService.getRestaurant(restaurantId, userId);
 
-		CommonResponse.ResponseWithData<RestaurantProfileDto> responseWithData = new CommonResponse.ResponseWithData<>(
+		ResponseWithData<RestaurantProfileDto> responseWithData = new ResponseWithData<>(
 			HttpStatus.OK.value(), "사업장 조회에 성공하였습니다.", restaurant);
 
 		return ResponseEntity.status(responseWithData.status())
@@ -139,7 +155,7 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "조회 완료"),
 	})
 	@PostMapping("/restaurant")
-	public ResponseEntity<CommonResponse.ResponseWithMessage> createRestaurant(@RequestBody RestaurantProfileDto restaurantProfile,
+	public ResponseEntity<ResponseWithMessage> createRestaurant(@RequestBody RestaurantProfileDto restaurantProfile,
 		HttpServletRequest request) {
 
 		String id = (String)request.getAttribute("userId");
@@ -147,7 +163,7 @@ public class OwnerController {
 
 		restaurantService.createRestaurant(restaurantProfile,userId);
 
-		CommonResponse.ResponseWithMessage responseWithMessage = new CommonResponse.ResponseWithMessage(HttpStatus.OK.value(),
+		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(),
 			"사업장 정보 설정에 성공하였습니다");
 
 		return ResponseEntity.status(responseWithMessage.status())

@@ -4,11 +4,30 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { colors } from "../../constants/colors";
 import { useState } from "react";
 
-export default function NumberSelector({ value = 1, fontSize, sx }) {
+export default function NumberSelector({
+  value = 1,
+  maxVal,
+  onChange,
+  fontSize,
+  sx,
+}) {
   const [selectorValue, setValue] = useState(value);
-  const handleIncrease = () => setValue(selectorValue + 1);
-  const handleDecrease = () =>
-    setValue(selectorValue > 1 ? selectorValue - 1 : 1);
+  const handleIncrease = () => {
+    const newVal = selectorValue + 1;
+    if (maxVal === undefined || newVal <= maxVal) {
+      setValue(newVal);
+      onChange(newVal);
+    } else {
+      setValue(maxVal);
+      onChange(maxVal);
+    }
+  };
+
+  const handleDecrease = () => {
+    const newVal = selectorValue > 1 ? selectorValue - 1 : 1;
+    setValue(newVal);
+    onChange(newVal);
+  };
 
   return (
     <Stack

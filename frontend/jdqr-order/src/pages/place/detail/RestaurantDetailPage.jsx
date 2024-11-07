@@ -1,7 +1,7 @@
 import React from "react"
-import BackButton from "../../../components/button/BackButton"
 import KakaoMap from "../../../components/map/KakaoMap"
 import RestaurantDetailBox from "./RestaurantDetailBox"
+import MapBackButtonHeader from "../../../components/header/MapBackButtonHeader"
 
 const RestaurantDetailPage = () => {
   return (
@@ -14,7 +14,7 @@ const RestaurantDetailPage = () => {
           right: 0,
         }}
       >
-        <BackButton />
+        <MapBackButtonHeader />
       </div>
       <div
         style={{

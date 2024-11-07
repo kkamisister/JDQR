@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Stack, TextField, InputAdornment, Typography } from "@mui/material"
+import { Stack, TextField, InputAdornment } from "@mui/material"
 import SearchIcon from "@mui/icons-material/Search"
 import RestaurantCategoryButton from "../button/RestaurantCategoryButton"
 import { colors } from "../../constants/colors"
@@ -11,20 +11,14 @@ const MapDefaultHeader = () => {
   const handleButtonClick = (index) => {
     setActiveIndex((prevIndex) => {
       const newIndex = prevIndex === index ? null : index
-
-      if (newIndex === null) {
-        setIsChecked(false)
-      } else {
-        setIsChecked(true)
-      }
-      console.log(isChecked)
+      setIsChecked(newIndex !== null) // 간소화된 isChecked 설정
       return newIndex
     })
   }
 
   return (
     <Stack spacing={1} alignItems="center" sx={{ width: "100%", zIndex: 10 }}>
-      <Stack // 검색창
+      <Stack
         direction="row"
         justifyContent="center"
         alignItems="center"
@@ -66,7 +60,7 @@ const MapDefaultHeader = () => {
           }}
         />
       </Stack>
-      <Stack // 카테고리 버튼
+      <Stack
         direction="row"
         justifyContent="space-between"
         alignItems="center"

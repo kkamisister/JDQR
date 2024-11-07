@@ -1,10 +1,10 @@
 import React from "react"
-import { Box, IconButton, Toolbar } from "@mui/material"
 import { useNavigate } from "react-router-dom"
+import { Box, Toolbar, IconButton } from "@mui/material"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import { colors } from "../../constants/colors"
 
-const BackButton = () => {
+const MapBackButtonHeader = () => {
   const navigate = useNavigate()
 
   const backToPrevPage = () => {
@@ -37,4 +37,4 @@ const BackButton = () => {
   )
 }
 
-export default BackButton
+export default MapBackButtonHeader

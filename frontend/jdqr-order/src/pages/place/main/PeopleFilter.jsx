@@ -7,6 +7,8 @@ const PeopleFilter = () => {
   const [activeIndex, setActiveIndex] = useState(null)
   const [isChecked, setIsChecked] = useState(false)
 
+  const peopleOptions = ["1인", "2인", "4인", "단체"]
+
   const handleButtonClick = (index) => {
     setActiveIndex((prevIndex) => {
       const newIndex = prevIndex === index ? null : index
@@ -23,6 +25,13 @@ const PeopleFilter = () => {
 
   const isCheckboxDisabled = activeIndex === null
 
+  const getFilterMessage = () => {
+    if (isChecked && activeIndex !== null) {
+      return `${peopleOptions[activeIndex]}석이 남아있는 식당을 보고 있어요`
+    }
+    return ""
+  }
+
   return (
     <Stack direction="column" spacing={1} height="70px">
       <Stack
@@ -33,7 +42,7 @@ const PeopleFilter = () => {
         whiteSpace="nowrap"
       >
         <Typography fontSize={15}>인원 수</Typography>
-        {["1인", "2인", "4인", "단체"].map((name, index) => (
+        {peopleOptions.map((name, index) => (
           <PeopleFilterButton
             key={index}
             name={name}
@@ -44,7 +53,6 @@ const PeopleFilter = () => {
       </Stack>
       <Stack
         direction="row"
-        // spacing={1}
         alignItems="center"
         paddingLeft="10px"
         whiteSpace="nowrap"
@@ -65,8 +73,8 @@ const PeopleFilter = () => {
               color: colors.main.primary400,
             },
             "&.Mui-disabled": {
-              color: colors.background.box, // 비활성화 상태의 색상
-              opacity: 0.5, // 비활성화 상태의 불투명도
+              color: colors.background.box,
+              opacity: 0.5,
             },
             "& .MuiSvgIcon-root": {
               fontSize: 25,
@@ -75,6 +83,11 @@ const PeopleFilter = () => {
           disabled={isCheckboxDisabled}
           onChange={(e) => setIsChecked(e.target.checked)}
         />
+        {isChecked && activeIndex !== null && (
+          <Typography fontSize={14} color={colors.main.primary400}>
+            {getFilterMessage()}
+          </Typography>
+        )}
       </Stack>
     </Stack>
   )

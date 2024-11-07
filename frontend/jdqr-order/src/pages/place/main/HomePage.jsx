@@ -1,7 +1,7 @@
 import React from "react"
 import KakaoMap from "../../../components/map/KakaoMap"
 import RestaurantListBox from "./RestaurantListBox"
-import RestaurantSearchBar from "./RestaurantSearchBar"
+import MapDefaultHeader from "../../../components/header/MapDefaultHeader"
 
 const HomePage = () => {
   return (
@@ -14,7 +14,7 @@ const HomePage = () => {
           right: 0,
         }}
       >
-        <RestaurantSearchBar />
+        <MapDefaultHeader />
       </div>
       <div
         style={{

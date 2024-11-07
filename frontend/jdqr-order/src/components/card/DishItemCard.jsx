@@ -74,7 +74,7 @@ const DishItemCard = ({
                 color: colors.text.sub2,
               }}
             >
-              {dish.options.length > 0
+              {dish.options?.length > 0
                 ? dish.options.map((option, index) => option.choiceName)
                 : "\u00A0"}
             </Typography>

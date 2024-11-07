@@ -8,11 +8,13 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.example.backend.common.config.QuerydslConfig;
+import com.example.backend.config.ContainerSupport;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.owner.entity.Owner;
 import com.example.backend.owner.repository.OwnerRepository;
@@ -20,7 +22,8 @@ import com.example.backend.owner.repository.OwnerRepository;
 @DataJpaTest
 @ActiveProfiles("test")
 @Import({QuerydslConfig.class})
-class RestaurantRepositoryTest {
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class RestaurantRepositoryTest extends ContainerSupport {
 
 	@Autowired
 	private RestaurantRepository restaurantRepository;

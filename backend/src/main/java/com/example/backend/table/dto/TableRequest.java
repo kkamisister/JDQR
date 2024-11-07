@@ -16,8 +16,8 @@ public record TableRequest(){
 		String color,
 		@Schema(name = "인원 수",description = "점주가 설정한 테이블 인원 수")
 		int people,
-		@Schema(name = "좌표정보",description = "테이블의 좌표를 담은 리스트")
-		List<Grid> position
+		@Schema(name = "테이블 ID",description = "테이블의 ID")
+		String tableId
 	){
 
 	}

@@ -171,55 +171,49 @@ class RestaurantServiceImplTest {
 		Table table1 = Table.builder()
 			.restaurantId(restaurant1.getId())
 			.color("#fffff")
-			.pos(grids)
 			.name("영표의식탁1")
 			.people(6)
-			.status(UseStatus.AVAILABLE)
+			.useStatus(UseStatus.AVAILABLE)
 			.build();
 
 		Table table2 = Table.builder()
 			.restaurantId(restaurant1.getId())
 			.color("#fffff")
-			.pos(grids)
 			.name("영표의식탁2")
 			.people(4)
-			.status(UseStatus.AVAILABLE)
+			.useStatus(UseStatus.AVAILABLE)
 			.build();
 
 		Table table3 = Table.builder()
 			.restaurantId(restaurant2.getId())
 			.color("#fffff")
-			.pos(grids)
 			.name("영표의식탁3")
 			.people(3)
-			.status(UseStatus.AVAILABLE)
+			.useStatus(UseStatus.AVAILABLE)
 			.build();
 
 		Table table4 = Table.builder()
 			.restaurantId(restaurant2.getId())
 			.color("#fffff")
-			.pos(grids)
 			.name("영표의식탁4")
 			.people(2)
-			.status(UseStatus.AVAILABLE)
+			.useStatus(UseStatus.AVAILABLE)
 			.build();
 
 		Table table5 = Table.builder()
 			.restaurantId(restaurant3.getId())
 			.color("#fffff")
-			.pos(grids)
 			.name("영표의식탁5")
 			.people(5)
-			.status(UseStatus.AVAILABLE)
+			.useStatus(UseStatus.AVAILABLE)
 			.build();
 
 		Table table6 = Table.builder()
 			.restaurantId(restaurant3.getId())
 			.color("#fffff")
-			.pos(grids)
 			.name("영표의식탁6")
 			.people(6)
-			.status(UseStatus.AVAILABLE)
+			.useStatus(UseStatus.AVAILABLE)
 			.build();
 
 		List<Table> findTables = List.of(table1,table2,table3,table4,table5,table6);

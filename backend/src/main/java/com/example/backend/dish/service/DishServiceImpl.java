@@ -176,4 +176,27 @@ public class DishServiceImpl implements DishService {
 
 	}
 
+	/**
+	 * 음식점의 메뉴를 검색하는 메서드
+	 * @param keyword
+	 * @param restaurantId
+	 * @return
+	 */
+	@Override
+	public DishSearchResultDto getSearchedDishes(String keyword, Integer restaurantId) {
+
+		//1. 식당을 조회한다
+		Restaurant restaurant = restaurantRepository.findById(restaurantId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
+
+		//2. keyword를 포함하고 있는 식당의 메뉴를 조회한다
+		List<Dish> dishes = dishRepository.findDishesByKeyword(restaurant, keyword);
+
+		// 반환 DTO
+		DishSearchResultDto dishSearchResultDto = DishSearchResultDto.builder()
+			.dishes(dishes)
+			.build();
+
+		return dishSearchResultDto;
+	}
 }

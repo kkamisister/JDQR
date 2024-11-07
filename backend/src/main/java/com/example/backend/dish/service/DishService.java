@@ -6,4 +6,6 @@ public interface DishService {
 
 	DishSummaryResultDto getAllDishes(String tableId);
 	DishDetailInfo getDish(Integer dishId,String tableId);
+	DishSearchResultDto getSearchedDishes(String keyword, Integer restaurantId);
+
 }

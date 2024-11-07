@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import com.example.backend.common.enums.EntityStatus;
 import com.example.backend.table.entity.Table;
 
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class TableRepositoryImpl implements TableRepository {
 		Query query = new Query();
 
 		query.addCriteria(Criteria.where("restaurant_id").is(restaurantId));
+		query.addCriteria(Criteria.where("status").ne(EntityStatus.DELETE));
 
 		return mongoTemplate.find(query,Table.class);
 

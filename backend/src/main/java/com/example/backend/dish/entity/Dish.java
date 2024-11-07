@@ -41,4 +41,14 @@ public class Dish extends BaseEntity {
             .build();
     }
 
+    @Override
+    public String toString() {
+        return "Dish{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", price=" + price +
+            ", description='" + description + '\'' +
+            ", image='" + image + '\'' +
+            '}';
+    }
 }

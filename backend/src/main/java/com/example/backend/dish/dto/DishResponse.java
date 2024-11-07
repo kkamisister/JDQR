@@ -1,9 +1,12 @@
 package com.example.backend.dish.dto;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.DishCategory;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -71,8 +74,40 @@ public record DishResponse() {
 		String description,
 		String image,
 		List<OptionDto> options,
-		List<String> tags
+		@JsonInclude(JsonInclude.Include.NON_EMPTY)
+		List<String> tags,
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		Integer quantity
 	){
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
+			DishDetailInfo that = (DishDetailInfo)o;
+			return dishId == that.dishId && Objects.equals(options, that.options);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(dishId,options);
+		}
+
+		// quantity를 설정할 수 있는 withQuantity 메서드 추가
+		public DishDetailInfo withQuantity(int quantity) {
+			return new DishDetailInfo(
+				this.dishId,
+				this.dishName,
+				this.price,
+				this.description,
+				this.image,
+				this.options,
+				this.tags,
+				quantity
+			);
+		}
+
 		public static DishDetailInfo of(Dish dish,List<OptionDto> options,List<String> tags){
 			return DishDetailInfo.builder()
 				.dishId(dish.getId())
@@ -82,6 +117,18 @@ public record DishResponse() {
 				.image(dish.getImage())
 				.options(options)
 				.tags(tags)
+				.build();
+		}
+
+		public static DishDetailInfo of(Dish dish,List<OptionDto> options){
+			return DishDetailInfo.builder()
+				.dishId(dish.getId())
+				.dishName(dish.getName())
+				.price(dish.getPrice())
+				.description(dish.getDescription())
+				.image(dish.getImage())
+				.options(options)
+				.tags(Collections.emptyList())
 				.build();
 		}
 	}

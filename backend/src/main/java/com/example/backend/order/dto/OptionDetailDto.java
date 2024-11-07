@@ -14,5 +14,5 @@ public class OptionDetailDto {
 	private String optionName;
 	private Integer choiceId;
 	private String choiceName;
-	private Integer choicePrice;
+	private Integer price;
 }

@@ -43,8 +43,8 @@ public class RestaurantController {
 	})
 	@GetMapping("/restaurant")
 	public ResponseEntity<ResponseWithData<RestaurantInfo>> getNearRestaurant(
-		@RequestParam("minLat") double minLat,@RequestParam("maxLat") double maxLat,
-		@RequestParam("minLng") double minLng,@RequestParam("maxLng") double maxLng,
+		@RequestParam(value = "minLat",defaultValue = "30") double minLat,@RequestParam(value = "maxLat",defaultValue = "50") double maxLat,
+		@RequestParam(value = "minLng",defaultValue = "100") double minLng,@RequestParam(value = "maxLng",defaultValue = "150") double maxLng,
 		@RequestParam(value = "people",required = false, defaultValue = "0") int people,
 		@RequestParam(value = "together",required = false, defaultValue = "false") boolean together){
 

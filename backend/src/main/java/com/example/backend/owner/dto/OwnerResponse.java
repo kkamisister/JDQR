@@ -25,7 +25,10 @@ public record OwnerResponse() {
         Integer maxChoiceCount,
         Boolean isMandatory
     ) {
-) {
+
+    }
+
+
 	public record CategoryResult(
 		List<CategoryDto> dishCategories
 	){

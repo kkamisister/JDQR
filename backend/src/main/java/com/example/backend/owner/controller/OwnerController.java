@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -21,20 +20,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.backend.common.dto.CommonResponse.*;
-import com.example.backend.common.dto.CommonResponse;
-import com.example.backend.common.dto.CommonResponse.ResponseWithData;
-import com.example.backend.common.dto.CommonResponse.ResponseWithMessage;
 import com.example.backend.dish.dto.DishRequest;
-import com.example.backend.dish.dto.DishResponse;
 import com.example.backend.dish.dto.DishResponse.DishSummaryResultDto;
-import com.example.backend.dish.service.DishService;
 import com.example.backend.etc.dto.RestaurantProfileDto;
 import com.example.backend.etc.service.RestaurantService;
 import com.example.backend.owner.dto.CategoryDto;
-import com.example.backend.owner.dto.OwnerResponse;
-import com.example.backend.owner.dto.OwnerResponse.CategoryResult;
 import com.example.backend.owner.service.OwnerService;
 
 @RestController
@@ -207,6 +198,24 @@ public class OwnerController {
 
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);
+	}
+
+	@Operation(summary = "전체 옵션 조회", description = "전체 옵션을 조회하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "옵션 조회 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@GetMapping("/option/all")
+	// 6. 전체 옵션 조회
+	public ResponseEntity<ResponseWithData<WholeOptionResponseDto>> getWholeOptionInfo(HttpServletRequest request){
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		WholeOptionResponseDto responseDto = ownerService.getWholeOptionInfo(userId);
+
+		ResponseWithData<WholeOptionResponseDto> response = new ResponseWithData<>(HttpStatus.OK.value(), "전체 옵션 조회를 완료하였습니다", responseDto);
+
+		return ResponseEntity.status(response.status()).body(response);
 	}
 
 	@Operation(summary = "사업장 조회", description = "사업장을 조회하는 api")

@@ -9,14 +9,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.Map;
 import java.util.Objects;
 
 import com.example.backend.dish.dto.ChoiceDto;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.repository.RestaurantRepository;
 import com.example.backend.owner.dto.OptionVo;
-import com.example.backend.owner.dto.OwnerResponse.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,10 +35,7 @@ import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.DishTagRepository;
 import com.example.backend.dish.repository.OptionRepository;
 import com.example.backend.dish.repository.TagRepository;
-import com.example.backend.etc.entity.Restaurant;
-import com.example.backend.etc.repository.RestaurantRepository;
 import com.example.backend.owner.dto.CategoryDto;
-import com.example.backend.owner.dto.OwnerResponse;
 import com.example.backend.owner.entity.Owner;
 import com.example.backend.owner.repository.OwnerRepository;
 

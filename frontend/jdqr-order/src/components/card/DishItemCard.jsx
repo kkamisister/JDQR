@@ -13,22 +13,26 @@ const DishItemCard = ({
   sx,
 }) => {
   return (
-    <Stack>
+    <Stack
+      sx={{
+        ...sx,
+        "&:hover": {
+          backgroundColor: colors.background.primary,
+        },
+        padding: "10px",
+        borderRadius: "10px",
+        transition: "all 0.3s ease", // transition 적용
+        cursor: "pointer",
+        color: colors.text.main,
+      }}
+    >
       <Stack
         onClick={onClick}
         direction="row"
         spacing={2}
         sx={{
-          padding: "10px",
-          borderRadius: "10px",
           justifyContent: "space-between",
           alignItems: "center",
-          "&:hover": {
-            backgroundColor: colors.background.primary,
-          },
-          transition: "all 0.3s ease", // transition 적용
-          cursor: "pointer",
-          color: colors.text.main,
         }}
       >
         <Stack>
@@ -70,7 +74,9 @@ const DishItemCard = ({
                 color: colors.text.sub2,
               }}
             >
-              치즈추가, 씬도우로 변경
+              {dish.options.length > 0
+                ? dish.options.map((option, index) => option.choiceName)
+                : "\u00A0"}
             </Typography>
           )}
 

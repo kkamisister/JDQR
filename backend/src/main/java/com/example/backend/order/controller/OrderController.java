@@ -131,7 +131,7 @@ public class OrderController {
 	}
 
 
-	@PostMapping("/")
+	@PostMapping("")
 	public ResponseEntity<ResponseWithMessage> saveOrder(HttpServletRequest request){
 		String tableId = (String)request.getAttribute("tableId");
 
@@ -143,7 +143,7 @@ public class OrderController {
 			.body(responseWithMessage);
 	}
 
-	@GetMapping("/")
+	@GetMapping("")
 	public ResponseEntity<ResponseWithData<TotalOrderInfoResponseDto>> getOrderInfo(HttpServletRequest request) {
 		String tableId = (String)request.getAttribute("tableId");
 

@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.common.dto.CommonResponse;
+import com.example.backend.common.dto.CommonResponse.ResponseWithData;
 import com.example.backend.dish.dto.DishRequest;
+import com.example.backend.dish.dto.DishResponse;
+import com.example.backend.dish.dto.DishResponse.DishSummaryResultDto;
 import com.example.backend.dish.service.DishService;
 import com.example.backend.etc.dto.RestaurantProfileDto;
 import com.example.backend.etc.service.RestaurantService;
@@ -36,14 +39,47 @@ public class OwnerController {
 	private final OwnerService ownerService;
 	private final RestaurantService restaurantService;
 
-	// //1. 전체 메뉴 조회
-	// @Operation(summary = "전체 메뉴 조회", description = "전체 메뉴를 조회하는 api")
-	// @ApiResponses(value = {
-	// 	@ApiResponse(responseCode = "200", description = "메뉴 조회 성공"),
-	// 	@ApiResponse(responseCode = "500", description = "서버 에러")
-	// })
-	// @GetMapping("")
-	// public ResponseEntity<?> getAllMenus()
+	//1. 전체 메뉴 조회
+	@Operation(summary = "전체 메뉴 조회", description = "전체 메뉴를 조회하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "메뉴 조회 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@GetMapping("/dish")
+	public ResponseEntity<ResponseWithData<DishSummaryResultDto>> getAllMenus(HttpServletRequest request){
+
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		DishSummaryResultDto allMenus = ownerService.getAllMenus(userId);
+
+		ResponseWithData<DishSummaryResultDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(),
+			"전체메뉴 조회에 성공하였습니다.",allMenus);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
+	}
+
+	@Operation(summary = "메뉴 상세 조회", description = "상세메뉴를 조회하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "메뉴 조회 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@GetMapping("/dish/{dishId}")
+	public ResponseEntity<ResponseWithData<DishSummaryResultDto>> getMenus(HttpServletRequest request, @PathVariable("dishId") Integer dishId) {
+
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		DishSummaryResultDto menu = ownerService.getMenu(userId, dishId);
+
+		ResponseWithData<DishSummaryResultDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(),
+			"상세메뉴 조회에 성공하였습니다.",menu);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
+
+	}
 
 	//2. 메뉴 추가
 	@Operation(summary = "메뉴 추가", description = "새로운 메뉴를 추가하는 api")
@@ -117,8 +153,8 @@ public class OwnerController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "조회 완료"),
 	})
-	@GetMapping("/restaurant/{id}")
-	public ResponseEntity<CommonResponse.ResponseWithData<RestaurantProfileDto>> getRestaurant(@PathVariable("id") Integer restaurantId,
+	@GetMapping("/restaurant/{restaurantId}")
+	public ResponseEntity<ResponseWithData<RestaurantProfileDto>> getRestaurant(@PathVariable("restaurantId") Integer restaurantId,
 		HttpServletRequest request) {
 
 		String id = (String)request.getAttribute("userId");
@@ -126,7 +162,7 @@ public class OwnerController {
 
 		RestaurantProfileDto restaurant = restaurantService.getRestaurant(restaurantId, userId);
 
-		CommonResponse.ResponseWithData<RestaurantProfileDto> responseWithData = new CommonResponse.ResponseWithData<>(
+		ResponseWithData<RestaurantProfileDto> responseWithData = new ResponseWithData<>(
 			HttpStatus.OK.value(), "사업장 조회에 성공하였습니다.", restaurant);
 
 		return ResponseEntity.status(responseWithData.status())

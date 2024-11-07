@@ -6,6 +6,7 @@ import static com.example.backend.order.entity.QOrder.*;
 import static com.example.backend.order.entity.QOrderItem.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.example.backend.common.repository.Querydsl4RepositorySupport;
 import com.example.backend.dish.entity.Dish;
@@ -46,5 +47,15 @@ public class DishRepositoryCustomImpl extends Querydsl4RepositorySupport impleme
 		List<Dish> dishes = orderItems.stream().map(OrderItem::getDish).toList();
 
 		return dishes;
+	}
+
+	@Override
+	public Optional<Dish> findDishWithCategoryById(Integer dishId) {
+		Dish dish1 = selectFrom(dish)
+			.join(dish.dishCategory, dishCategory).fetchJoin()
+			.where(dish.id.eq(dishId))
+			.fetchOne();
+
+		return Optional.ofNullable(dish1);
 	}
 }

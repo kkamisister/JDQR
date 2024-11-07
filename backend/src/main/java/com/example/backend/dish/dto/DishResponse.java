@@ -22,9 +22,7 @@ public record DishResponse() {
 		List<String> dishCategories,
 		List<DishSummaryInfo> dishes
 	) {
-
 	}
-
 
 	@Builder
 	@Schema(name = "메뉴 요약정보", description = "각 메뉴들의 목록 정보, 메인페이지 메뉴 탭에 사용")
@@ -148,5 +146,11 @@ public record DishResponse() {
 		}
 	}
 
+	@Builder
+	@Schema(name = "메뉴 검색 결과 데이터", description = "메뉴 검색 결과를 반환하는 DTO")
+	public record DishSearchResultDto(
+		List<Dish> dishes
+	) {
+	}
 
 }

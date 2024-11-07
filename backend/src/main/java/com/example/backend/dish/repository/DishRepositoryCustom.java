@@ -8,5 +8,6 @@ import com.example.backend.order.entity.Order;
 
 public interface DishRepositoryCustom {
 	List<Dish> findDishesByRestaurant(Restaurant restaurant);
+	List<Dish> findDishesByKeyword(Restaurant restaurant, String keyword);
 	List<Dish> findAllByOrder(Order order);
 }

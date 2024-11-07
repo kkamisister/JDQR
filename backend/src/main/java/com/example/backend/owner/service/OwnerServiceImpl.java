@@ -181,18 +181,29 @@ public class OwnerServiceImpl implements OwnerService{
 
 	@Override
 	public WholeOptionResponseDto getWholeOptionInfo(Integer userId) {
+
+		// 1. userId에 해당하는 restaurant를 찾는다.
 		Restaurant restaurant = restaurantRepository.findByOwnerId(userId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
 
+		// 2. option table과 choice table을 join하여 현재 restaurant에 해당하는 옵션 정보를 들고 온다.
 		List<OptionVo> optionVos = optionRepository.findAllOptionByRestaurant(restaurant);
+
+		// 3. optionVos를 가지고 알맞은 api 반환 형식으로 가공한다.
+		// 3-1. stream의 groupingBy를 이용해 optionId를 key로 분류한다.
 		Map<Integer, List<OptionVo>> optionGroupByOptionId = optionVos.stream()
 			.collect(Collectors.groupingBy(OptionVo::getOptionId));
+
+		// 3-2. 각 option에 대해 세부 옵션 정보를 저장한다.
 		List<OptionResponseDto> optionResponseDtos = optionGroupByOptionId.entrySet().stream()
 			.map(optionEntry -> {
 				Integer optionId = optionEntry.getKey();
 				List<OptionVo> values = optionEntry.getValue();
+
+				// 옵션 그룹에 대한 정보를 담고 있는 class
 				OptionVo baseOptionVo = values.get(0);
 
+				// 세부 옵션 정보 구하기
 				List<ChoiceDto> choiceDtos = values.stream()
 					.map(optionVo -> ChoiceDto.builder()
 						.choiceId(optionVo.getChoiceId())
@@ -212,6 +223,7 @@ public class OwnerServiceImpl implements OwnerService{
 			})
 			.toList();
 
+		// 옵션 리스트를 바탕으로 record build 후 반환
 		return WholeOptionResponseDto.builder()
 			.options(optionResponseDtos)
 			.build();

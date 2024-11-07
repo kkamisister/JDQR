@@ -16,9 +16,12 @@ public record DishResponse() {
 	@Schema(name = "메뉴 요약조회 데이터", description = "메뉴 요약조회 전체 결과, 메뉴설정 페이지에 필요한 모든 데이터를"
 		+ "담는다")
 	public record DishSummaryResultDto(
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 		String tableId,
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 		String tableName,
-		int peopleCount,
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		Integer peopleCount,
 		List<String> dishCategories,
 		List<DishSummaryInfo> dishes
 	) {

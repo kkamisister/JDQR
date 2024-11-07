@@ -35,9 +35,9 @@ spring:
       port: 6379
 
 
-  #  mongodb:
-  #    uri: mongodb://ssafy:zeroticket607@j11a607.p.ssafy.io:27017/
-  #    database: product
+    mongodb:
+      uri: mongodb://ssafy:zeroticket608@13.124.221.144:27017/
+      database: product
 
   logging.level:
     org.hibernate.SQL: debug

@@ -1,12 +1,14 @@
 package com.example.backend.owner.service;
 
 import static com.example.backend.dish.dto.DishResponse.*;
+import static com.example.backend.owner.dto.OwnerResponse.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,8 @@ import com.example.backend.dish.repository.OptionRepository;
 import com.example.backend.dish.repository.TagRepository;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.repository.RestaurantRepository;
+import com.example.backend.owner.dto.CategoryDto;
+import com.example.backend.owner.dto.OwnerResponse;
 import com.example.backend.owner.entity.Owner;
 import com.example.backend.owner.repository.OwnerRepository;
 
@@ -291,6 +295,99 @@ public class OwnerServiceImpl implements OwnerService{
 		return dishSummaryResultDto;
 
 	}
+
+	/**
+	 * 카테고리를 추가하는 메서드
+	 * @param categoryDto
+	 * @param userId
+	 */
+	@Override
+	public void createCategory(CategoryDto categoryDto, Integer userId) {
+
+		log.warn("categoryDto : {}",categoryDto);
+
+		//1. 점주를 조회한다
+		Owner owner = ownerRepository.findById(userId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
+
+		//2. 점주의 식당을 조회한다
+		Restaurant restaurant = restaurantRepository.findByOwner(owner)
+			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
+
+		//3. 카테고리를 추가한다
+		DishCategory dishCategory = DishCategory.builder()
+			.name(categoryDto.getDishCategoryName())
+			.restaurant(restaurant)
+			.build();
+
+
+		//4. 카테고리를 저장한다
+		dishCategoryRepository.save(dishCategory);
+	}
+
+	/**
+	 * 메뉴 카테고리를 삭제하는 메서드
+	 * @param dishCategoryId
+	 * @param userId
+	 */
+	@Override
+	public void removeCategory(Integer dishCategoryId, Integer userId) {
+		//1. 점주를 조회한다
+		Owner owner = ownerRepository.findById(userId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
+
+		//2. 식당을 조회한다
+		Restaurant restaurant = restaurantRepository.findByOwner(owner)
+			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
+
+		//2. 식당카테고리를 조회한다
+		List<DishCategory> dishCategories = dishCategoryRepository.findByRestaurant(restaurant);
+
+		for(DishCategory dishCategory : dishCategories){
+
+			if(Objects.equals(dishCategory.getId(), dishCategoryId)){
+				dishCategoryRepository.delete(dishCategory);
+				return;
+			}
+		}
+	}
+
+	/**
+	 * 모든 메뉴 카테고리를 조회하는 메서드
+	 * @param userId
+	 */
+	@Override
+	public CategoryResult getAllCategories(Integer userId) {
+
+		//1. 점주를 조회한다
+		Owner owner = ownerRepository.findById(userId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
+
+		//2. 식당을 조회한다
+		Restaurant restaurant = restaurantRepository.findByOwner(owner)
+				.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
+
+		//3. 응답을 생성한다
+		List<DishCategory> dishCategories = dishCategoryRepository.findByRestaurant(restaurant);
+
+		List<CategoryDto> categoryDtos = new ArrayList<>();
+		for(int idx=0;idx<dishCategories.size();idx++){
+
+			DishCategory dishCategory = dishCategories.get(idx);
+
+			int categoryId = dishCategory.getId();
+			String categoryName = dishCategory.getName();
+
+			CategoryDto categoryDto = new CategoryDto(categoryId, categoryName);
+			categoryDtos.add(categoryDto);
+		}
+
+		CategoryResult categoryResult = new CategoryResult(categoryDtos);
+
+		return categoryResult;
+	}
+
+
 
 	/**
 	 * 메뉴 요약정보를 생성하는 메서드

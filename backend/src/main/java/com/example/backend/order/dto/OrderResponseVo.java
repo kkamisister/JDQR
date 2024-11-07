@@ -1,10 +1,13 @@
 package com.example.backend.order.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class OrderResponseVo {
     private Integer orderId;
     private Integer dishId;
@@ -18,5 +21,5 @@ public class OrderResponseVo {
     private String optionName;
     private Integer choiceId;
     private String choiceName;
-    private String choicePrice;
+    private Integer choicePrice;
 }

@@ -362,7 +362,7 @@ public class OrderServiceImpl implements OrderService {
 		// 4-1. 담은 음식의 총 개수와 담은 음식의 총 가격을 구하기
 		int totalDishCount = orderResponseVos.size();
 		int totalPrice = orderResponseVos.stream()
-			.mapToInt(vo -> Integer.parseInt(vo.getDishPrice() + vo.getChoicePrice()))
+			.mapToInt(vo -> vo.getDishPrice() + vo.getChoicePrice())
 			.sum();
 
 		// 4-2. OrderInfoResponseDto 데이터 만들기

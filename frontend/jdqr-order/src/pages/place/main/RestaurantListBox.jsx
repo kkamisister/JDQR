@@ -6,11 +6,15 @@ import { colors } from "../../../constants/colors"
 import MapListContainer from "../../../components/container/MapListContainer"
 
 const RestaurantListBox = () => {
-  // RestaurantItemCard를 동적으로 렌더링할 배열
-  const restaurantItems = [1, 2, 3, 4]
+  const restaurantItems = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
   return (
-    <MapListContainer spacing={2}>
+    <MapListContainer
+      spacing={3}
+      sx={{
+        height: "100%",
+      }}
+    >
       <Stack
         sx={{
           height: "20px",
@@ -37,9 +41,21 @@ const RestaurantListBox = () => {
         }}
       />
 
-      {restaurantItems.map((item, index) => (
-        <RestaurantItemCard key={index} />
-      ))}
+      <Box
+        sx={{
+          overflowY: "auto",
+          flexGrow: 1,
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          "-ms-overflow-style": "none",
+          "scrollbar-width": "none",
+        }}
+      >
+        {restaurantItems.map((item, index) => (
+          <RestaurantItemCard key={index} />
+        ))}
+      </Box>
     </MapListContainer>
   )
 }

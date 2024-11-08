@@ -30,14 +30,14 @@ const KakaoMap = () => {
   }, [isLoaded])
 
   return (
-    <Stack>
+    <Stack sx={{ width: "100%", height: "100%" }}>
       <Map
         id="map"
         center={location}
         style={{
           top: 0,
           width: "100%",
-          height: "60vh",
+          height: "100%",
         }}
         level={3}
         draggable

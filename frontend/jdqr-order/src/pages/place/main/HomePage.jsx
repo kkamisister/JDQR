@@ -38,9 +38,9 @@ const HomePage = () => {
           bottom: -700,
           left: 0,
           right: 0,
-          maxHeight: "80VH",
-          zIndex: 1,
+          maxHeight: "80vh",
           overflowY: "auto",
+          zIndex: 1,
         }}
       >
         <RestaurantListBox />

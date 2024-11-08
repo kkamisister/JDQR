@@ -1,12 +1,13 @@
 import BaseButton from "../../components/button/BaseButton";
-import { Box } from "@mui/material";
+import { Stack, Box } from "@mui/material";
+import Header from "../../components/header/Header";
+import PaymentList from "./PaymentList";
 
-const PaymentPage = () => {
+const PaymentPage = ({}) => {
   return (
     <Box>
-      <BaseButton count={20}>
-        {(1489032).toLocaleString()}원 결제하기
-      </BaseButton>
+      <Header title="결제하기" BackPage={true} />
+      <PaymentList />
     </Box>
   );
 };

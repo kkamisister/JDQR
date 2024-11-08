@@ -2,6 +2,9 @@ package com.example.backend.etc.service;
 
 import static com.example.backend.etc.dto.RestaurantResponse.*;
 
+import com.example.backend.common.dto.CommonResponse;
+import com.example.backend.dish.dto.DishRequest;
+import com.example.backend.etc.dto.RestaurantDto;
 import com.example.backend.etc.dto.RestaurantProfileDto;
 import com.example.backend.etc.dto.RestaurantResponse;
 import com.example.backend.etc.dto.RestaurantResponse.RestaurantInfo;
@@ -13,4 +16,8 @@ public interface RestaurantService {
 	void createRestaurant(RestaurantProfileDto restaurantProfile,Integer userId);
 
 	RestaurantDetailInfo getRestaurantDetail(Integer restaurantId);
+
+	void updateBusinessStatus(Integer restaurantId);
+	RestaurantDto getBusinessStatus(Integer restaurantId);
+
 }

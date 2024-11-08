@@ -374,4 +374,39 @@ public class RestaurantServiceImpl implements RestaurantService {
 		}
 		return restaurantDtos;
 	}
+
+	/**
+	 * 가맹점의 영업여부를 업데이트하는 메서드
+	 * @param restaurantId
+	 */
+	@Override
+	public void updateBusinessStatus(Integer restaurantId) {
+		//1. 식당을 조회한다
+		Restaurant restaurant = restaurantRepository.findById(restaurantId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
+
+		//2. 식당 테이블(restaurants)의 open컬럼 값이 true면 false로, false면 true로 변환
+		restaurant.setOpen(!restaurant.getOpen());
+
+		//3. 변경 사항을 저장하여 db에 반영
+		restaurantRepository.save(restaurant);
+	}
+
+	/**
+	 * 가맹점의 영업여부를 조회하는 메서드
+	 * @param restaurantId
+	 * @return
+	 */
+	@Override
+	public RestaurantDto getBusinessStatus(Integer restaurantId) {
+
+		//1. 식당을 조회한다
+		Restaurant restaurant = restaurantRepository.findById(restaurantId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
+
+		//3. 응답을 리턴한다
+		RestaurantDto resDto = RestaurantDto.from(restaurant);
+
+		return resDto;
+	}
 }

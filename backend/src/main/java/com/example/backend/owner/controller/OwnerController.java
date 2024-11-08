@@ -1,5 +1,6 @@
 package com.example.backend.owner.controller;
 
+import com.example.backend.etc.dto.RestaurantDto;
 import com.example.backend.owner.dto.OwnerResponse.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -254,6 +255,50 @@ public class OwnerController {
 
 		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(),
 			"사업장 정보 설정에 성공하였습니다");
+
+		return ResponseEntity.status(responseWithMessage.status())
+			.body(responseWithMessage);
+	}
+
+	@Operation(summary = "영업여부 조회", description = "영업여부를 조회하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "조회 완료"),
+	})
+	@GetMapping("/restaurant/status")
+	public ResponseEntity<ResponseWithData<RestaurantDto>> getBusinessStatus(@RequestParam("restaurantId") @Parameter(description = "식당ID", required = true) Integer restaurantId,
+		HttpServletRequest request){
+
+		// 유저확인
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		// db에 변경사항 저장
+		RestaurantDto restaurant = restaurantService.getBusinessStatus(restaurantId);
+
+		ResponseWithData<RestaurantDto> responseWithData = new ResponseWithData<>(
+			HttpStatus.OK.value(), "사업장 조회에 성공하였습니다.", restaurant);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
+	}
+
+	@Operation(summary = "영업여부 변경", description = "영업여부를 변경하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "변경 완료"),
+	})
+	@PutMapping("/restaurant/status")
+	public ResponseEntity<ResponseWithMessage> changeBusinessStatus(@RequestParam("restaurantId") @Parameter(description = "식당ID", required = true) Integer restaurantId,
+		HttpServletRequest request){
+
+		// 유저확인
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		// db에 변경사항 저장
+		restaurantService.updateBusinessStatus(restaurantId);
+
+		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(),
+			"영업여부가 변경되었습니다.");
 
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);

@@ -17,7 +17,11 @@ const MapDefaultHeader = () => {
   }
 
   return (
-    <Stack spacing={1} alignItems="center" sx={{ width: "100%", zIndex: 10 }}>
+    <Stack
+      spacing={1}
+      alignItems="center"
+      sx={{ width: "100%", height: "auto" }}
+    >
       <Stack
         direction="row"
         justifyContent="center"

@@ -1,45 +1,51 @@
 import React from "react"
+import { Stack } from "@mui/material"
 import KakaoMap from "../../../components/map/KakaoMap"
 import RestaurantListBox from "./RestaurantListBox"
 import MapDefaultHeader from "../../../components/header/MapDefaultHeader"
 
 const HomePage = () => {
   return (
-    <>
-      <div
-        style={{
+    <Stack>
+      <Stack
+        sx={{
           position: "fixed",
           top: 0,
           left: 0,
           right: 0,
+          zIndex: 1,
         }}
       >
         <MapDefaultHeader />
-      </div>
-      <div
-        style={{
+      </Stack>
+
+      <Stack
+        sx={{
           position: "fixed",
           top: 0,
           left: 0,
           right: 0,
-          zIndex: -1,
+          width: "100%",
+          height: "100%",
         }}
       >
         <KakaoMap />
-      </div>
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
+      </Stack>
+
+      <Stack
+        sx={{
+          position: "relative",
+          bottom: -700,
           left: 0,
           right: 0,
-          marginTop: "105px",
+          maxHeight: "80VH",
+          zIndex: 1,
           overflowY: "auto",
         }}
       >
         <RestaurantListBox />
-      </div>
-    </>
+      </Stack>
+    </Stack>
   )
 }
 

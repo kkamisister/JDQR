@@ -23,11 +23,11 @@ services:
     container_name: springboot-app
     volumes:
       - ./backend/build/libs/backend-0.0.1-SNAPSHOT.jar:/app.jar
+      - /home/ubuntu/pinpoint-agent-2.5.1:/pinpoint
     ports:
       - "8080:8080"
-    command: ["java", "-jar", "/app.jar"]
+    command: ["java", "-jar","-javaagent:./pinpoint/pinpoint-bootstrap-2.5.1.jar", "-Dpinpoint.agentId=adventcalendarDev","-Dpinpoint.applicationName=adventcalendar","-Dpinpoint.config=./pinpoint/pinpoint-root.config","-Dspring.profiles.active=${SERVER_MODE}","-Duser.timezone=Asia/Seoul", "/app.jar"]
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
       - TZ=Asia/Seoul
     depends_on:
       - redis
@@ -41,7 +41,6 @@ services:
     volumes:
       - ./redis-data:/data
     restart: always
-
 ```
 
 ### Jenkins 파이프라인
@@ -54,17 +53,26 @@ services:
     pipeline{
         agent any
         
+        parameters {
+            string(name: 'AWS_ACCESS_KEY_ID', defaultValue: '~', description: 'aws access key')
+            string(name: 'AWS_SECRET_ACCESS_KEY', defaultValue: '~', description: 'aws secret key')
+            string(name: 'AWS_S3_BUCKET_NAME', defaultValue: 'jdqr-aws-bucket', description: 'aws bucket name')
+            string(name: 'AWS_REGION_STATIC', defaultValue: 'us-east-1', description: 'aws region')
+        }
+        
         stages{
             
             stage('shutdown old process') {
                 steps {
                     sh """
+                        pwd
+                        
                         #!/bin/bash
                         ls -al
                         
                         # docker 내리기
                         echo "Stop docker container..."
-                        docker compose -f /home/ubuntu/docker-compose.yml down
+                        docker compose down
                     """    
                 }
             }
@@ -75,6 +83,24 @@ services:
                         git branch: 'be-develop', credentialsId: 'a608', 
                         url: 'https://lab.ssafy.com/s11-final/S11P31A608.git'
                     }
+                }
+            }
+            
+            stage('환경변수 값 주입') {
+                steps {
+                    dir("./backend") {
+                        sh """
+                            echo 'application.yml 파일 위치로 이동'
+                            cd ./src/main/resources
+                            
+                            echo 'application.yml 환경변수 주입'
+                            sed -i 's#\${AWS_ACCESS_KEY_ID}#$AWS_ACCESS_KEY_ID#' application.yml
+                            sed -i 's#\${AWS_SECRET_ACCESS_KEY}#$AWS_SECRET_ACCESS_KEY#' application.yml
+                            sed -i 's#\${AWS_S3_BUCKET_NAME}#$AWS_S3_BUCKET_NAME#' application.yml
+                            sed -i 's#\${AWS_REGION_STATIC}#$AWS_REGION_STATIC#' application.yml
+                        """
+                    }
+                    
                 }
             }
             
@@ -94,7 +120,7 @@ services:
                     sh """
                         # 다시 docker-compose 실행
                         echo "Starting Docker Compose..."
-                        docker compose -f /home/ubuntu/docker-compose.yml up -d
+                        docker compose up -d
                         
                         echo "Docker Compose started successfully."
                     """
@@ -107,25 +133,25 @@ services:
                 script {
                     def message
                     if (currentBuild.result == 'SUCCESS') {
-                        message = "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
+                        message = "됐다!! 됐어!! : ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
                         mattermostSend (color: 'good',
                             message: message,
-                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
-                            channel: 'jenkins_build'
+                            endpoint: 'https://meeting.ssafy.com/hooks/grkzh4nxyir6drb4oau8hn4awc',
+                            channel: 'a608_jenkins_build'
                         )
                     } else if (currentBuild.result == 'FAILURE') {
-                        message = "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)\n"
+                        message = "X됐다!! X됐어!! : ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)\n"
                             mattermostSend (color: 'danger',
                             message: message,
-                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
-                            channel: 'jenkins_build'
+                            endpoint: 'https://meeting.ssafy.com/hooks/grkzh4nxyir6drb4oau8hn4awc',
+                            channel: 'a608_jenkins_build'
                         )
                     } else {
-                        message = "빌드 상태: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
+                        message = "됐나?? 됐어?? : ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
                         mattermostSend (
                             message: message,
-                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
-                            channel: 'jenkins_build'
+                            endpoint: 'https://meeting.ssafy.com/hooks/grkzh4nxyir6drb4oau8hn4awc',
+                            channel: 'a608_jenkins_build'
                         )
                     }
                 }
@@ -138,93 +164,102 @@ services:
 > **FrontEnd 배포 구성**
 > 
 - **Build**
+
+pipeline{
+    agent any
     
-    ```bash
-    pipeline{
-        agent any
+    tools {
+        nodejs 'nodejs-20.15.0'
+    }
+    
+    stages{
         
-        tools {
-            nodejs 'nodejs-20.15.0'
+        stage('delete previous build') {
+            steps {
+                sh """
+                    #!/bin/bash
+                    whoami
+                    rm -rf /usr/share/nginx/html/build
+                """    
+            }
         }
         
-        stages{
-            
-            stage('delete previous build') {
-                steps {
-                    sh """
-                        #!/bin/bash
-                        whoami
-                        rm -rf /usr/share/nginx/html/build
-                    """    
+        
+        stage('github clone (FE)') {
+            steps {
+                script {
+                    git branch: 'fe-develop', credentialsId: 'a608', 
+                    url: 'https://lab.ssafy.com/s11-final/S11P31A608.git'
                 }
             }
-            
-            
-            stage('gitlab clone (FE)') {
-                steps {
-                    script {
-                        git branch: 'fe-develop', credentialsId: 'a608', 
-                        url: 'https://lab.ssafy.com/s11-final/S11P31A608.git'
-                    }
+        }
+
+        stage('remove previous repo (FE)') {
+            steps {
+                dir("./frontend/jdqr-order") {
+                    sh """ 
+                        yarn cache clean
+                        rm -rf node_modules yarn.lock
+                        node --version  # 올바른 Node.js 버전이 출력되는지 확인
+                        yarn install
+                        CI=false yarn build
+                    """
                 }
             }
-    
-            stage('build (FE)') {
-                steps {
-                    dir("./frontend/mutualrisk") {
-                        sh """ 
-                            node --version  # 올바른 Node.js 버전이 출력되는지 확인
-                            yarn install
-                            CI=false yarn build
-                        """
-                    }
-                }
-            }
-            
-            
-            stage('move build files to nginx static') {
-                steps {
-                    sh """
-                        pwd
-                        ls -al
-                        mv frontend/mutualrisk/build /usr/share/nginx/html/
-                        cp -r /usr/share/nginx/html/stockImage /usr/share/nginx/html/build
-                        echo "Deploy React App success."
+        }
+
+        stage('build (FE)') {
+            steps {
+                dir("./frontend/jdqr-order") {
+                    sh """ 
+                        node --version  # 올바른 Node.js 버전이 출력되는지 확인
+                        yarn install
+                        CI=false yarn build
                     """
                 }
             }
         }
         
-        post {
-            always {
-                script {
-                    def message
-                    if (currentBuild.result == 'SUCCESS') {
-                        message = "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
-                        mattermostSend (color: 'good',
-                            message: message,
-                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
-                            channel: 'jenkins_build'
-                        )
-                    } else if (currentBuild.result == 'FAILURE') {
-                        message = "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)\n"
-                            mattermostSend (color: 'danger',
-                            message: message,
-                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
-                            channel: 'jenkins_build'
-                        )
-                    } else {
-                        message = "빌드 상태: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
-                        mattermostSend (
-                            message: message,
-                            endpoint: 'https://meeting.ssafy.com/hooks/g1rz3da4b7f1mcrk43qpdfxqqe',
-                            channel: 'jenkins_build'
-                        )
-                    }
+        
+        stage('move build files to nginx static') {
+            steps {
+                sh """
+                    pwd
+                    ls -al
+                    mv frontend/jdqr-order/build /usr/share/nginx/html/
+                    echo "Deploy React App success."
+                """
+            }
+        }
+    }
+    
+  post {
+        always {
+            script {
+                def message
+                if (currentBuild.result == 'SUCCESS') {
+                    message = "무슨 마술을 부린거야? : ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
+                    mattermostSend (color: 'good',
+                        message: message,
+                        endpoint: 'https://meeting.ssafy.com/hooks/grkzh4nxyir6drb4oau8hn4awc',
+                        channel: 'a608_jenkins_build'
+                    )
+                } else if (currentBuild.result == 'FAILURE') {
+                    message = "쓰읍...사기를 쳐놨네: ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)\n"
+                        mattermostSend (color: 'danger',
+                        message: message,
+                        endpoint: 'https://meeting.ssafy.com/hooks/grkzh4nxyir6drb4oau8hn4awc',
+                        channel: 'a608_jenkins_build'
+                    )
+                } else {
+                    message = "이건 뭐지 : ${env.JOB_NAME} #${env.BUILD_NUMBER} \n(<${env.BUILD_URL}|Details>)"
+                    mattermostSend (
+                        message: message,
+                        endpoint: 'https://meeting.ssafy.com/hooks/grkzh4nxyir6drb4oau8hn4awc',
+                        channel: 'a608_jenkins_build'
+                    )
                 }
             }
         }
     }
-    ```
-
-    
+}

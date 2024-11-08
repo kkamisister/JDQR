@@ -20,4 +20,6 @@ public interface OwnerService {
 	CategoryResult getAllCategories(Integer userId);
 
     WholeOptionResponseDto getWholeOptionInfo(Integer userId);
+
+	OptionResponseDto getIndividualOptionInfo(Integer userId, Integer optionId);
 }

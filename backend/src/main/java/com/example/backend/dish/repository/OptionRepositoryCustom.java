@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface OptionRepositoryCustom {
     List<OptionVo> findAllOptionByRestaurant(Restaurant restaurant);
+
+    List<OptionVo> findOptionByOptionId(Integer optionId);
 }

@@ -218,6 +218,25 @@ public class OwnerController {
 		return ResponseEntity.status(response.status()).body(response);
 	}
 
+	@Operation(summary = "상세 옵션 조회", description = "상세 옵션을 조회하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "옵션 조회 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@GetMapping("/option/{optionId}")
+	// 6. 전체 옵션 조회
+	public ResponseEntity<ResponseWithData<OptionResponseDto>> getIndividualOptionInfo(HttpServletRequest request,
+																							@PathVariable Integer optionId){
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		OptionResponseDto responseDto = ownerService.getIndividualOptionInfo(userId, optionId);
+
+		ResponseWithData<OptionResponseDto> response = new ResponseWithData<>(HttpStatus.OK.value(), "전체 옵션 조회를 완료하였습니다", responseDto);
+
+		return ResponseEntity.status(response.status()).body(response);
+	}
+
 	@Operation(summary = "사업장 조회", description = "사업장을 조회하는 api")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "조회 완료"),

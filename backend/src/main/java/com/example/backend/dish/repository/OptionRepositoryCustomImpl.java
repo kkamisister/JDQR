@@ -19,4 +19,13 @@ public class OptionRepositoryCustomImpl extends Querydsl4RepositorySupport imple
             .where(option.restaurant.eq(restaurant))
             .fetch();
     }
+
+    @Override
+    public List<OptionVo> findOptionByOptionId(Integer optionId) {
+        return select(Projections.constructor(OptionVo.class, option.id, option.name, option.maxChoiceCount, option.mandatory, choice.id, choice.name, choice.price))
+            .from(choice)
+            .join(choice.option, option)
+            .where(option.id.eq(optionId))
+            .fetch();
+    }
 }

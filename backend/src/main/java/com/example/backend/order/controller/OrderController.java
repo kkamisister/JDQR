@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderController {
 
 	private final OrderService orderService;
+	private final SimpMessagingTemplate messagingTemplate;
 
 	@Operation(summary = "인증 토큰 발급", description = "토큰을 발급한 url을 반환하는 api")
 	@ApiResponses(value = {
@@ -74,27 +76,15 @@ public class OrderController {
 	}
 
 	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")
-	@PostMapping("/{tossOrderId}/payment/{status}")
-	public ResponseEntity<ResponseWithMessage> finishPayment(HttpServletRequest request,
-																  @PathVariable String tossOrderId,
-																  @PathVariable String status,
-																  @RequestBody SimpleTossPaymentRequestDto simpleTossPaymentRequestDto) {
-
-		String tableId = (String)request.getAttribute("tableId");
-
+	@MessageMapping("/payment")
+	public void finishPayment(
+		@Header("tableId") String tableId,  // 헤더에서 직접 tableId 받기
+		@Payload SimpleTossPaymentRequestDto simpleTossPaymentRequestDto,  // Payload로 데이터 받기
+		@Header("tossOrderId") String tossOrderId,  // 필요에 따라 헤더로 받기
+		@Header("status") String status
+	) {
 		SimpleResponseMessage simpleResponseMessage = orderService.finishPayment(tableId, tossOrderId, status, simpleTossPaymentRequestDto);
-
-		int httpStatus;
-		if (simpleResponseMessage.equals(SimpleResponseMessage.PAYMENT_SUCCESS) || simpleResponseMessage.equals(SimpleResponseMessage.WHOLE_PAYMENT_SUCCESS)) {
-			httpStatus = HttpStatus.OK.value();
-		}
-		else {
-			httpStatus = HttpStatus.BAD_REQUEST.value();
-		}
-		ResponseWithMessage responseWithMessage = new ResponseWithMessage(httpStatus, simpleResponseMessage.getMessage());
-
-		return ResponseEntity.status(responseWithMessage.status())
-			.body(responseWithMessage);
+		messagingTemplate.convertAndSend("/sub/cart/"+tableId, simpleResponseMessage);
 	}
 
 	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")

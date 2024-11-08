@@ -5,8 +5,11 @@ import { Box, Divider, Stack, Typography } from "@mui/material";
 import DishTab from "../../components/tab/DishTab";
 import DishItemCard from "../../components/card/DishItemCard";
 import { colors } from "../../constants/colors";
+import { useNavigate } from "react-router-dom";
 
 export default function DishList({ dishes }) {
+  const navigate = useNavigate();
+
   const mockDish = {
     status: 200,
     message: "메뉴 조회에 성공하였습니다.",
@@ -68,28 +71,8 @@ export default function DishList({ dishes }) {
   };
 
   // 아이템을 세션 스토리지에 저장하고 리다이렉트하는 함수
-  const handleDishClick = (dish) => {
-    const cartItem = {
-      dishId: dish.dishId,
-      userId: "d8ba9920-08f6-4f65-b7df-811ae20e70d1", // 고정된 유저 ID
-      dishName: dish.dishName,
-      dishCategoryId: 1, // 카테고리 ID 예시 (실제 값으로 수정 필요)
-      dishCategoryName: dish.categoryName, // 카테고리 이름
-      optionIds: dish.options?.map((option) => option.optionId) || [], // 옵션 ID 목록
-      price: dish.price,
-      quantity: 1,
-      orderedAt: null,
-    };
-
-    // 기존 장바구니 아이템 가져오기
-    const existingCart = JSON.parse(sessionStorage.getItem("cartList")) || [];
-    // 새로운 아이템 추가
-    const updatedCart = [...existingCart, cartItem];
-    // 세션 스토리지에 저장
-    sessionStorage.setItem("cartList", JSON.stringify(updatedCart));
-
-    // /cart로 리다이렉트
-    window.location.href = "/cart";
+  const handleDishClick = (dishId) => {
+    navigate(`${dishId}`);
   };
 
   return (
@@ -139,7 +122,7 @@ export default function DishList({ dishes }) {
                 <Box key={dish.dishId}>
                   <DishItemCard
                     dish={dish}
-                    onClick={() => handleDishClick(dish)}
+                    onClick={() => handleDishClick(dish.dishId)}
                   />
                   {dishIndex < dishCategory.items.length - 1 && (
                     <Divider variant="middle" />

@@ -22,5 +22,9 @@ public class DishCategory extends BaseEntity {
     private Restaurant restaurant;
 
     private String name;
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+    }
 }
 

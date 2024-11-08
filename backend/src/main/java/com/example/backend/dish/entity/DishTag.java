@@ -41,5 +41,10 @@ public class DishTag extends BaseEntity {
 			.dish(dish)
 			.build();
 	}
+
+	public void setTagAndDish(Tag tag, Dish dish){
+		this.tag = tag;
+		this.dish = dish;
+	}
 }
 

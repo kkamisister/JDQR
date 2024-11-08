@@ -60,4 +60,8 @@ public class Restaurant extends BaseEntity {
             .open(Boolean.FALSE)
             .build();
     }
+
+    public void setOwner(Owner owner){
+        this.owner = owner;
+    }
 }

@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
+import com.example.backend.TestDataGenerator;
 import com.example.backend.common.config.QuerydslConfig;
 import com.example.backend.config.ContainerSupport;
 import com.example.backend.etc.entity.Restaurant;
@@ -44,6 +45,8 @@ class OrderRepositoryTest extends ContainerSupport {
 	@Autowired
 	private OrderRepository orderRepository;
 
+	private final TestDataGenerator generator = new TestDataGenerator();
+
 	@DisplayName("테이블 ID로 주문을 조회할 수 있다")
 	@Test
 	void findByTableId() {
@@ -56,72 +59,28 @@ class OrderRepositoryTest extends ContainerSupport {
 
 		ownerRepository.save(owner);
 
-		Restaurant restaurant1 = Restaurant.builder()
-			.owner(owner)
-			.name("용수의식당")
-			.address("멀티캠퍼스10층")
-			.phoneNumber("000-111-222")
-			.latitude(10.0)
-			.longitude(130.0)
-			.open(true)
-			.build();
 
-		Restaurant restaurant2 = Restaurant.builder()
-			.owner(owner)
-			.name("영표집")
-			.address("멀티캠퍼스11층")
-			.phoneNumber("000-111-222")
-			.latitude(5.0)
-			.longitude(130.0)
-			.open(true)
-			.build();
+		// 식당 생성
+		List<Restaurant> restaurants = generator.generateTestRestaurantList(false);
+		for(Restaurant restaurant : restaurants) {
+			restaurant.setOwner(owner);
+		}
 
-		Restaurant restaurant3 = Restaurant.builder()
-			.owner(owner)
-			.name("용수집")
-			.address("멀티캠퍼스13층")
-			.phoneNumber("000-111-222")
-			.latitude(10.0)
-			.longitude(150.0)
-			.open(true)
-			.build();
+		restaurantRepository.saveAll(restaurants);
 
-		Restaurant save = restaurantRepository.save(restaurant1);
-		Restaurant save1 = restaurantRepository.save(restaurant2);
-		Restaurant save2 = restaurantRepository.save(restaurant3);
+		// order 생성
+		List<Order> orders = generator.generateTestOrderList(false);
+		orderRepository.saveAll(orders);
 
-
-		Order order = Order.builder()
-			.tableId("11111")
-			.menuCnt(5)
-			.orderStatus(OrderStatus.PENDING)
-			.paymentMethod(PaymentMethod.UNDEFINED)
-			.build();
-		Order order2 = Order.builder()
-			.tableId("11111")
-			.menuCnt(9)
-			.orderStatus(OrderStatus.PENDING)
-			.paymentMethod(PaymentMethod.UNDEFINED)
-			.build();
-		Order order3 = Order.builder()
-			.tableId("11111")
-			.menuCnt(7)
-			.orderStatus(OrderStatus.PENDING)
-			.paymentMethod(PaymentMethod.UNDEFINED)
-			.build();
-
-		orderRepository.save(order);
-		orderRepository.save(order2);
-		orderRepository.save(order3);
 
 		//when
 		List<Order> orderList = orderRepository.findByTableId("11111");
 
 		//then
-		assertThat(orderList.size()).isEqualTo(3);
+		assertThat(orderList.size()).isEqualTo(2);
 
 		assertThat(orderList).extracting(Order::getMenuCnt)
-			.containsExactly(5,9,7);
+			.containsExactly(5,9);
 
 	}
 }

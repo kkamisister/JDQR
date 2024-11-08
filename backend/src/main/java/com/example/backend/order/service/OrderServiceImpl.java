@@ -66,8 +66,9 @@ public class OrderServiceImpl implements OrderService {
 	private final PaymentDetailRepository paymentDetailRepository;
 	private final SimpMessagingTemplate messagingTemplate;
 	private final TossWebClient tossWebClient;
+    private final OrderPaymentRepository orderPaymentRepository;
 
-	/**
+    /**
 	 * tableName으로 qrCode를 찾아서, 해당 코드에 token을 더한 주소를 반환
 	 * @param tableId
 	 * @return
@@ -274,23 +275,31 @@ public class OrderServiceImpl implements OrderService {
 		PaymentMethod paymentMethod = paymentRequestDto.type();
 
 		// 2. 해당 테이블의 가장 최근 order를 확인하고, 결제 방식을 업데이트시킨다
-		updatePaymentMethodOfOrder(tableId, paymentMethod);
+		List<Order> orders = updatePaymentMethodOfOrder(tableId, paymentMethod);
 
 		// 3. paymentMethod 에 따라 다르게 재고 관리를 시행
 		Payment payment;
-		Order order = orderRepository.findMostRecentOrder(tableId);
 		// 3-1. paymentMethod 가 MONEY_DIVIDE 일 경우
 		if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
-			Integer totalPurchaseAmount = getTotalPurchaseAmount(order);
-			payment = createBasePaymentForMoneyDivide(order, totalPurchaseAmount, paymentRequestDto);
+			Integer totalPurchaseAmount = getTotalPurchaseAmount(orders);
+			payment = createBasePaymentForMoneyDivide(orders, totalPurchaseAmount, paymentRequestDto);
 		}
 		// 3-2. paymentMethod 가 MENU_DIVIDE 일 경우
 		else {
-			payment = createBasePaymentForMenuDivide(order, paymentRequestDto);
+			payment = createBasePaymentForMenuDivide(paymentRequestDto);
 		}
 
+        // 4. OrderPayment에 데이터 삽입
+        List<OrderPayment> orderPayments = orders.stream()
+            .map(order -> OrderPayment.builder()
+                .order(order)
+                .payment(payment)
+                .build())
+            .toList();
 
-		return InitialPaymentResponseDto.builder()
+        orderPaymentRepository.saveAll(orderPayments);
+
+        return InitialPaymentResponseDto.builder()
 			.tossOrderId(payment.getTossOrderId())
 			.amount(payment.getAmount())
 			.build();
@@ -304,7 +313,7 @@ public class OrderServiceImpl implements OrderService {
 	 * @param tossOrderId                  : toss 주문번호
 	 * @param status                       : 결제 결과
 	 * @param simpleTossPaymentRequestDto : toss paymentKey + amount(결제 금액)
-	 * @return
+	 * @return : 반환 메시지
 	 */
 	@Override
 	@Transactional
@@ -325,17 +334,7 @@ public class OrderServiceImpl implements OrderService {
 			if (!tossPaymentResponseDto.getSuccess()) throw new JDQRException(ErrorCode.TOSS_CONFIRM_ERROR);
 
 			// 3. 주문에 대한 결제가 모두 끝났는지를 체크
-			//    모두 끝났을 경우, 테이블의 상태를 AVAILABLE로 변경
-			if(checkOrderIsFinished(tossOrderId)) {
-				Table table = tableRepository.findById(tableId)
-					.orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
-				table.setUseStatus(UseStatus.AVAILABLE);
-				tableRepository.save(table);
-
-				return SimpleResponseMessage.WHOLE_PAYMENT_SUCCESS;
-			}
-
-			return SimpleResponseMessage.PAYMENT_SUCCESS;
+			return checkOrderIsFinished(tableId, tossOrderId);
 		}
 		else {
 			return SimpleResponseMessage.PAYMENT_FAILED;
@@ -425,13 +424,39 @@ public class OrderServiceImpl implements OrderService {
 	/**
 	 * {tossOrderId}에 해당하는 주문의 결제가 모두 끝났는지를 판단한다.
 	 *
+	 * @param tableId : 현재 주문에 해당하는 tableId
 	 * @param tossOrderId : 테이블의 가장 최신 주문 id
 	 */
-	private boolean checkOrderIsFinished(String tossOrderId) {
+	private SimpleResponseMessage checkOrderIsFinished(String tableId, String tossOrderId) {
 		// 주문한 금액의 총합과 결제한 금액의 총합이 서로 동일할 경우, 결제가 모두 끝났다고 판단
 		Payment payment = paymentRepository.findByTossOrderId(tossOrderId);
-		Order order = payment.getOrder();
-		return getTotalPurchaseAmount(order).equals(getCurPaidAmount(order));
+
+		// payment의 상태 변경 & 저장
+		payment.setPaymentStatus(PaymentStatus.PAID);
+		paymentRepository.save(payment);
+
+		List<Order> ordersByPayment = orderRepository.findOrdersByPayment(payment);
+
+		// 결제가 다 끝났는지를 확인
+		boolean flag = getTotalPurchaseAmount(ordersByPayment).equals(getCurPaidAmount(ordersByPayment));
+
+		// 결제가 끝났을 경우 : order과 table의 상태 변경
+		if (flag) {
+			for (Order order : ordersByPayment) {
+				order.setOrderStatus(OrderStatus.PAID);
+			}
+			orderRepository.saveAll(ordersByPayment);
+
+			Table table = tableRepository.findById(tableId)
+				.orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
+			table.setUseStatus(UseStatus.AVAILABLE);
+			tableRepository.save(table);
+
+			return SimpleResponseMessage.WHOLE_PAYMENT_SUCCESS;
+		}
+		else {
+			return SimpleResponseMessage.PAYMENT_SUCCESS;
+		}
 	}
 
 	@Transactional
@@ -452,13 +477,13 @@ public class OrderServiceImpl implements OrderService {
 
 		// 1. 우리 DB의 상태 업데이트
 		// 현재 결제의 결제 방식 확인
-		Order order = payment.getOrder();
-		PaymentMethod paymentMethod = order.getPaymentMethod();
+		List<Order> orders = orderRepository.findOrdersByPayment(payment);
+		PaymentMethod paymentMethod = orders.get(0).getPaymentMethod();
 
 		// 1-1. 결제 방식이 MONEY_DIVIDE 방식일 경우
 		if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
-			Integer totalPurchaseAmount = getTotalPurchaseAmount(order);
-			Integer curPaidAmount = getCurPaidAmount(order);
+			Integer totalPurchaseAmount = getTotalPurchaseAmount(orders);
+			Integer curPaidAmount = getCurPaidAmount(orders);
 
 			// 주문한 금액보다 더 많은 양의 금액을 결제하려고 시도하는 경우
 			if (curPaidAmount + payment.getAmount() > totalPurchaseAmount) {
@@ -509,11 +534,10 @@ public class OrderServiceImpl implements OrderService {
 	 * 메뉴별 결제를 할 경우에 해당 결제 정보가 담긴 payment entity를 추가한다.
 	 * 동시성 처리를 위해 Lock 적용
 	 *
-	 * @param order               : 결제를 하기를 원하는 order entity
 	 * @param paymentRequestDto : 결제 정보가 담긴 record
 	 */
 	@Transactional
-	protected Payment createBasePaymentForMenuDivide(Order order, PaymentRequestDto paymentRequestDto) {
+	protected Payment createBasePaymentForMenuDivide(PaymentRequestDto paymentRequestDto) {
 		List<OrderItemRequestDto> orderItemRequestDtos = paymentRequestDto.orderItemInfos();
 		List<Integer> orderItemIds = orderItemRequestDtos.stream()
 			.map(OrderItemRequestDto::orderItemId)
@@ -544,7 +568,6 @@ public class OrderServiceImpl implements OrderService {
 		Payment payment = Payment.builder()
 			.tossOrderId(tossOrderId)
 			.amount(purchasePrice)
-			.order(order)
 			.paymentStatus(PaymentStatus.PENDING)
 			.build();
 
@@ -568,18 +591,18 @@ public class OrderServiceImpl implements OrderService {
 	 * N빵 결제를 할 경우에 해당 결제 정보가 담긴 payment Entity를 추가한다.
 	 * 동시성 처리를 위해 Lock 적용
 	 *
-	 * @param order               : 결제를 하기를 원하는 order entity
+	 * @param orders               : 결제를 하기를 원하는 order entity list
 	 * @param totalPurchaseAmount : 총 주문 금액
 	 * @param paymentRequestDto : 결제 정보가 담긴 record
 	 */
 	@Transactional
-    protected Payment createBasePaymentForMoneyDivide(Order order, Integer totalPurchaseAmount, PaymentRequestDto paymentRequestDto) {
+    protected Payment createBasePaymentForMoneyDivide(List<Order> orders, Integer totalPurchaseAmount, PaymentRequestDto paymentRequestDto) {
 		// 1. 현재 결제가 된 총 금액을 구한다.
-		Integer curPaidAmount = getCurPaidAmount(order);
+		Integer curPaidAmount = getCurPaidAmount(orders);
 
 		// 결제할 금액 구하기
 		int paymentAmount = totalPurchaseAmount * paymentRequestDto.serveNum() / paymentRequestDto.peopleNum();
-
+        // validation check : 결제된 금액 + 결제할 금액 > 전체 주문 금액이면 오류 발생
 		if (curPaidAmount + paymentAmount > totalPurchaseAmount) {
 			throw new JDQRException(ErrorCode.EXCEED_TOTAL_PURCHASE_AMOUNT);
 		}
@@ -593,7 +616,6 @@ public class OrderServiceImpl implements OrderService {
 			.amount(paymentAmount)
 			.tossOrderId(tossOrderId)
 			.paymentStatus(PaymentStatus.PENDING)
-			.order(order)
 			.build();
 
 		// 3. entity 저장
@@ -611,25 +633,25 @@ public class OrderServiceImpl implements OrderService {
 
 	/**
 	 * 주문 기준으로, 현재 결제가 완료된 금액을 구해서 반환한다.
-	 * @param order : 조회하기를 원하는 order entity
+	 * @param orders : 조회하기를 원하는 order entity list
 	 * @return : 총 결제 금액
 	 */
-	private Integer getCurPaidAmount(Order order) {
-		return  paymentRepository.findAllByOrder(order).stream()
-			.filter(payment -> payment.getPaymentStatus().equals(PaymentStatus.PAID))
+	private Integer getCurPaidAmount(List<Order> orders) {
+		return  paymentRepository.findPaymentsByOrders(orders).stream()
 			.map(Payment::getAmount)
 			.reduce(0, Integer::sum);
 	}
 
 	/**
-	 * @param order : 현재 집계하기를 원하는 order id
+	 * @param orders : 현재 집계하기를 원하는 order들의 list
 	 * @return : 해당 테이블에서 구메한 메뉴들의 가격의 총합
 	 */
-	private Integer getTotalPurchaseAmount(Order order) {
-		if (!order.getOrderStatus().equals(OrderStatus.PENDING)) throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
+	private Integer getTotalPurchaseAmount(List<Order> orders) {
+		for (Order order : orders) {
+			if (!order.getOrderStatus().equals(OrderStatus.PENDING)) throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
+		}
 
-
-		List<OrderItem> orderItems = orderItemRepository.findAllByOrder(order).stream()
+		List<OrderItem> orderItems = orderItemRepository.findOrderItemByOrder(orders).stream()
 			.filter(orderItem -> orderItem.getOrderStatus().equals(OrderStatus.PENDING))
 			.toList();
 
@@ -647,27 +669,33 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	@Transactional
 	@RedLock(key = "'order_status'")
-    protected void updatePaymentMethodOfOrder(String tableId, PaymentMethod paymentMethod) {
+    protected List<Order> updatePaymentMethodOfOrder(String tableId, PaymentMethod paymentMethod) {
 		// 1. 테이블의 가장 최근 order 가져오기
-		Order order = orderRepository.findMostRecentOrder(tableId);
-		if (!order.getOrderStatus().equals(OrderStatus.PENDING)) throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
+		List<Order> orders = orderRepository.findUnpaidOrders(tableId);
 
-		// 2. 테이블을 확인 후 결제 방식(payment_method column)을 업데이트하기
-		PaymentMethod oldPaymentMethod = order.getPaymentMethod();
+		for (Order order : orders) {
+			if (!order.getOrderStatus().equals(OrderStatus.PENDING)) throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
 
-		// 2-1. 결제 방식이 아직 정해지지 않았을 경우
-		if (oldPaymentMethod.equals(PaymentMethod.UNDEFINED)) {
-			order.setPaymentMethod(paymentMethod);
-			orderRepository.save(order);
-		}
-		// 2-2. 결제 방식이 정해진 경우
-		// oldPaymentMethod는 항상 paymentMethod와 동일해야 한다
-		// 다를 경우 에러를 반환
-		else {
-			if (!oldPaymentMethod.equals(paymentMethod)) {
-				throw new JDQRException(ErrorCode.PAYMENT_METHOD_NOT_VALID);
+			// 2. 테이블을 확인 후 결제 방식(payment_method column)을 업데이트하기
+			PaymentMethod oldPaymentMethod = order.getPaymentMethod();
+
+			// 2-1. 결제 방식이 아직 정해지지 않았을 경우
+			if (oldPaymentMethod.equals(PaymentMethod.UNDEFINED)) {
+				order.setPaymentMethod(paymentMethod);
+			}
+			// 2-2. 결제 방식이 정해진 경우
+			// oldPaymentMethod는 항상 paymentMethod와 동일해야 한다
+			// 다를 경우 에러를 반환
+			else {
+				if (!oldPaymentMethod.equals(paymentMethod)) {
+					throw new JDQRException(ErrorCode.PAYMENT_METHOD_NOT_VALID);
+				}
 			}
 		}
+
+		// 3. 바뀐 결제 방식 저장
+		orderRepository.saveAll(orders);
+		return orders;
 	}
 
 	/**

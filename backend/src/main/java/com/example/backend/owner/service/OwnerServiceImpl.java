@@ -186,6 +186,11 @@ public class OwnerServiceImpl implements OwnerService{
 		return new CommonResponse.ResponseWithMessage(HttpStatus.OK.value(), "메뉴가 수정되었습니다.");
 	}
 
+	/**
+	 * 점주가 설정한 옵션의 전체 정보를 담아 반환
+	 * @param userId : 점주의 id
+	 * @return : 전체 옵션 정보를 담아 반환
+	 */
 	@Override
 	public WholeOptionResponseDto getWholeOptionInfo(Integer userId) {
 
@@ -207,26 +212,7 @@ public class OwnerServiceImpl implements OwnerService{
 				Integer optionId = optionEntry.getKey();
 				List<OptionVo> values = optionEntry.getValue();
 
-				// 옵션 그룹에 대한 정보를 담고 있는 class
-				OptionVo baseOptionVo = values.get(0);
-
-				// 세부 옵션 정보 구하기
-				List<ChoiceDto> choiceDtos = values.stream()
-					.map(optionVo -> ChoiceDto.builder()
-						.choiceId(optionVo.getChoiceId())
-						.choiceName(optionVo.getChoiceName())
-						.price(optionVo.getPrice())
-						.build()
-					)
-					.toList();
-
-				return OptionResponseDto.builder()
-					.optionId(optionId)
-					.optionName(baseOptionVo.getOptionName())
-					.choices(choiceDtos)
-					.maxChoiceCount(baseOptionVo.getMaxChoiceCount())
-					.isMandatory(baseOptionVo.getMandatory())
-					.build();
+				return getOptionResponseDto(optionId, values);
 			})
 			.toList();
 
@@ -234,6 +220,46 @@ public class OwnerServiceImpl implements OwnerService{
 		return WholeOptionResponseDto.builder()
 			.options(optionResponseDtos)
 			.build();
+	}
+
+	/**
+	 * optionId와, 그 optionId에 해당하는 List<OptionVo>를 받아서, api가 요구하는 형식으로 변환 후 반환
+	 * @param optionId : 검색 예정인 option의 id
+	 * @param values : OptionVo의 list들
+	 * @return : OptionResponseDto 형식
+	 */
+	private static OptionResponseDto getOptionResponseDto(Integer optionId, List<OptionVo> values) {
+		// 옵션 그룹에 대한 정보를 담고 있는 class
+		OptionVo baseOptionVo = values.get(0);
+
+		// 세부 옵션 정보 구하기
+		List<ChoiceDto> choiceDtos = values.stream()
+			.map(optionVo -> ChoiceDto.builder()
+				.choiceId(optionVo.getChoiceId())
+				.choiceName(optionVo.getChoiceName())
+				.price(optionVo.getPrice())
+				.build()
+			)
+			.toList();
+
+		return OptionResponseDto.builder()
+			.optionId(optionId)
+			.optionName(baseOptionVo.getOptionName())
+			.choices(choiceDtos)
+			.maxChoiceCount(baseOptionVo.getMaxChoiceCount())
+			.isMandatory(baseOptionVo.getMandatory())
+			.build();
+	}
+
+	/**
+	 * @param optionId : 정보를 얻고자 하는 option의 id
+	 */
+	@Override
+	public OptionResponseDto getIndividualOptionInfo(Integer userId, Integer optionId) {
+
+		List<OptionVo> optionVos = optionRepository.findOptionByOptionId(optionId);
+
+		return getOptionResponseDto(optionId, optionVos);
 	}
 
 	/**

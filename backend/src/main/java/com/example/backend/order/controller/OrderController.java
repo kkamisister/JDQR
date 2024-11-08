@@ -66,9 +66,12 @@ public class OrderController {
 		// 쿠키 생성 및 설정
 		Cookie cookie = new Cookie(UseCookie.USE_COOKIE.getExplain(), UUID.randomUUID().toString());
 		cookie.setPath("/"); // 쿠키 적용 경로 설정
-		// cookie.setHttpOnly(true); // HttpOnly 설정
+		cookie.setHttpOnly(true); // HttpOnly 설정
 		cookie.setMaxAge(60 * 20); // 쿠키 유효 시간 : 20분
+		cookie.setSecure(true);
+
 		response.addCookie(cookie); // 응답에 쿠키 추가
+		response.setHeader("Set-Cookie", "key=value; SameSite=None; Secure");
 
 		return ResponseEntity.ok().build();
 	}

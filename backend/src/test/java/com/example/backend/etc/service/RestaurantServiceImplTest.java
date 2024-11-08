@@ -160,13 +160,6 @@ class RestaurantServiceImplTest {
 		when(restaurantCategoryMapRepository.findByRestaurandIds(anyList()))
 			.thenReturn(restaurantCategoryMaps);
 
-		Grid g1 = new Grid(1,1);
-		Grid g2 = new Grid(1,1);
-		Grid g3 = new Grid(1,1);
-		Grid g4 = new Grid(1,1);
-		Grid g5 = new Grid(1,1);
-
-		List<Grid> grids = List.of(g1,g2,g3,g4,g5);
 
 		Table table1 = Table.builder()
 			.restaurantId(restaurant1.getId())

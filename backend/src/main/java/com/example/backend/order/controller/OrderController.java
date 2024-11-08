@@ -71,7 +71,6 @@ public class OrderController {
 		cookie.setSecure(true);
 
 		response.addCookie(cookie); // 응답에 쿠키 추가
-		response.setHeader("Set-Cookie", "key=value; SameSite=None; Secure");
 
 		return ResponseEntity.ok().build();
 	}

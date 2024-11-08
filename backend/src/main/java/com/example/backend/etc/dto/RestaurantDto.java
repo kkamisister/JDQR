@@ -2,6 +2,7 @@ package com.example.backend.etc.dto;
 
 import java.util.List;
 
+import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.entity.RestaurantCategory;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,4 +33,10 @@ public class RestaurantDto {
 	private double lat;
 	private double lng;
 	private boolean open;
+
+	public static RestaurantDto from(Restaurant restaurant) {
+		return RestaurantDto.builder()
+			.open(restaurant.getOpen())
+			.build();
+	}
 }

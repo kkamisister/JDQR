@@ -18,11 +18,11 @@ import static com.example.backend.dish.entity.QDishCategory.dishCategory;
 
 public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implements OrderRepositoryCustom {
     @Override
-    public Order findMostRecentOrder(String tableId) {
+    public List<Order> findUnpaidOrders(String tableId) {
         return selectFrom(order)
-            .where(order.tableId.eq(tableId))
-            .orderBy(order.id.desc())
-            .fetchOne();
+            .where(order.tableId.eq(tableId)
+                .and(order.orderStatus.eq(OrderStatus.PENDING)))
+            .fetch();
     }
 
     @Override

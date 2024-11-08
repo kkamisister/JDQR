@@ -2,6 +2,10 @@ package com.example.backend.order.repository;
 
 
 import com.example.backend.common.repository.Querydsl4RepositorySupport;
+import com.example.backend.order.entity.Order;
+import com.example.backend.order.entity.OrderItem;
+
+import java.util.List;
 
 import static com.example.backend.order.entity.QOrderItem.orderItem;
 

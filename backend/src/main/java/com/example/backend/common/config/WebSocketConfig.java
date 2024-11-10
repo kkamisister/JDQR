@@ -35,8 +35,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 		//클라이언트에서 연결할 엔드포인트 설정
 		registry.addEndpoint("/ws")
-			.setAllowedOrigins("http://localhost:3000")
-			.withSockJS();
+			.setAllowedOrigins("http://localhost:3000");
+			// .withSockJS();
 	}
 
 	@Override

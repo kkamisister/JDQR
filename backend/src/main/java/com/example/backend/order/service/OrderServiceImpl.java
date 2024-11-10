@@ -113,20 +113,21 @@ public class OrderServiceImpl implements OrderService {
 		// 2. 테이블 장바구니에 물품을 담는다
 		//<tableId,<userId,<hashCode,항목>>>
 		String key = "table::"+tableId;
-		// log.warn("userID : {}",productInfo.getUserId());
+		log.warn("key : {}",key);
+		log.warn("userID : {}",productInfo.getUserId());
 		Map<Integer,CartDto> cachedCartData = redisHashRepository.getCartDatas(key,productInfo.getUserId());
-		// log.warn("cachedCartData : {}",cachedCartData);
+		log.warn("cachedCartData : {}",cachedCartData);
 		if(!ObjectUtils.isEmpty(cachedCartData)){ // 1. 기존에 동일한 물품이 있어서 거기에 더해지는 경우 -> 지금 담는 hashCode와 비교하여 동일한 것을 찾아서 추가
 
 			CartDto cartData = cachedCartData.get(productInfo.hashCode());
 			int currentQuantity = cartData.getQuantity();
 			int newQuantity = currentQuantity + productInfo.getQuantity();
 			if(newQuantity < 0)newQuantity = 0;
-			// log.warn("newQuantity : {}",newQuantity);
+			log.warn("newQuantity : {}",newQuantity);
 
 			cartData.setQuantity(newQuantity);
-			// log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
-			// log.warn("cartData : {}",cartData);
+			log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
+			log.warn("cartData : {}",cartData);
 			cachedCartData.put(productInfo.hashCode(), cartData);
 
 			redisHashRepository.saveHashData(key, cartData.getUserId(), cachedCartData,20L);

@@ -257,7 +257,8 @@ public class OrderServiceImpl implements OrderService {
 		saveOrderItemOptions(orderItems, cartDatas);
 
 		// 4. redis에서 정보를 제거한다
-		redisHashRepository.removeKey(tableId);
+		String key = "table::" + tableId;
+		redisHashRepository.removeKey(key);
 
 		return SimpleResponseMessage.ORDER_SUCCESS;
 	}

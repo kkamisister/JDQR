@@ -99,7 +99,7 @@ const HomePage = () => {
           zIndex: 1,
         }}
       >
-        <RestaurantListBox />
+        <RestaurantListBox restaurants={mockData.data.restaurants} />
       </Stack>
     </Stack>
   )

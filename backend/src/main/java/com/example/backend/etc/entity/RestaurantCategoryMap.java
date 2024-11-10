@@ -33,4 +33,12 @@ public class RestaurantCategoryMap extends BaseEntity {
 	@JoinColumn(name = "restaurant_category_id")
 	private RestaurantCategory restaurantCategory;
 
+	public void setRestaurant(Restaurant restaurant) {
+		this.restaurant = restaurant;
+	}
+
+	public void setRestaurantCategory(RestaurantCategory restaurantCategory) {
+		this.restaurantCategory = restaurantCategory;
+	}
+
 }

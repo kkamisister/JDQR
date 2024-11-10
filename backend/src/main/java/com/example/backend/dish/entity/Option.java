@@ -36,4 +36,12 @@ public class Option extends BaseEntity {
     @OneToMany(mappedBy = "option",cascade = CascadeType.REMOVE)
     private List<Choice> choices = new ArrayList<>();
 
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+    }
+
+    public void setChoices(List<Choice> choices) {
+        this.choices = choices;
+    }
+
 }

@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.example.backend.TestDataGenerator;
 import com.example.backend.common.config.QuerydslConfig;
 import com.example.backend.config.ContainerSupport;
 import com.example.backend.dish.entity.Dish;
@@ -42,6 +43,8 @@ class DishRepositoryTest extends ContainerSupport {
 	@Autowired
 	private DishCategoryRepository dishCategoryRepository;
 
+	private final TestDataGenerator generator = new TestDataGenerator();
+
 	@DisplayName("식당이 가진 메뉴를 조회할 수 있다")
 	@Test
 	void findRestaurantDishes(){
@@ -54,115 +57,33 @@ class DishRepositoryTest extends ContainerSupport {
 
 		ownerRepository.save(owner);
 
-		Restaurant restaurant1 = Restaurant.builder()
-			.owner(owner)
-			.name("용수의식당")
-			.address("멀티캠퍼스10층")
-			.phoneNumber("000-111-222")
-			.latitude(10.0)
-			.longitude(130.0)
-			.open(true)
-			.build();
+		List<Restaurant> restaurants = generator.generateTestRestaurantList(false);
+		for(Restaurant restaurant : restaurants) {
+			restaurant.setOwner(owner);
+		}
+		restaurantRepository.saveAll(restaurants);
 
-		Restaurant restaurant2 = Restaurant.builder()
-			.owner(owner)
-			.name("영표집")
-			.address("멀티캠퍼스11층")
-			.phoneNumber("000-111-222")
-			.latitude(5.0)
-			.longitude(130.0)
-			.open(true)
-			.build();
+		List<DishCategory> dishCategories = generator.generateTestDishCategoryList(false);
+		for(int i=0;i<4;i++){
+			DishCategory dishCategory = dishCategories.get(i);
+			dishCategory.setRestaurant(restaurants.get(i%2));
+		}
+		dishCategoryRepository.saveAll(dishCategories);
 
-		Restaurant restaurant3 = Restaurant.builder()
-			.owner(owner)
-			.name("용수집")
-			.address("멀티캠퍼스13층")
-			.phoneNumber("000-111-222")
-			.latitude(10.0)
-			.longitude(150.0)
-			.open(true)
-			.build();
-
-		restaurantRepository.save(restaurant1);
-		restaurantRepository.save(restaurant2);
-		restaurantRepository.save(restaurant3);
-
-		DishCategory dishCategory1 = DishCategory.builder()
-			.restaurant(restaurant1)
-			.name("면류")
-			.build();
-		DishCategory dishCategory2 = DishCategory.builder()
-			.restaurant(restaurant1)
-			.name("사이드")
-			.build();
-		DishCategory dishCategory3 = DishCategory.builder()
-			.restaurant(restaurant3)
-			.name("음료")
-			.build();
-
-		dishCategoryRepository.save(dishCategory1);
-		dishCategoryRepository.save(dishCategory2);
-		dishCategoryRepository.save(dishCategory3);
-
-
-		Dish dish1 = Dish.builder()
-			.dishCategory(dishCategory1)
-			.name("짜장면")
-			.price(8000)
-			.description("흑인이 먹는 라면은?")
-			.image("image.jpg")
-			.build();
-
-		Dish dish2 = Dish.builder()
-			.dishCategory(dishCategory1)
-			.name("간짜장")
-			.price(9000)
-			.description("흑인이 먹는 라면은?")
-			.image("image.jpg")
-			.build();
-
-		Dish dish3 = Dish.builder()
-			.dishCategory(dishCategory2)
-			.name("치즈볼")
-			.price(8000)
-			.description("치즈볼")
-			.image("image.jpg")
-			.build();
-
-		Dish dish4 = Dish.builder()
-			.dishCategory(dishCategory2)
-			.name("함박스테이크")
-			.price(8000)
-			.description("햄버그")
-			.image("image.jpg")
-			.build();
-
-		Dish dish5 = Dish.builder()
-			.dishCategory(dishCategory1)
-			.name("콜라")
-			.price(8000)
-			.description("흑인이 먹는 물은?")
-			.image("image.jpg")
-			.build();
-
-		Dish dish6 = Dish.builder()
-			.dishCategory(dishCategory1)
-			.name("사이다")
-			.price(8000)
-			.description("백인이 먹는 사이다는?")
-			.image("image.jpg")
-			.build();
-
-		dishRepository.save(dish1);dishRepository.save(dish2);
-		dishRepository.save(dish3);dishRepository.save(dish4);
-		dishRepository.save(dish5);dishRepository.save(dish6);
+		List<Dish> dishes1 = generator.generateTestDishList(false);
+		for(int i=0;i<4;i++){
+			Dish dish = dishes1.get(i);
+			dish.setDishCategory(dishCategories.get(i%2));
+		}
+		dishRepository.saveAll(dishes1);
 
 		//when
-		List<Dish> dishes = dishRepository.findDishesByRestaurant(restaurant1);
+		List<Dish> dishes = dishRepository.findDishesByRestaurant(restaurants.get(0));
 
 		//then
-		assertThat(dishes.size()).isEqualTo(6);
+		assertThat(dishes.size()).isEqualTo(2);
+		assertThat(dishes).extracting(Dish::getName)
+			.containsExactly("더블QPC","콜라");
 	}
 
 	@DisplayName("키워드를 포함한 메뉴들을 조회할 수 있다")
@@ -177,119 +98,35 @@ class DishRepositoryTest extends ContainerSupport {
 
 		ownerRepository.save(owner);
 
-		Restaurant restaurant1 = Restaurant.builder()
-			.owner(owner)
-			.name("용수의식당")
-			.address("멀티캠퍼스10층")
-			.phoneNumber("000-111-222")
-			.latitude(10.0)
-			.longitude(130.0)
-			.open(true)
-			.build();
+		List<Restaurant> restaurants = generator.generateTestRestaurantList(false);
+		for(Restaurant restaurant : restaurants) {
+			restaurant.setOwner(owner);
+		}
+		restaurantRepository.saveAll(restaurants);
 
-		Restaurant restaurant2 = Restaurant.builder()
-			.owner(owner)
-			.name("영표집")
-			.address("멀티캠퍼스11층")
-			.phoneNumber("000-111-222")
-			.latitude(5.0)
-			.longitude(130.0)
-			.open(true)
-			.build();
+		List<DishCategory> dishCategories = generator.generateTestDishCategoryList(false);
+		for(int i=0;i<4;i++){
+			DishCategory dishCategory = dishCategories.get(i);
+			dishCategory.setRestaurant(restaurants.get(i%2));
+		}
+		dishCategoryRepository.saveAll(dishCategories);
 
-		Restaurant restaurant3 = Restaurant.builder()
-			.owner(owner)
-			.name("용수집")
-			.address("멀티캠퍼스13층")
-			.phoneNumber("000-111-222")
-			.latitude(10.0)
-			.longitude(150.0)
-			.open(true)
-			.build();
-
-		Restaurant savedRestaurant = restaurantRepository.save(restaurant1);
-		restaurantRepository.save(restaurant2);
-		restaurantRepository.save(restaurant3);
-
-		DishCategory dishCategory1 = DishCategory.builder()
-			.restaurant(restaurant1)
-			.name("면류")
-			.build();
-		DishCategory dishCategory2 = DishCategory.builder()
-			.restaurant(restaurant1)
-			.name("사이드")
-			.build();
-		DishCategory dishCategory3 = DishCategory.builder()
-			.restaurant(restaurant3)
-			.name("음료")
-			.build();
-
-		dishCategoryRepository.save(dishCategory1);
-		dishCategoryRepository.save(dishCategory2);
-		dishCategoryRepository.save(dishCategory3);
-
-
-		Dish dish1 = Dish.builder()
-			.dishCategory(dishCategory1)
-			.name("짜장면")
-			.price(8000)
-			.description("흑인이 먹는 라면은?")
-			.image("image.jpg")
-			.build();
-
-		Dish dish2 = Dish.builder()
-			.dishCategory(dishCategory1)
-			.name("간짜장")
-			.price(9000)
-			.description("흑인이 먹는 라면은?")
-			.image("image.jpg")
-			.build();
-
-		Dish dish3 = Dish.builder()
-			.dishCategory(dishCategory1)
-			.name("치즈볼")
-			.price(8000)
-			.description("치즈볼")
-			.image("image.jpg")
-			.build();
-
-		Dish dish4 = Dish.builder()
-			.dishCategory(dishCategory1)
-			.name("치즈함박스테이크")
-			.price(8000)
-			.description("햄버그")
-			.image("image.jpg")
-			.build();
-
-		Dish dish5 = Dish.builder()
-			.dishCategory(dishCategory1)
-			.name("콜라")
-			.price(8000)
-			.description("흑인이 먹는 물은?")
-			.image("image.jpg")
-			.build();
-
-		Dish dish6 = Dish.builder()
-			.dishCategory(dishCategory1)
-			.name("사이다")
-			.price(8000)
-			.description("백인이 먹는 사이다는?")
-			.image("image.jpg")
-			.build();
-
-		dishRepository.save(dish1);dishRepository.save(dish2);
-		dishRepository.save(dish3);dishRepository.save(dish4);
-		dishRepository.save(dish5);dishRepository.save(dish6);
+		List<Dish> dishes1 = generator.generateTestDishList(false);
+		for(int i=0;i<6;i++){
+			Dish dish = dishes1.get(i);
+			dish.setDishCategory(dishCategories.get(i%2));
+		}
+		dishRepository.saveAll(dishes1);
 
 		//when
-		List<Dish> dishes = dishRepository.findDishesByKeyword(savedRestaurant, "치즈");
+		List<Dish> dishes = dishRepository.findDishesByKeyword(restaurants.get(0), "콜");
 
 		//then
-		assertThat(dishes.size()).isEqualTo(2);
+		assertThat(dishes.size()).isEqualTo(1);
 		
 		assertThat(dishes)
 			.extracting(Dish::getName)
-			.contains("치즈볼","치즈함박스테이크");
+			.contains("콜라");
 
 	}
 

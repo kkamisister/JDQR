@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.example.backend.TestDataGenerator;
 import com.example.backend.common.config.QuerydslConfig;
 import com.example.backend.common.enums.CategoryType;
 import com.example.backend.config.ContainerSupport;
@@ -31,46 +32,25 @@ class RestaurantCategoryRepositoryTest extends ContainerSupport {
 	@Autowired
 	private RestaurantCategoryRepository restaurantCategoryRepository;
 
+	private final TestDataGenerator generator = new TestDataGenerator();
+
 	@DisplayName("식당의 Major카테고리를 조회할 수 있다")
 	@Test
 	void findMajorCategory(){
 
-		RestaurantCategory restaurantCategory1 = RestaurantCategory.builder()
-			.name("일식")
-			.categoryType(CategoryType.MAJOR)
-			.build();
+		List<RestaurantCategory> restaurantCategories = generator.generateTestRestaurantCategoryList(false);
 
-		RestaurantCategory restaurantCategory2 = RestaurantCategory.builder()
-			.name("일식")
-			.categoryType(CategoryType.MAJOR)
-			.build();
-
-		RestaurantCategory restaurantCategory3 = RestaurantCategory.builder()
-			.name("일식")
-			.categoryType(CategoryType.MINOR)
-			.build();
-
-		RestaurantCategory restaurantCategory4 = RestaurantCategory.builder()
-			.name("일식")
-			.categoryType(CategoryType.MAJOR)
-			.build();
-
-		RestaurantCategory restaurantCategory5 = RestaurantCategory.builder()
-			.name("일식")
-			.categoryType(CategoryType.MINOR)
-			.build();
-
-		restaurantCategoryRepository.save(restaurantCategory1);
-		restaurantCategoryRepository.save(restaurantCategory2);
-		restaurantCategoryRepository.save(restaurantCategory3);
-		restaurantCategoryRepository.save(restaurantCategory4);
-		restaurantCategoryRepository.save(restaurantCategory5);
+		restaurantCategoryRepository.saveAll(restaurantCategories);
 
 		//when
 		List<RestaurantCategory> allMajor = restaurantCategoryRepository.findAllMajor();
 
 		//then
-		assertThat(allMajor.size()).isEqualTo(3);
+		assertThat(allMajor.size()).isEqualTo(4);
+		assertThat(allMajor)
+			.extracting(RestaurantCategory::getName)
+			.containsExactly("한식","일식","양식","중식");
+
 
 	}
 

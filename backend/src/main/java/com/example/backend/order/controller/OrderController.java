@@ -72,6 +72,7 @@ public class OrderController {
 		cookie.setMaxAge(60 * 20); // 쿠키 유효 시간 : 20분
 		cookie.setSecure(true);
 
+		cookie.setDomain("localhost");
 		// SameSite=None 속성을 수동으로 추가하기 위해 Set-Cookie 헤더를 직접 설정
 		response.addHeader("Set-Cookie",
 			String.format("%s=%s; Max-Age=%d; Path=%s; Secure; SameSite=None",

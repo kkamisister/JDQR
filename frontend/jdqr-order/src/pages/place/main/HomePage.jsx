@@ -1,8 +1,10 @@
-import React from "react"
+import React, { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { Stack } from "@mui/material"
 import KakaoMap from "../../../components/map/KakaoMap"
 import RestaurantListBox from "./RestaurantListBox"
 import MapDefaultHeader from "../../../components/header/MapDefaultHeader"
+import { fetchRestaurants } from "../../../utils/apis/place"
 
 const HomePage = () => {
   const mockData = {
@@ -61,6 +63,25 @@ const HomePage = () => {
     },
   }
 
+  const [bounds, setBounds] = useState(null) // 지도 범위 저장
+  const [peopleFilter, setPeopleFilter] = useState(0) // 필터링 옵션 예시
+
+  const {
+    data: restaurantsData,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["restaurants", bounds, peopleFilter],
+    queryFn: () => fetchRestaurants(bounds, peopleFilter),
+    enabled: !!bounds, // bounds가 설정되었을 때만 쿼리 활성화
+  })
+
+  console.log("Fetched Restaurants Data:", restaurantsData)
+
+  const handleBoundsChange = (newBounds) => {
+    setBounds(newBounds)
+  }
+
   return (
     <Stack>
       <Stack
@@ -72,7 +93,10 @@ const HomePage = () => {
           zIndex: 1,
         }}
       >
-        <MapDefaultHeader majorCategories={mockData.data.majorCategories} />
+        <MapDefaultHeader
+          majorCategories={restaurantsData?.majorCategories || []}
+        />
+        {/* <MapDefaultHeader majorCategories={mockData.data.majorCategories} /> */}
       </Stack>
 
       <Stack
@@ -85,7 +109,7 @@ const HomePage = () => {
           height: "100%",
         }}
       >
-        <KakaoMap />
+        <KakaoMap onBoundsChange={handleBoundsChange} />
       </Stack>
 
       <Stack
@@ -99,6 +123,7 @@ const HomePage = () => {
           zIndex: 1,
         }}
       >
+        {/* <RestaurantListBox restaurants={restaurantsData?.restaurants || []} /> */}
         <RestaurantListBox restaurants={mockData.data.restaurants} />
       </Stack>
     </Stack>

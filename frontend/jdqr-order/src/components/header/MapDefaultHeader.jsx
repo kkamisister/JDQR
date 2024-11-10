@@ -4,7 +4,7 @@ import SearchIcon from "@mui/icons-material/Search"
 import RestaurantCategoryButton from "../button/RestaurantCategoryButton"
 import { colors } from "../../constants/colors"
 
-const MapDefaultHeader = () => {
+const MapDefaultHeader = ({ majorCategories }) => {
   const [activeIndex, setActiveIndex] = useState(null)
   const [isChecked, setIsChecked] = useState(false)
 
@@ -78,7 +78,7 @@ const MapDefaultHeader = () => {
           zIndex: 9,
         }}
       >
-        {["한식", "양식", "중식", "일식", "술집"].map((name, index) => (
+        {majorCategories.map((name, index) => (
           <RestaurantCategoryButton
             key={index}
             name={name}

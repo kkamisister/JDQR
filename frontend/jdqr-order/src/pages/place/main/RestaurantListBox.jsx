@@ -5,9 +5,7 @@ import PeopleFilter from "./PeopleFilter"
 import { colors } from "../../../constants/colors"
 import MapListContainer from "../../../components/container/MapListContainer"
 
-const RestaurantListBox = () => {
-  const restaurantItems = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
+const RestaurantListBox = ({ restaurants }) => {
   return (
     <MapListContainer
       spacing={3}
@@ -52,8 +50,8 @@ const RestaurantListBox = () => {
           "scrollbar-width": "none",
         }}
       >
-        {restaurantItems.map((item, index) => (
-          <RestaurantItemCard key={index} />
+        {restaurants.map((restaurant, index) => (
+          <RestaurantItemCard key={index} restaurant={restaurant} />
         ))}
       </Box>
     </MapListContainer>

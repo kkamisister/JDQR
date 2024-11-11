@@ -40,10 +40,8 @@ const RestaurantItemCard = ({ restaurant, sx }) => {
           sx={{
             flex: 1,
             alignItems: "flex-start",
-            maxWidth: "130px",
-            "@media (max-width: 130px)": {
-              flexDirection: "column",
-            },
+            maxWidth: "130px", // 최대 너비 설정
+            flexDirection: { xs: "column", sm: "row" },
           }}
         >
           <Typography
@@ -60,6 +58,9 @@ const RestaurantItemCard = ({ restaurant, sx }) => {
             sx={{
               "@media (max-width: 130px)": {
                 flexWrap: "wrap",
+              },
+              "@media (min-width: 600px)": {
+                paddingLeft: "10px", // paddingLeft 1px 추가
               },
             }}
           >

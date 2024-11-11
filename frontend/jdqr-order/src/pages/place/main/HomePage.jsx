@@ -66,11 +66,7 @@ const HomePage = () => {
   const [bounds, setBounds] = useState(null) // 지도 범위 저장
   const [peopleFilter, setPeopleFilter] = useState(0) // 필터링 옵션 예시
 
-  const {
-    data: restaurantsData,
-    error,
-    isLoading,
-  } = useQuery({
+  const { data: restaurantsData } = useQuery({
     queryKey: ["restaurants", bounds, peopleFilter],
     queryFn: () => fetchRestaurants(bounds, peopleFilter),
     enabled: !!bounds, // bounds가 설정되었을 때만 쿼리 활성화
@@ -123,8 +119,8 @@ const HomePage = () => {
           zIndex: 1,
         }}
       >
-        {/* <RestaurantListBox restaurants={restaurantsData?.restaurants || []} /> */}
-        <RestaurantListBox restaurants={mockData.data.restaurants} />
+        <RestaurantListBox restaurants={restaurantsData?.restaurants || []} />
+        {/* <RestaurantListBox restaurants={mockData.data.restaurants} /> */}
       </Stack>
     </Stack>
   )

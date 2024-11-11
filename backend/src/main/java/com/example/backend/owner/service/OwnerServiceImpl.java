@@ -12,9 +12,8 @@ import java.util.stream.Collectors;
 import java.util.Objects;
 
 import com.example.backend.common.service.ImageS3Service;
-import com.example.backend.common.service.ImageS3ServiceImpl;
+import com.example.backend.common.util.TagParser;
 import com.example.backend.dish.dto.ChoiceDto;
-import com.example.backend.dish.dto.OptionDto;
 import com.example.backend.dish.entity.Choice;
 import com.example.backend.dish.repository.ChoiceRepository;
 import com.example.backend.etc.entity.Restaurant;
@@ -32,17 +31,12 @@ import com.example.backend.dish.dto.DishRequest;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.DishCategory;
 import com.example.backend.dish.entity.DishOption;
-import com.example.backend.dish.entity.DishTag;
 import com.example.backend.dish.entity.Option;
-import com.example.backend.dish.entity.Tag;
 import com.example.backend.dish.repository.DishCategoryRepository;
 import com.example.backend.dish.repository.DishOptionRepository;
 import com.example.backend.dish.repository.DishRepository;
-import com.example.backend.dish.repository.DishTagRepository;
 import com.example.backend.dish.repository.OptionRepository;
-import com.example.backend.dish.repository.TagRepository;
 import com.example.backend.owner.dto.CategoryDto;
-import com.example.backend.owner.dto.OwnerRequest;
 import com.example.backend.owner.dto.OwnerRequest.OptionRequestDto;
 import com.example.backend.owner.entity.Owner;
 import com.example.backend.owner.repository.OwnerRepository;
@@ -59,8 +53,6 @@ public class OwnerServiceImpl implements OwnerService{
 	private final DishRepository dishRepository;
 	private final DishCategoryRepository dishCategoryRepository;
 	private final OwnerRepository ownerRepository;
-	private final DishTagRepository dishTagRepository;
-	private final TagRepository tagRepository;
 	private final OptionRepository optionRepository;
 	private final DishOptionRepository dishOptionRepository;
 	private final RestaurantRepository restaurantRepository;
@@ -86,15 +78,6 @@ public class OwnerServiceImpl implements OwnerService{
 		Dish dish = Dish.of(dishInfo,dishCategory,imageUrl);
 
 		Dish savedDish = dishRepository.save(dish);
-
-		// dishTag 엔티티 생성
-		for(int tagId : dishInfo.tagIds()){
-			Tag tag = tagRepository.findById(tagId)
-				.orElseThrow(() -> new JDQRException(ErrorCode.TAG_NOT_FOUND));
-			DishTag dishTag = DishTag.of(tag, savedDish);
-			dishTagRepository.save(dishTag);
-
-		}
 
 		// 메뉴에 대한 옵션그룹 엔티티를 생성
 		for(int optionGroupId : dishInfo.optionIds()){
@@ -125,9 +108,7 @@ public class OwnerServiceImpl implements OwnerService{
 		for(DishOption dishOption : dishOptions){
 			dishOptionRepository.delete(dishOption);
 		}
-		//메뉴태그(dish_tag) 테이블에서 dis_id컬럼이 dishId인 행들을 삭제
-		List<DishTag> dishTags = dishTagRepository.findByDishId(dishId);
-		dishTagRepository.deleteAll(dishTags);
+
 		//메뉴(dish) 테이블에서 id컬럼이 dishId인 행 삭제
 		dishRepository.delete(dish);
 
@@ -161,20 +142,6 @@ public class OwnerServiceImpl implements OwnerService{
 			DishCategory dishCategory = dishCategoryRepository.findById(dishInfo.dishCategoryId())
 				.orElseThrow(() -> new JDQRException(ErrorCode.FUCKED_UP_QR));
 			dish.setDishCategory(dishCategory);
-		}
-
-		//메뉴의 정보(태그)를 수정한다.
-		//메뉴id가 dishId인 기존의 dishTag 삭제
-		List<DishTag> existingTags = dishTagRepository.findByDishId(dishId);
-		for(DishTag dishTag : existingTags){
-			dishTagRepository.delete(dishTag);
-		}
-		//새로운 dishTag 추가
-		for(int tagId : dishInfo.tagIds()){
-			Tag tag = tagRepository.findById(tagId)
-				.orElseThrow(() -> new JDQRException(ErrorCode.TAG_NOT_FOUND));
-			DishTag newDishTag = DishTag.of(tag, dish);
-			dishTagRepository.save(newDishTag);
 		}
 
 		//메뉴의 정보(옵션그룹)를 수정한다.
@@ -533,9 +500,7 @@ public class OwnerServiceImpl implements OwnerService{
 	private DishSimpleInfo createDishSimpleInfo(Dish dish) {
 		// itmes 항목 채우기
 		// 우선, 메뉴의 태그를 가져와야한다
-		List<DishTag> dishTags = dishTagRepository.findTagsByDish(dish);
-		List<String> tags = dishTags.stream().map(DishTag::getTag)
-			.map(Tag::getName).toList();
+		List<String> tags = TagParser.parseTags(dish.getTags());
 
 		DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags);
 		return dishSimpleInfo;

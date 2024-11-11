@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.backend.common.enums.EntityStatus;
 import com.example.backend.common.enums.UseStatus;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
+import com.example.backend.common.util.TagParser;
 import com.example.backend.dish.dto.DishResponse.DishDataDto;
 import com.example.backend.dish.dto.DishResponse.DishDetailInfo;
 import com.example.backend.dish.dto.DishResponse.DishDetailSummaryInfo;
@@ -22,12 +22,9 @@ import com.example.backend.dish.dto.OptionDto;
 import com.example.backend.dish.entity.Choice;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.DishOption;
-import com.example.backend.dish.entity.DishTag;
 import com.example.backend.dish.entity.Option;
-import com.example.backend.dish.entity.Tag;
 import com.example.backend.dish.repository.DishOptionRepository;
 import com.example.backend.dish.repository.DishRepository;
-import com.example.backend.dish.repository.DishTagRepository;
 import com.example.backend.etc.dto.RestaurantCategoryDetail;
 import com.example.backend.etc.dto.RestaurantCategoryDto;
 import com.example.backend.etc.dto.RestaurantDto;
@@ -60,7 +57,6 @@ public class RestaurantServiceImpl implements RestaurantService {
 	private final OwnerRepository ownerRepository;
 	private final DishRepository dishRepository;
 	private final DishOptionRepository dishOptionRepository;
-	private final DishTagRepository dishTagRepository;
 	/**
 	 * 유저의 화면범위에 존재하는 가맹점을 반환하는 메서드
 	 * @param minLat
@@ -319,9 +315,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 			}
 
 			// 메뉴의 태그들을 가지고온다
-			List<DishTag> dishTags = dishTagRepository.findTagsByDish(dish);
-			List<String> tags = dishTags.stream().map(DishTag::getTag)
-				.map(Tag::getName).toList();
+			List<String> tags = TagParser.parseTags(dish.getTags());
 
 			// 5. 반환 DTO
 			DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish,optionDtos,tags);

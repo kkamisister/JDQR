@@ -118,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
 		log.warn("userID : {}",productInfo.getUserId());
 		Map<Integer,CartDto> cachedCartData = redisHashRepository.getCartDatas(key,productInfo.getUserId());
 		log.warn("cachedCartData : {}",cachedCartData);
-		if(!ObjectUtils.isEmpty(cachedCartData)){ // 1. 기존에 동일한 물품이 있어서 거기에 더해지는 경우 -> 지금 담는 hashCode와 비교하여 동일한 것을 찾아서 추가
+		if(cachedCartData.containsKey(productInfo.hashCode())){ // 1. 기존에 동일한 물품이 있어서 거기에 더해지는 경우 -> 지금 담는 hashCode와 비교하여 동일한 것을 찾아서 추가
 
 			CartDto cartData = cachedCartData.get(productInfo.hashCode());
 			int currentQuantity = cartData.getQuantity();

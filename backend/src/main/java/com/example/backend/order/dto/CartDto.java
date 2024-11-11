@@ -16,8 +16,8 @@ import lombok.ToString;
 @Builder
 @Schema(name = "음식 데이터",description = "장바구니에 담은 음식 데이터")
 @Getter @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 @ToString
 public class CartDto {
 	private Integer dishId;

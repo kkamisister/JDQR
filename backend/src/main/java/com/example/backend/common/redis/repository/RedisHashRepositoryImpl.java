@@ -91,7 +91,7 @@ public class RedisHashRepositoryImpl implements RedisHashRepository{
 	 */
 	@Override
 	public void removeKey(String key) {
-		redisTemplate.opsForValue().getAndDelete(key);
+		redisTemplate.delete(key);
 	}
 
 	@Override

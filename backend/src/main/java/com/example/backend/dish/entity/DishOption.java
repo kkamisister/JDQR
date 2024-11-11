@@ -43,4 +43,11 @@ public class DishOption extends BaseEntity {
 			.build();
 
 	}
+
+	public void setDish(Dish dish) {
+		this.dish = dish;
+	}
+	public void setOption(Option option) {
+		this.option = option;
+	}
 }

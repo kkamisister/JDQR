@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.example.backend.TestDataGenerator;
 import com.example.backend.common.config.QuerydslConfig;
 import com.example.backend.config.ContainerSupport;
 import com.example.backend.etc.entity.Restaurant;
@@ -34,6 +35,8 @@ class RestaurantRepositoryCustomTest extends ContainerSupport {
 	@Autowired
 	private OwnerRepository ownerRepository;
 
+	private final TestDataGenerator generator = new TestDataGenerator();
+
 	@DisplayName("좌표 범위 안에 있는 음식점을 조회할 수 있다")
 	@Test
 	void findByCoordTest(){
@@ -46,51 +49,11 @@ class RestaurantRepositoryCustomTest extends ContainerSupport {
 
 		ownerRepository.save(owner);
 
-		Restaurant restaurant1 = Restaurant.builder()
-			.owner(owner)
-			.name("용수의식당")
-			.address("멀티캠퍼스10층")
-			.phoneNumber("000-111-222")
-			.latitude(10.0)
-			.longitude(130.0)
-			.open(true)
-			.build();
-
-		Restaurant restaurant2 = Restaurant.builder()
-			.owner(owner)
-			.name("영표집")
-			.address("멀티캠퍼스11층")
-			.phoneNumber("000-111-222")
-			.latitude(30.0)
-			.longitude(130.0)
-			.open(true)
-			.build();
-
-		Restaurant restaurant3 = Restaurant.builder()
-			.owner(owner)
-			.name("용수집")
-			.address("멀티캠퍼스13층")
-			.phoneNumber("000-111-222")
-			.latitude(10.0)
-			.longitude(150.0)
-			.open(true)
-			.build();
-
-
-		Restaurant restaurant4 = Restaurant.builder()
-			.owner(owner)
-			.name("용수집2")
-			.address("멀티캠퍼스23층")
-			.phoneNumber("000-111-222")
-			.latitude(30.0)
-			.longitude(110.0)
-			.open(true)
-			.build();
-
-		restaurantRepository.save(restaurant1);
-		restaurantRepository.save(restaurant2);
-		restaurantRepository.save(restaurant3);
-		restaurantRepository.save(restaurant4);
+		List<Restaurant> restaurants1 = generator.generateTestRestaurantList(false);
+		for(Restaurant restaurant : restaurants1) {
+			restaurant.setOwner(owner);
+		}
+		restaurantRepository.saveAll(restaurants1);
 
 		//when
 		List<Restaurant> restaurants = restaurantRepository.findByCoord(30, 50, 100, 150);
@@ -100,7 +63,7 @@ class RestaurantRepositoryCustomTest extends ContainerSupport {
 
 		assertThat(restaurants)
 			.extracting(Restaurant::getName)
-			.contains("영표집","용수집2");
+			.contains("용수집","영표의식당");
 
 	}
 

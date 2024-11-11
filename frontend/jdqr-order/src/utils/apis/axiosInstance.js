@@ -6,7 +6,7 @@ const dummyToken = "dummyTableToken";
 const tableId = "6721aa9b0d22a923091eef73";
 
 const axiosInstance = axios.create({
-  baseURL: "https://jdqr608.duckdns.org/api/v1",
+  baseURL: "https://jdqr608.duckdns.org/api/v1/",
   timeout: 1000,
   withCredentials: true,
   headers: {

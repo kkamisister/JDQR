@@ -1,10 +1,14 @@
-import { Stack, Typography, FormGroup, FormControlLabel } from "@mui/material";
+import { Stack, Typography, Checkbox, Box } from "@mui/material";
 import { colors } from "../../../constants/colors";
-import { CheckBox } from "@mui/icons-material";
 
-export default function DishOptions({ options }) {
+export default function DishOptions({
+  options = [],
+  selectedOptions,
+  handleOptionChange,
+}) {
+  // console.log("이것이 옵션", options);
   return (
-    <Stack>
+    <Stack spacing={2}>
       <Typography
         sx={{
           fontSize: 20,
@@ -16,25 +20,48 @@ export default function DishOptions({ options }) {
       </Typography>
 
       {options.map((option) => (
-        <Stack key={option.optionId}>
-          <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+        <Stack key={option.optionId} spacing={1}>
+          <Typography
+            sx={{ fontSize: 16, fontWeight: 600, color: colors.text.main }}
+          >
             {option.optionName}
           </Typography>
-          <FormGroup>
-            {option.choices.map((choice) => (
-              <FormControlLabel
-                key={choice.choiceId}
-                control={
-                  <CheckBox
-                    sx={{
-                      color: colors.main.primary500,
-                    }}
-                  />
-                }
-                label={choice.choiceName}
+
+          {/* 오타 수정: chocies -> choices */}
+          {option.choices?.map((choice) => (
+            <Stack
+              // pr={2}
+              key={choice.choiceId}
+              direction="row"
+              alignItems="center"
+              onClick={() =>
+                handleOptionChange(option.optionId, choice.choiceId)
+              }
+            >
+              <Checkbox
+                checked={selectedOptions[option.optionId] === choice.choiceId}
+                sx={{
+                  color: colors.text.sub2,
+                  "&.Mui-checked": {
+                    color: colors.main.primary500, // 선택된 상태에서 색상 설정
+                  },
+                }}
               />
-            ))}
-          </FormGroup>
+              {/* 옵션 이름 */}
+              <Typography fontSize={18}>{choice.choiceName}</Typography>
+              {/* 점선 */}
+              <Box
+                component="span"
+                sx={{
+                  borderBottom: `1px dotted ${colors.text.sub2}`,
+                  flexGrow: 1,
+                  mx: 1,
+                }}
+              />
+              {/* 가격 */}
+              <Typography>{choice.price.toLocaleString()}원</Typography>
+            </Stack>
+          ))}
         </Stack>
       ))}
     </Stack>

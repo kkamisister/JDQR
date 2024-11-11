@@ -21,7 +21,6 @@ export default function DishList({ dishes, categories }) {
     });
   };
 
-  // 아이템을 세션 스토리지에 저장하고 리다이렉트하는 함수
   const handleDishClick = (dishId) => {
     navigate(`${dishId}`);
   };

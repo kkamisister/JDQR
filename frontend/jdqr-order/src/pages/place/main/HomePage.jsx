@@ -86,6 +86,7 @@ const HomePage = () => {
           onBoundsChange={handleBoundsChange}
           initialLocation={location} // 초기 위치 전달
           initialBounds={bounds} // 초기 bounds 전달
+          restaurants={restaurantsData?.restaurants || []}
         />
       </Stack>
 

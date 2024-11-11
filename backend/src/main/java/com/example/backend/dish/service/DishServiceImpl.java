@@ -82,7 +82,6 @@ public class DishServiceImpl implements DishService {
 
 			// itmes 항목 채우기
 			// 우선, 메뉴의 태그를 가져와야한다
-
 			List<String> tags = TagParser.parseTags(dish.getTags());
 
 			DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags);

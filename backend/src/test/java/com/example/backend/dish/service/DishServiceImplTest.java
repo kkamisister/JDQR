@@ -44,8 +44,7 @@ class DishServiceImplTest {
 	private DishRepository dishRepository;
 	@Mock
 	private RedisHashRepository redisHashRepository;
-	@Mock
-	private DishTagRepository dishTagRepository;
+
 
 	private final TestDataGenerator generator = new TestDataGenerator();
 
@@ -85,14 +84,6 @@ class DishServiceImplTest {
 			dish.setDishCategory(dishCategories.get(i%4));
 		}
 
-		List<Tag> tags = generator.generateTestTagList(true);
-
-		List<DishTag> dishTags1 = generator.generateTestDishTagList(true);
-		for(int i=0;i<6;i++){
-			DishTag dishTag = dishTags1.get(i);
-			dishTag.setTagAndDish(tags.get(i),dishes1.get(i));
-		}
-
 		when(restaurantRepository.findById(anyInt()))
 			.thenReturn(Optional.ofNullable(restaurants.get(0)));
 
@@ -104,9 +95,6 @@ class DishServiceImplTest {
 
 		when(redisHashRepository.getCurrentUserCnt(anyString()))
 			.thenReturn(5);
-
-		when(dishTagRepository.findTagsByDish(any(Dish.class)))
-			.thenReturn(dishTags1);
 
 		//when
 		DishSummaryResultDto resultDto = dishService.getAllDishes(table.getId());

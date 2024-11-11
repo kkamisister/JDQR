@@ -30,6 +30,7 @@ public final class TestDataGenerator {
 	private final List<String> userIdList;
 
 	private final List<String> tagNameList;
+	private final String tagName;
 	private final List<String> restaurantNameList;
 	private final List<String> restaurantAddressList;
 	private final List<Double> restaurantLatitudeList;
@@ -60,9 +61,11 @@ public final class TestDataGenerator {
 	private final List<String> choiceList;
 	private final List<Integer> choicePriceList;
 
+
 	public TestDataGenerator(){
 
 		tagNameList = List.of("인기","화재","맛있음","맛없음","영표픽","용수픽");
+		tagName = "[\"인기\",\"화재\",\"맛있음\",\"맛없음\",\"영표픽\",\"용수픽\"]";
 		restaurantNameList = List.of("용수의식당","영표집","용수집","영표의식당");
 		restaurantAddressList = List.of("멀티캠퍼스1층","멀티캠퍼스2층","멀티캠퍼스3층","멀티캠퍼스4층");
 		restaurantLatitudeList = List.of(5.0,10.0,30.0,50.0);
@@ -255,25 +258,6 @@ public final class TestDataGenerator {
 	}
 
 
-	// 6개
-	public List<DishTag> generateTestDishTagList(boolean isIdNeed){
-
-		int numOfElement = 6;
-
-		List<DishTag> dishTagList = new ArrayList<>();
-		for(int i=0;i<numOfElement;i++){
-			dishTagList.add(generateDishTag(isIdNeed ? i + 1 : null));
-		}
-
-		return dishTagList;
-	}
-
-	private DishTag generateDishTag(Integer id){
-		return DishTag.builder()
-			.id(id)
-			.build();
-	}
-
 	// 8개
 	public List<Dish> generateTestDishList(boolean isIdNeed){
 
@@ -292,6 +276,7 @@ public final class TestDataGenerator {
 			.id(id)
 			.name(dishName)
 			.price(price)
+			.tags(tagName)
 			.build();
 	}
 
@@ -317,17 +302,17 @@ public final class TestDataGenerator {
 
 	}
 
-	// 6개
-	public List<Tag> generateTestTagList(boolean isIdNeed){
-		int numOfElement = 6;
-
-		List<Tag> tagList = new ArrayList<>();
-		for(int i=0;i<numOfElement;i++){
-			tagList.add(generateTag(tagNameList.get(i),isIdNeed ? i + 1 : null));
-		}
-
-		return tagList;
-	}
+	// // 6개
+	// public List<Tag> generateTestTagList(boolean isIdNeed){
+	// 	int numOfElement = 6;
+	//
+	// 	List<Tag> tagList = new ArrayList<>();
+	// 	for(int i=0;i<numOfElement;i++){
+	// 		tagList.add(generateTag(tagNameList.get(i),isIdNeed ? i + 1 : null));
+	// 	}
+	//
+	// 	return tagList;
+	// }
 
 	// 4개
 	public List<Restaurant> generateTestRestaurantList(boolean isIdNeed){
@@ -352,11 +337,11 @@ public final class TestDataGenerator {
 
 	}
 
-	private Tag generateTag(String name,Integer id){
-		return Tag.builder()
-			.id(id)
-			.name(name)
-			.build();
-	}
+	// private Tag generateTag(String name,Integer id){
+	// 	return Tag.builder()
+	// 		.id(id)
+	// 		.name(name)
+	// 		.build();
+	// }
 
 }

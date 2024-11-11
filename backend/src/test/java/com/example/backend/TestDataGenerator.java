@@ -64,7 +64,7 @@ public final class TestDataGenerator {
 
 	public TestDataGenerator(){
 
-		tagNameList = List.of("인기","화재","맛있음","맛없음","영표픽","용수픽");
+		tagNameList = List.of("인기","화제","맛있음","맛없음","영표픽","용수픽");
 		restaurantNameList = List.of("용수의식당","영표집","용수집","영표의식당");
 		restaurantAddressList = List.of("멀티캠퍼스1층","멀티캠퍼스2층","멀티캠퍼스3층","멀티캠퍼스4층");
 		restaurantLatitudeList = List.of(5.0,10.0,30.0,50.0);

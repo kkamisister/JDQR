@@ -122,7 +122,8 @@ public class JDQRFilter extends OncePerRequestFilter {
             || pathMatcher.match("/api/v1/test/**", path)
             || pathMatcher.match("/api/v1/order/auth/**", path)
             || pathMatcher.match("/ws/**",path)
-            || pathMatcher.match("/api/v1/map/**",path);
+            || pathMatcher.match("/api/v1/map/**",path)
+            || pathMatcher.match("/api/v1/owner/login/**",path);
     }
 
     /**

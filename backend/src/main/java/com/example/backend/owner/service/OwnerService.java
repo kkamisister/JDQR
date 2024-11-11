@@ -13,7 +13,7 @@ public interface OwnerService {
 
 	ResponseWithMessage addDish(Integer userId, DishRequest.DishInfo dishInfo, MultipartFile multipartFile);
 	ResponseWithMessage removeDish(Integer userId, Integer dishId);
-	ResponseWithMessage updateDish(Integer userId, Integer dishId, DishRequest.DishInfo dishInfo);
+	ResponseWithMessage updateDish(Integer userId, Integer dishId, DishRequest.DishInfo dishInfo, MultipartFile multipartFile);
 
 	DishSummaryResultDto getAllMenus(Integer userId);
 	DishSummaryResultDto getMenu(Integer userId,Integer dishId);

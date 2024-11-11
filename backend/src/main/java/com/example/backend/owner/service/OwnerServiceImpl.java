@@ -130,7 +130,7 @@ public class OwnerServiceImpl implements OwnerService{
 
 	@Override
 	@Transactional
-	public CommonResponse.ResponseWithMessage updateDish(Integer userId, Integer dishId, DishRequest.DishInfo dishInfo) {
+	public CommonResponse.ResponseWithMessage updateDish(Integer userId, Integer dishId, DishRequest.DishInfo dishInfo, MultipartFile multipartFile) {
 
 		//해당하는 가게 주인이 존재하는지 찾는다.
 		Owner owner = ownerRepository.findById(userId)
@@ -146,7 +146,7 @@ public class OwnerServiceImpl implements OwnerService{
 		dish.setDescription(dishInfo.description());
 
 		//메뉴의 정보(이미지)를 수정한다.
-		String imageUrl = "";
+		String imageUrl = imageS3Service.uploadImageToS3(multipartFile);
 		dish.setImage(imageUrl);
 
 		//메뉴의 정보(카테고리)를 수정한다.

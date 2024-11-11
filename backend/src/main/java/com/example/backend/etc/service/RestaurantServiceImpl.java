@@ -211,12 +211,12 @@ public class RestaurantServiceImpl implements RestaurantService {
 			}
 		}
 		// major 카테고리와  minor 카테고리를 구분한다
-		RestaurantCategoryDto major = null;
+		List<RestaurantCategoryDto> major = new ArrayList<>();
 		List<RestaurantCategoryDto> minor = new ArrayList<>();
 
 		for(RestaurantCategoryDto restaurantCategoryDto : restaurantCategories){
 			if(restaurantCategoryDto.getIsMajor()){
-				major = restaurantCategoryDto;
+				major.add(restaurantCategoryDto);
 			}
 			else{
 				minor.add(restaurantCategoryDto);
@@ -390,12 +390,12 @@ public class RestaurantServiceImpl implements RestaurantService {
 			log.warn("restaurantCategories : {}",restaurantCategories);
 
 			// major 카테고리와  minor 카테고리를 구분한다
-			RestaurantCategoryDto major = null;
+			List<RestaurantCategoryDto> major = new ArrayList<>();
 			List<RestaurantCategoryDto> minor = new ArrayList<>();
 
 			for(RestaurantCategoryDto restaurantCategoryDto : restaurantCategories){
 				if(restaurantCategoryDto.getIsMajor()){
-					major = restaurantCategoryDto;
+					major.add(restaurantCategoryDto);
 				}
 				else{
 					minor.add(restaurantCategoryDto);
@@ -445,5 +445,77 @@ public class RestaurantServiceImpl implements RestaurantService {
 		RestaurantDto resDto = RestaurantDto.from(restaurant);
 
 		return resDto;
+	}
+
+	/**
+	 * 키워드에 해당하는 가맹점을 검색하는 메서드
+	 * @param keyword
+	 */
+	@Override
+	public RestaurantInfo searchByKeyword(String keyword,double minLat,double maxLat,double minLng,double maxLng,int people,boolean together) {
+
+		// 키워드에 해당하는 가맹점을 검색한다
+		List<Restaurant> findRestaurants = restaurantRepository.findByKeyword(keyword);
+		for(Restaurant restaurant : findRestaurants){
+			log.warn("restaurant : {}",restaurant);
+		}
+
+		//2. 식당의 MAJOR 카테고리를 가지고온다
+		List<RestaurantCategory> allMajor = restaurantCategoryRepository.findAllMajor();
+
+		//2-1. major 카테고리 리스트 생성
+		List<String> majorList = allMajor.stream().map(RestaurantCategory::getName).toList();
+		log.warn("majorList : {}",majorList);
+
+		//3. 식당카테고리 매핑 엔티티를 가지고온다
+		List<Integer> restaurantIds = findRestaurants.stream().map(Restaurant::getId).toList();
+
+		//3-1. <식당ID,식당> 의 맵 생성
+		Map<Integer, Restaurant> IdToRestaurantMap = findRestaurants.stream()
+			.collect(Collectors.toMap(Restaurant::getId, restaurant -> restaurant));
+
+		//3-2. 식당과 카테고리를 이어주는 연결엔티티를 가지고온다
+		List<RestaurantCategoryMap> restaurantCategoryMaps = restaurantCategoryMapRepository.findByRestaurandIds(
+			restaurantIds);
+
+		// 4. <식당ID, 카테고리 리스트> 의 맵을 생성한다
+		Map<Integer, List<RestaurantCategoryDto>> IdToRestaurantCategoryMap = new HashMap<>();
+
+		for(RestaurantCategoryMap restaurantCategoryMap : restaurantCategoryMaps) {
+
+			int restaurantId = restaurantCategoryMap.getRestaurant().getId();
+
+			RestaurantCategory restaurantCategory = restaurantCategoryMap.getRestaurantCategory();
+			log.warn("restaurantCategory : {}",restaurantCategory);
+
+			// 식당이 속한 (카테고리ID,카테고리이름)을 가진 DTO를 생성한다
+			RestaurantCategoryDto categoryDto = RestaurantCategoryDto.from(restaurantCategory);
+
+			log.warn("categoryDto : {}",categoryDto);
+
+			if(!IdToRestaurantCategoryMap.containsKey(restaurantId)) {
+				List<RestaurantCategoryDto> categoryDtos = new ArrayList<>();
+				categoryDtos.add(categoryDto);
+				IdToRestaurantCategoryMap.put(restaurantId, categoryDtos);
+			}
+			else{
+				List<RestaurantCategoryDto> categoryDtos = IdToRestaurantCategoryMap.get(restaurantId);
+				categoryDtos.add(categoryDto);
+				IdToRestaurantCategoryMap.put(restaurantId, categoryDtos);
+			}
+		}
+
+		//5. 식당에 대한 정보를 채워간다
+		List<RestaurantDto> restaurantDtos = getRestaurantDtos(people, together,
+			restaurantIds, IdToRestaurantMap, IdToRestaurantCategoryMap);
+
+		//응답 DTO 생성
+		RestaurantInfo restaurantInfo = RestaurantInfo.builder()
+			.majorCategories(majorList)
+			.restaurants(restaurantDtos)
+			.build();
+
+		return restaurantInfo;
+
 	}
 }

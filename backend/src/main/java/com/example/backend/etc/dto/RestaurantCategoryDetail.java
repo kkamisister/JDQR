@@ -15,10 +15,10 @@ import lombok.ToString;
 @Builder
 public class RestaurantCategoryDetail {
 
-	private RestaurantCategoryDto major;
+	private List<RestaurantCategoryDto> major;
 	private List<RestaurantCategoryDto> minor;
 
-	public static RestaurantCategoryDetail of(RestaurantCategoryDto major, List<RestaurantCategoryDto> minor) {
+	public static RestaurantCategoryDetail of(List<RestaurantCategoryDto> major, List<RestaurantCategoryDto> minor) {
 		return RestaurantCategoryDetail.builder()
 			.major(major)
 			.minor(minor)

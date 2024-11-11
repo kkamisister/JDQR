@@ -36,6 +36,28 @@ public class RestaurantController {
 
 	private final RestaurantService restaurantService;
 
+	@Operation(summary = "가맹점 검색", description = "유저의 화면범위에 있는 가맹점을 검색하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "조회 완료"),
+	})
+	@GetMapping("/restaurant/keyword")
+	public ResponseEntity<ResponseWithData<RestaurantInfo>> restaurantSearchByKeyword(
+		@RequestParam("keyword") String keyword,
+		@RequestParam(value = "minLat",defaultValue = "30") double minLat,@RequestParam(value = "maxLat",defaultValue = "50") double maxLat,
+		@RequestParam(value = "minLng",defaultValue = "100") double minLng,@RequestParam(value = "maxLng",defaultValue = "150") double maxLng,
+		@RequestParam(value = "people",required = false, defaultValue = "0") int people,
+		@RequestParam(value = "together",required = false, defaultValue = "false") boolean together){
+
+		RestaurantInfo restaurant = restaurantService.searchByKeyword(keyword, minLat, maxLat, minLng, maxLng,
+			people, together);
+
+		ResponseWithData<RestaurantInfo> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(),
+			"가맹점 검색에 성공하였습니다.", restaurant);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
+	}
+
 
 	@Operation(summary = "가맹점 위치 조회", description = "유저의 화면범위에 있는 가맹점을 조회하는 api")
 	@ApiResponses(value = {

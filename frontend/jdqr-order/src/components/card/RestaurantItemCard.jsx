@@ -16,7 +16,7 @@ const RestaurantItemCard = ({ restaurant, sx }) => {
         height: "80px",
         cursor: "pointer",
         "&:hover": {
-          backgroundColor: colors.background.box,
+          backgroundColor: colors.background.primary,
         },
         transition: "all 0.3s ease",
         ...sx,
@@ -37,9 +37,14 @@ const RestaurantItemCard = ({ restaurant, sx }) => {
         sx={{ justifyContent: "flex-start" }}
       >
         <Stack
-          direction="row"
-          spacing={1}
-          sx={{ flex: 1, alignItems: "center" }}
+          sx={{
+            flex: 1,
+            alignItems: "flex-start",
+            maxWidth: "130px",
+            "@media (max-width: 130px)": {
+              flexDirection: "column",
+            },
+          }}
         >
           <Typography
             fontSize={17}
@@ -48,14 +53,29 @@ const RestaurantItemCard = ({ restaurant, sx }) => {
           >
             {restaurant.restaurantName}
           </Typography>
-          <Typography
-            fontSize={14}
-            color={colors.text.sub1}
-            sx={{ whiteSpace: "nowrap" }}
+
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{
+              "@media (max-width: 130px)": {
+                flexWrap: "wrap",
+              },
+            }}
           >
-            {restaurant.restaurantCategories[0].restaurantCategoryName}
-          </Typography>
+            {restaurant.restaurantCategories.minor.map((category) => (
+              <Typography
+                key={category.restaurantCategoryId}
+                fontSize={14}
+                color={colors.text.sub1}
+                sx={{ whiteSpace: "nowrap" }}
+              >
+                {category.restaurantCategoryName}
+              </Typography>
+            ))}
+          </Stack>
         </Stack>
+
         <Stack
           direction="row"
           spacing={1}

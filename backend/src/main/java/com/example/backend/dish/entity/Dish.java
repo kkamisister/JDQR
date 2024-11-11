@@ -30,6 +30,8 @@ public class Dish extends BaseEntity {
 
     @Column(name = "image")
     private String image;
+    @Column(name = "tags")
+    private String tags;
 
     public static Dish of(DishInfo dishInfo,DishCategory dishCategory,String imageUrl){
         return Dish.builder()

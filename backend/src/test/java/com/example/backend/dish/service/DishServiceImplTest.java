@@ -2,13 +2,11 @@ package com.example.backend.dish.service;
 
 import static com.example.backend.dish.dto.DishResponse.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,15 +16,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.example.backend.TestDataGenerator;
 import com.example.backend.common.redis.repository.RedisHashRepository;
-import com.example.backend.dish.dto.DishResponse;
 import com.example.backend.dish.dto.DishResponse.DishSummaryInfo;
 import com.example.backend.dish.dto.DishResponse.DishSummaryResultDto;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.DishCategory;
-import com.example.backend.dish.entity.DishTag;
-import com.example.backend.dish.entity.Tag;
 import com.example.backend.dish.repository.DishRepository;
-import com.example.backend.dish.repository.DishTagRepository;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.repository.RestaurantRepository;
 import com.example.backend.owner.entity.Owner;

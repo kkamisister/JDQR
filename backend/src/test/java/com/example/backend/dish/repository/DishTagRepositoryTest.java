@@ -1,13 +1,9 @@
 package com.example.backend.dish.repository;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +14,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.example.backend.TestDataGenerator;
 import com.example.backend.common.config.QuerydslConfig;
-import com.example.backend.config.ContainerSupport;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.DishCategory;
-import com.example.backend.dish.entity.DishTag;
-import com.example.backend.dish.entity.Tag;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.repository.RestaurantRepository;
 import com.example.backend.owner.entity.Owner;
 import com.example.backend.owner.repository.OwnerRepository;
 
-import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 
 @ActiveProfiles("test")

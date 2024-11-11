@@ -3,13 +3,9 @@ package com.example.backend.dish.service;
 import static com.example.backend.dish.dto.DishResponse.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
 import com.example.backend.common.redis.repository.RedisHashRepository;
-import com.example.backend.dish.dto.DishResponse;
+import com.example.backend.common.util.JsonUtil;
+import com.example.backend.common.util.TagParser;
 import com.example.backend.dish.dto.DishResponse.DishSimpleInfo;
 import com.example.backend.dish.dto.DishResponse.DishSummaryInfo;
 import com.example.backend.dish.dto.OptionDto;
@@ -25,13 +22,9 @@ import com.example.backend.dish.entity.Choice;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.DishCategory;
 import com.example.backend.dish.entity.DishOption;
-import com.example.backend.dish.entity.DishTag;
 import com.example.backend.dish.entity.Option;
-import com.example.backend.dish.entity.Tag;
-import com.example.backend.dish.repository.DishCategoryRepository;
 import com.example.backend.dish.repository.DishOptionRepository;
 import com.example.backend.dish.repository.DishRepository;
-import com.example.backend.dish.repository.DishTagRepository;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.repository.RestaurantRepository;
 import com.example.backend.table.entity.Table;
@@ -50,7 +43,6 @@ public class DishServiceImpl implements DishService {
 	private final RestaurantRepository restaurantRepository;
 	private final DishRepository dishRepository;
 	private final RedisHashRepository redisHashRepository;
-	private final DishTagRepository dishTagRepository;
 	private final DishOptionRepository dishOptionRepository;
 
 	/**
@@ -90,9 +82,8 @@ public class DishServiceImpl implements DishService {
 
 			// itmes 항목 채우기
 			// 우선, 메뉴의 태그를 가져와야한다
-			List<DishTag> dishTags = dishTagRepository.findTagsByDish(dish);
-			List<String> tags = dishTags.stream().map(DishTag::getTag)
-				.map(Tag::getName).toList();
+
+			List<String> tags = TagParser.parseTags(dish.getTags());
 
 			DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags);
 
@@ -165,9 +156,7 @@ public class DishServiceImpl implements DishService {
 		}
 
 		// 4. 메뉴의 태그들을 가지고온다
-		List<DishTag> dishTags = dishTagRepository.findTagsByDish(dish);
-		List<String> tags = dishTags.stream().map(DishTag::getTag)
-			.map(Tag::getName).toList();
+		List<String> tags = TagParser.parseTags(dish.getTags());
 
 		// 5. 반환 DTO
 		DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish,optionDtos,tags);
@@ -175,7 +164,6 @@ public class DishServiceImpl implements DishService {
 		return dishDetailInfo;
 
 	}
-
 	/**
 	 * 음식점의 메뉴를 검색하는 메서드
 	 * @param keyword
@@ -194,14 +182,11 @@ public class DishServiceImpl implements DishService {
 		List<DishSimpleInfo> dishSimpleInfos = new ArrayList<>();
 		for(Dish dish : dishes){
 
-			List<DishTag> dishTags = dishTagRepository.findTagsByDish(dish);
-			List<String> tags = dishTags.stream().map(DishTag::getTag)
-				.map(Tag::getName).toList();
+			List<String> tags = TagParser.parseTags(dish.getTags());
 
 			DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags);
 			dishSimpleInfos.add(dishSimpleInfo);
 		}
-
 
 		// 반환 DTO
 		DishSearchResultDto dishSearchResultDto = DishSearchResultDto.builder()

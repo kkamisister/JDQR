@@ -263,3 +263,30 @@ pipeline{
         }
     }
 }
+
+
+### 트러블슈팅
+- 젠킨스 WEB UI에서 수동으로 빌드를 클릭하면 되지만, push했을 때, 자동 빌드가 실패하는 문제 발생
+    - 아래의 화면에서 Free Swap Space가 0B로 뜨는 걸 보고 Jenkins 서버 메모리 부족 상태로 판단 → 스왑공간 늘려보기로 함
+```
+//현재 시스템의 메모리와 스왑 상태 확인
+free -h
+
+//새로운 스왑 파일 생성
+sudo fallocate -l 2G /swapfile
+
+//파일 권한 설정
+sudo chmod 600 /swapfile
+
+//스왑 파일을 스왑 영역으로 설정
+sudo mkswap /swapfile
+
+//활성화 명령어로 스왑을 사용하도록 설정
+sudo swapon /swapfile
+
+//스왑이 적용되었는지 확인
+free -h
+
+//서버 재부팅 후에도 스왑이 적용되도록 /etc/fstab파일에 추가
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```

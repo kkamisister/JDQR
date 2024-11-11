@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.backend.common.entity.BaseEntity;
+import com.example.backend.dish.dto.OptionDto;
 import com.example.backend.etc.entity.Restaurant;
+import com.example.backend.owner.dto.OwnerRequest;
+import com.example.backend.owner.dto.OwnerRequest.OptionRequestDto;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -42,6 +46,15 @@ public class Option extends BaseEntity {
 
     public void setChoices(List<Choice> choices) {
         this.choices = choices;
+    }
+
+    public static Option of(Restaurant restaurant,OptionRequestDto optionDto){
+        return Option.builder()
+            .restaurant(restaurant)
+            .name(optionDto.optionName())
+            .maxChoiceCount(optionDto.maxChoiceCount())
+            .mandatory(optionDto.isMandatory())
+            .build();
     }
 
 }

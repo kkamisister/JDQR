@@ -1,6 +1,7 @@
 package com.example.backend.owner.controller;
 
 import com.example.backend.etc.dto.RestaurantDto;
+import com.example.backend.owner.dto.OwnerRequest.OptionRequestDto;
 import com.example.backend.owner.dto.OwnerResponse.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -212,7 +213,6 @@ public class OwnerController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@GetMapping("/option/all")
-	// 6. 전체 옵션 조회
 	public ResponseEntity<ResponseWithData<WholeOptionResponseDto>> getWholeOptionInfo(HttpServletRequest request){
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
@@ -230,7 +230,6 @@ public class OwnerController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@GetMapping("/option/{optionId}")
-	// 6. 전체 옵션 조회
 	public ResponseEntity<ResponseWithData<OptionResponseDto>> getIndividualOptionInfo(HttpServletRequest request,
 																							@PathVariable Integer optionId){
 		String id = (String)request.getAttribute("userId");
@@ -242,6 +241,27 @@ public class OwnerController {
 
 		return ResponseEntity.status(response.status()).body(response);
 	}
+
+	@Operation(summary = "옵션 추가", description = "옵션을 추가하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "옵션 추가 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@PostMapping("/option")
+	public ResponseEntity<ResponseWithMessage> createOption(@RequestBody OptionRequestDto optionRequestDto,HttpServletRequest request){
+
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		ownerService.createOption(userId,optionRequestDto);
+
+		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(),
+			"옵션생성에 성공하였습니다.");
+
+		return ResponseEntity.status(responseWithMessage.status())
+			.body(responseWithMessage);
+	}
+
 
 	@Operation(summary = "사업장 조회", description = "사업장을 조회하는 api")
 	@ApiResponses(value = {

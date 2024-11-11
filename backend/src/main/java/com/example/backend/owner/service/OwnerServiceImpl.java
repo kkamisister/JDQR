@@ -14,6 +14,9 @@ import java.util.Objects;
 import com.example.backend.common.service.ImageS3Service;
 import com.example.backend.common.service.ImageS3ServiceImpl;
 import com.example.backend.dish.dto.ChoiceDto;
+import com.example.backend.dish.dto.OptionDto;
+import com.example.backend.dish.entity.Choice;
+import com.example.backend.dish.repository.ChoiceRepository;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.repository.RestaurantRepository;
 import com.example.backend.owner.dto.OptionVo;
@@ -39,6 +42,8 @@ import com.example.backend.dish.repository.DishTagRepository;
 import com.example.backend.dish.repository.OptionRepository;
 import com.example.backend.dish.repository.TagRepository;
 import com.example.backend.owner.dto.CategoryDto;
+import com.example.backend.owner.dto.OwnerRequest;
+import com.example.backend.owner.dto.OwnerRequest.OptionRequestDto;
 import com.example.backend.owner.entity.Owner;
 import com.example.backend.owner.repository.OwnerRepository;
 
@@ -59,6 +64,7 @@ public class OwnerServiceImpl implements OwnerService{
 	private final OptionRepository optionRepository;
 	private final DishOptionRepository dishOptionRepository;
 	private final RestaurantRepository restaurantRepository;
+	private final ChoiceRepository choiceRepository;
 	private final ImageS3Service imageS3Service;
 
 	@Override
@@ -264,6 +270,36 @@ public class OwnerServiceImpl implements OwnerService{
 		List<OptionVo> optionVos = optionRepository.findOptionByOptionId(optionId);
 
 		return getOptionResponseDto(optionId, optionVos);
+	}
+
+	/**
+	 * 옵션을 생성하는 메서드
+	 * @param optionDto
+	 * @param userId
+	 */
+	@Override
+	public void createOption(Integer userId,OptionRequestDto optionDto) {
+
+		//1. 점주를 찾는다
+		Owner owner = ownerRepository.findById(userId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
+
+		//2. 식당을 찾는다
+		Restaurant restaurant = restaurantRepository.findByOwner(owner)
+			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
+
+		//3. 옵션을 추가한다
+		Option option = Option.of(restaurant,optionDto);
+
+		//4. 옵션을 저장한다
+		Option savedOption = optionRepository.save(option);
+
+		//5. 세부옵션(choice)을 설정한다
+		List<Choice> choices = optionDto.choices().stream()
+			.map(choiceDto -> Choice.of(choiceDto, savedOption))
+			.toList();
+
+		choiceRepository.saveAll(choices);
 	}
 
 	/**

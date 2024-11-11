@@ -55,10 +55,21 @@ const RestaurantListBox = ({ restaurants }) => {
       >
         {restaurants.length > 0 ? (
           restaurants.map((restaurant, index) => (
-            <RestaurantItemCard key={index} restaurant={restaurant} />
+            <Box
+              key={index}
+              sx={{
+                marginBottom: index === restaurants.length - 1 ? "24px" : 0,
+              }}
+            >
+              <RestaurantItemCard restaurant={restaurant} />
+            </Box>
           ))
         ) : (
-          <Typography color={colors.text.sub1} fontSize={16}>
+          <Typography
+            color={colors.text.sub1}
+            fontSize={16}
+            sx={{ marginBottom: "24px" }}
+          >
             검색 결과가 없습니다
           </Typography>
         )}

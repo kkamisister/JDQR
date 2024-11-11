@@ -4,7 +4,7 @@ import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk"
 import activeMapmarker from "../../assets/images/mapmarker1.png"
 import inactiveMapmarker from "../../assets/images/mapmarker2.png"
 
-const KakaoMap = () => {
+const KakaoMap = ({ onBoundsChange }) => {
   const [isActive, setIsActive] = useState(false)
   const [location, setLocation] = useState({
     lat: 37.50125774784631,
@@ -14,6 +14,7 @@ const KakaoMap = () => {
   const isLoaded = useKakaoLoader()
 
   useEffect(() => {
+    // 사용자의 현재 위치 가져오기
     if (isLoaded && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -29,6 +30,19 @@ const KakaoMap = () => {
     }
   }, [isLoaded])
 
+  const handleBoundsChanged = (map) => {
+    const bounds = map.getBounds()
+    const sw = bounds.getSouthWest()
+    const ne = bounds.getNorthEast()
+
+    onBoundsChange({
+      swLat: sw.getLat(),
+      neLat: ne.getLat(),
+      swLng: sw.getLng(),
+      neLng: ne.getLng(),
+    })
+  }
+
   return (
     <Stack sx={{ width: "100%", height: "100%" }}>
       <Map
@@ -42,6 +56,8 @@ const KakaoMap = () => {
         level={3}
         draggable
         scrollwheel
+        onDragEnd={(map) => handleBoundsChanged(map)}
+        onZoomChanged={(map) => handleBoundsChanged(map)}
       >
         <MapMarker
           position={location}

@@ -8,4 +8,5 @@ public interface RestaurantRepositoryCustom {
 
 	List<Restaurant> findByCoord(double minLat, double maxLat, double minLng, double maxLng);
 
+	List<Restaurant> findByKeyword(String keyword);
 }

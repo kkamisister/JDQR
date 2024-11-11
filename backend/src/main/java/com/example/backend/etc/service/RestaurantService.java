@@ -20,4 +20,6 @@ public interface RestaurantService {
 	void updateBusinessStatus(Integer restaurantId);
 	RestaurantDto getBusinessStatus(Integer restaurantId);
 
+	RestaurantInfo searchByKeyword(String keyword,double minLat,double maxLat,double minLng,double maxLng,int people,boolean together);
+
 }

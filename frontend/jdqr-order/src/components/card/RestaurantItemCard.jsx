@@ -37,9 +37,14 @@ const RestaurantItemCard = ({ restaurant, sx }) => {
         sx={{ justifyContent: "flex-start" }}
       >
         <Stack
-          direction="row"
-          spacing={1}
-          sx={{ flex: 1, alignItems: "center" }}
+          sx={{
+            flex: 1,
+            alignItems: "flex-start",
+            maxWidth: "130px",
+            "@media (max-width: 130px)": {
+              flexDirection: "column",
+            },
+          }}
         >
           <Typography
             fontSize={17}
@@ -48,7 +53,16 @@ const RestaurantItemCard = ({ restaurant, sx }) => {
           >
             {restaurant.restaurantName}
           </Typography>
-          <Stack direction="row" spacing={0.5}>
+
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{
+              "@media (max-width: 130px)": {
+                flexWrap: "wrap",
+              },
+            }}
+          >
             {restaurant.restaurantCategories.minor.map((category) => (
               <Typography
                 key={category.restaurantCategoryId}
@@ -61,6 +75,7 @@ const RestaurantItemCard = ({ restaurant, sx }) => {
             ))}
           </Stack>
         </Stack>
+
         <Stack
           direction="row"
           spacing={1}

@@ -128,14 +128,16 @@ public class OwnerController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@PutMapping("/dish")
-	public ResponseEntity<ResponseWithMessage> updateDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId, @RequestBody DishRequest.DishInfo dishInfo,
+	public ResponseEntity<ResponseWithMessage> updateDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId,
+		@RequestParam(value = "image", required = false) MultipartFile imageFile,
+		@RequestBody DishRequest.DishInfo dishInfo,
 		HttpServletRequest request){
 		//4-1. 유저 확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
 		//4-2. db에 변경사항 저장
-		ResponseWithMessage responseWithMessage = ownerService.updateDish(userId, dishId, dishInfo);
+		ResponseWithMessage responseWithMessage = ownerService.updateDish(userId, dishId, dishInfo, imageFile);
 
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);

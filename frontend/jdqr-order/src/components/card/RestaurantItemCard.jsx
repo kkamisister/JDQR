@@ -16,7 +16,7 @@ const RestaurantItemCard = ({ restaurant, sx }) => {
         height: "80px",
         cursor: "pointer",
         "&:hover": {
-          backgroundColor: colors.background.box,
+          backgroundColor: colors.background.primary,
         },
         transition: "all 0.3s ease",
         ...sx,

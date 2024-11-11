@@ -48,13 +48,18 @@ const RestaurantItemCard = ({ restaurant, sx }) => {
           >
             {restaurant.restaurantName}
           </Typography>
-          <Typography
-            fontSize={14}
-            color={colors.text.sub1}
-            sx={{ whiteSpace: "nowrap" }}
-          >
-            {restaurant.restaurantCategories[0].restaurantCategoryName}
-          </Typography>
+          <Stack direction="row" spacing={0.5}>
+            {restaurant.restaurantCategories.minor.map((category) => (
+              <Typography
+                key={category.restaurantCategoryId}
+                fontSize={14}
+                color={colors.text.sub1}
+                sx={{ whiteSpace: "nowrap" }}
+              >
+                {category.restaurantCategoryName}
+              </Typography>
+            ))}
+          </Stack>
         </Stack>
         <Stack
           direction="row"

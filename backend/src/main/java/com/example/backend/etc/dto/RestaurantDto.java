@@ -23,7 +23,7 @@ public class RestaurantDto {
 
 	private int id;
 	private String restaurantName;
-	private List<RestaurantCategoryDto> restaurantCategories;
+	private RestaurantCategoryDetail restaurantCategories;
 	private int restTableNum;
 	private int restSeatNum;
 	private int maxPeopleNum;

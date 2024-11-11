@@ -28,6 +28,7 @@ import com.example.backend.dish.entity.Tag;
 import com.example.backend.dish.repository.DishOptionRepository;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.DishTagRepository;
+import com.example.backend.etc.dto.RestaurantCategoryDetail;
 import com.example.backend.etc.dto.RestaurantCategoryDto;
 import com.example.backend.etc.dto.RestaurantDto;
 import com.example.backend.etc.dto.RestaurantProfileDto;
@@ -82,6 +83,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 		//2-1. major 카테고리 리스트 생성
 		List<String> majorList = allMajor.stream().map(RestaurantCategory::getName).toList();
+		log.warn("majorList : {}",majorList);
 
 		//3. 식당카테고리 매핑 엔티티를 가지고온다
 		List<Integer> restaurantIds = findRestaurants.stream().map(Restaurant::getId).toList();
@@ -96,15 +98,18 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 		// 4. <식당ID, 카테고리 리스트> 의 맵을 생성한다
 		Map<Integer, List<RestaurantCategoryDto>> IdToRestaurantCategoryMap = new HashMap<>();
+
 		for(RestaurantCategoryMap restaurantCategoryMap : restaurantCategoryMaps) {
 
 			int restaurantId = restaurantCategoryMap.getRestaurant().getId();
 			
-			// 식당이 속한 (카테고리ID,카테고리이름)을 가진 DTO를 생성한다
-			int restaurantCategoryId = restaurantCategoryMap.getRestaurantCategory().getId();
-			String restaurantCategoryName = restaurantCategoryMap.getRestaurantCategory().getName();
+			RestaurantCategory restaurantCategory = restaurantCategoryMap.getRestaurantCategory();
+			log.warn("restaurantCategory : {}",restaurantCategory);
 
-			RestaurantCategoryDto categoryDto = new RestaurantCategoryDto(restaurantCategoryId,restaurantCategoryName);
+			// 식당이 속한 (카테고리ID,카테고리이름)을 가진 DTO를 생성한다
+			RestaurantCategoryDto categoryDto = RestaurantCategoryDto.from(restaurantCategory);
+
+			log.warn("categoryDto : {}",categoryDto);
 
 			if(!IdToRestaurantCategoryMap.containsKey(restaurantId)) {
 				List<RestaurantCategoryDto> categoryDtos = new ArrayList<>();
@@ -205,10 +210,24 @@ public class RestaurantServiceImpl implements RestaurantService {
 				maxPeopleNum = Math.max(maxPeopleNum,table.getPeople());
 			}
 		}
+		// major 카테고리와  minor 카테고리를 구분한다
+		RestaurantCategoryDto major = null;
+		List<RestaurantCategoryDto> minor = new ArrayList<>();
+
+		for(RestaurantCategoryDto restaurantCategoryDto : restaurantCategories){
+			if(restaurantCategoryDto.getIsMajor()){
+				major = restaurantCategoryDto;
+			}
+			else{
+				minor.add(restaurantCategoryDto);
+			}
+		}
+
+		RestaurantCategoryDetail categoryDetail = RestaurantCategoryDetail.of(major,minor);
 
 		// 식당정보 생성
 		RestaurantDto restaurantDto = getRestaurantDto(restaurantId, restaurant,
-			restaurantCategories, restTableNum, restSeatNum, maxPeopleNum);
+			categoryDetail, restTableNum, restSeatNum, maxPeopleNum);
 
 		// dishInfo를 생성해야한다
 
@@ -262,7 +281,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 	}
 
 	private static RestaurantDto getRestaurantDto(Integer restaurantId, Restaurant restaurant,
-		List<RestaurantCategoryDto> restaurantCategories, int restTableNum, int restSeatNum, int maxPeopleNum) {
+		RestaurantCategoryDetail restaurantCategories, int restTableNum, int restSeatNum, int maxPeopleNum) {
 		RestaurantDto restaurantDto = RestaurantDto.builder()
 			.id(restaurantId)
 			.restaurantName(restaurant.getName())
@@ -335,6 +354,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 		for(int idx = 0; idx< restaurantIds.size(); idx++){
 
 			int restaurantId = restaurantIds.get(idx);
+			log.warn("restaurantId : {}",restaurantId);
 			Restaurant restaurant = IdToRestaurantMap.get(restaurantId);
 
 			List<Table> findTables = tableRepository.findByRestaurantId(restaurantId);
@@ -367,8 +387,25 @@ public class RestaurantServiceImpl implements RestaurantService {
 			// 식당정보 생성
 			List<RestaurantCategoryDto> restaurantCategories = IdToRestaurantCategoryMap.get(restaurantId);
 
+			log.warn("restaurantCategories : {}",restaurantCategories);
+
+			// major 카테고리와  minor 카테고리를 구분한다
+			RestaurantCategoryDto major = null;
+			List<RestaurantCategoryDto> minor = new ArrayList<>();
+
+			for(RestaurantCategoryDto restaurantCategoryDto : restaurantCategories){
+				if(restaurantCategoryDto.getIsMajor()){
+					major = restaurantCategoryDto;
+				}
+				else{
+					minor.add(restaurantCategoryDto);
+				}
+			}
+
+			RestaurantCategoryDetail categoryDetail = RestaurantCategoryDetail.of(major,minor);
+
 			RestaurantDto restaurantDto = getRestaurantDto(restaurantId, restaurant,
-				restaurantCategories, restTableNum, restSeatNum, maxPeopleNum);
+				categoryDetail, restTableNum, restSeatNum, maxPeopleNum);
 
 			restaurantDtos.add(restaurantDto);
 		}

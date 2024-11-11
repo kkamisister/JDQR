@@ -4,31 +4,24 @@ import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk"
 import activeMapmarker from "../../assets/images/mapmarker1.png"
 import inactiveMapmarker from "../../assets/images/mapmarker2.png"
 
-const KakaoMap = ({ onBoundsChange }) => {
+const KakaoMap = ({ onBoundsChange, initialLocation, initialBounds }) => {
   const [isActive, setIsActive] = useState(false)
   const [location, setLocation] = useState({
     lat: 37.50125774784631,
     lng: 127.03956684373539,
   })
+  const [bounds, setBounds] = useState(initialBounds || null)
 
   const isLoaded = useKakaoLoader()
 
   useEffect(() => {
-    // 사용자의 현재 위치 가져오기
-    if (isLoaded && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          })
-        },
-        () => {
-          console.warn("Geolocation not available or permission denied.")
-        }
-      )
+    if (isLoaded && initialLocation) {
+      setLocation(initialLocation)
     }
-  }, [isLoaded])
+    if (initialBounds) {
+      setBounds(initialBounds)
+    }
+  }, [isLoaded, initialLocation, initialBounds])
 
   const handleBoundsChanged = (map) => {
     const bounds = map.getBounds()
@@ -36,10 +29,10 @@ const KakaoMap = ({ onBoundsChange }) => {
     const ne = bounds.getNorthEast()
 
     onBoundsChange({
-      swLat: sw.getLat(),
-      neLat: ne.getLat(),
-      swLng: sw.getLng(),
-      neLng: ne.getLng(),
+      minLat: sw.getLat(),
+      maxLat: ne.getLat(),
+      minLng: sw.getLng(),
+      maxLng: ne.getLng(),
     })
   }
 
@@ -58,6 +51,7 @@ const KakaoMap = ({ onBoundsChange }) => {
         scrollwheel
         onDragEnd={(map) => handleBoundsChanged(map)}
         onZoomChanged={(map) => handleBoundsChanged(map)}
+        bounds={bounds}
       >
         <MapMarker
           position={location}

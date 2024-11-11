@@ -6,62 +6,13 @@ import DishTab from "../../components/tab/DishTab";
 import DishItemCard from "../../components/card/DishItemCard";
 import { colors } from "../../constants/colors";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
-export default function DishList({ dishes }) {
+export default function DishList({ dishes, categories }) {
   const navigate = useNavigate();
 
-  const mockDish = {
-    status: 200,
-    message: "메뉴 조회에 성공하였습니다.",
-    data: {
-      dishId: 1,
-      dishName: "핫치킨 피자",
-      price: 12800,
-      description: "불닭볶음면보다 매운 피자🔥",
-      imageUrl: "https://example.com/image1.jpg",
-      options: [
-        {
-          optionId: 1,
-          optionName: "도우 변경",
-          choices: [
-            {
-              choiceId: 1,
-              choiceName: "치즈 추가",
-              price: 2000,
-            },
-            {
-              choiceId: 2,
-              choiceName: "고구마 무스 추가",
-              price: 2000,
-            },
-            {
-              choiceId: 3,
-              choiceName: "치즈 크러스트로 변경",
-              price: 4000,
-            },
-            {
-              choiceId: 4,
-              choiceName: "골드 크러스트로 변경",
-              price: 5000,
-            },
-          ],
-        },
-      ],
-      tags: ["인기"],
-    },
-  };
-
-  const categories = [
-    "인기 메뉴",
-    "아이거진짜좋은메뉴인데얼마나좋냐면",
-    "피자",
-    "파스타",
-    "리조또",
-    "사이드",
-    "음료/주류",
-  ];
-
   const handleCategoryClick = (category) => {
+    // console.log("카테고리는 말이죵", category);
     scroller.scrollTo(category, {
       duration: 800,
       delay: 0,
@@ -85,6 +36,7 @@ export default function DishList({ dishes }) {
     >
       <DishSearchBar />
       <DishTab dishCategories={categories} onTabClick={handleCategoryClick} />
+
       <Box
         id="scrollable-dish-list"
         sx={{
@@ -100,8 +52,11 @@ export default function DishList({ dishes }) {
           scrollbarWidth: "none",
         }}
       >
-        {dishes.map((dishCategory, index) => (
-          <Element name={dishCategory.categoryName} key={index}>
+        {dishes.map((category, index) => (
+          <Element
+            name={category.dishCategoryName}
+            key={category.dishCategoryId}
+          >
             <Stack
               sx={{
                 bgcolor: colors.background.white,
@@ -116,15 +71,15 @@ export default function DishList({ dishes }) {
                   p: "10px",
                 }}
               >
-                {dishCategory.categoryName}
+                {category.dishCategoryName}
               </Typography>
-              {dishCategory.items.map((dish, dishIndex) => (
+              {category.items.map((dish, dishIndex) => (
                 <Box key={dish.dishId}>
                   <DishItemCard
                     dish={dish}
                     onClick={() => handleDishClick(dish.dishId)}
                   />
-                  {dishIndex < dishCategory.items.length - 1 && (
+                  {dishIndex < category.items.length - 1 && (
                     <Divider variant="middle" />
                   )}
                 </Box>

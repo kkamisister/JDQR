@@ -19,7 +19,7 @@ export default function DishTab({ dishCategories, onTabClick }) {
         variant="scrollable"
         scrollButtons="auto"
         aria-label="scrollable auto tabs example"
-        textColor={colors.text.main}
+        textColor="inherit"
         TabIndicatorProps={{
           style: {
             backgroundColor: colors.main.primary500,

@@ -1,5 +1,5 @@
 import React from "react"
-import { Box, Divider, Stack } from "@mui/material"
+import { Box, Divider, Stack, Typography } from "@mui/material"
 import RestaurantItemCard from "../../../components/card/RestaurantItemCard"
 import PeopleFilter from "./PeopleFilter"
 import { colors } from "../../../constants/colors"
@@ -43,6 +43,9 @@ const RestaurantListBox = ({ restaurants }) => {
         sx={{
           overflowY: "auto",
           flexGrow: 1,
+          display: "flex",
+          justifyContent: restaurants.length > 0 ? "flex-start" : "center",
+          alignItems: restaurants.length > 0 ? "flex-start" : "center",
           "&::-webkit-scrollbar": {
             display: "none",
           },
@@ -50,9 +53,15 @@ const RestaurantListBox = ({ restaurants }) => {
           "scrollbar-width": "none",
         }}
       >
-        {restaurants.map((restaurant, index) => (
-          <RestaurantItemCard key={index} restaurant={restaurant} />
-        ))}
+        {restaurants.length > 0 ? (
+          restaurants.map((restaurant, index) => (
+            <RestaurantItemCard key={index} restaurant={restaurant} />
+          ))
+        ) : (
+          <Typography color={colors.text.sub1} fontSize={16}>
+            검색 결과가 없습니다
+          </Typography>
+        )}
       </Box>
     </MapListContainer>
   )

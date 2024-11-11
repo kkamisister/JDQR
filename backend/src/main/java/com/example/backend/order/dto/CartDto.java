@@ -25,8 +25,7 @@ public class CartDto {
 	private String dishName;
 	private Integer dishCategoryId;
 	private String dishCategoryName;
-	private List<Integer> optionIds;
-	private int price;
+	private List<Integer> choiceIds;
 	private int quantity;
 	private LocalDateTime orderedAt;
 
@@ -38,11 +37,11 @@ public class CartDto {
 			return false;
 		CartDto cartDto = (CartDto)o;
 		return Objects.equals(dishId, cartDto.dishId) && Objects.equals(userId, cartDto.userId)
-			&& Objects.equals(optionIds, cartDto.optionIds);
+			&& Objects.equals(choiceIds, cartDto.choiceIds);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(dishId, userId, optionIds);
+		return Objects.hash(dishId, userId, choiceIds);
 	}
 }

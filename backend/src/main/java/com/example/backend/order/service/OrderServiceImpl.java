@@ -20,6 +20,7 @@ import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.Choice;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.ChoiceRepository;
+import com.example.backend.dish.repository.OptionRepository;
 import com.example.backend.order.dto.CartRequest.*;
 import com.example.backend.order.dto.OptionDetailDto;
 import com.example.backend.order.dto.OrderRequest.*;
@@ -67,8 +68,9 @@ public class OrderServiceImpl implements OrderService {
 	private final SimpMessagingTemplate messagingTemplate;
 	private final TossWebClient tossWebClient;
     private final OrderPaymentRepository orderPaymentRepository;
+	private final OptionRepository optionRepository;
 
-    /**
+	/**
 	 * tableName으로 qrCode를 찾아서, 해당 코드에 token을 더한 주소를 반환
 	 * @param tableId
 	 * @return
@@ -721,7 +723,7 @@ public class OrderServiceImpl implements OrderService {
 			OrderItem orderItem = orderItems.get(i);
 			CartDto productInfo = cartDatas.get(i);
 
-			List<Integer> optionIds = productInfo.getOptionIds();
+			List<Integer> optionIds = productInfo.getChoiceIds();
 
 			orderItemChoices.addAll(getOrderItemOptions(orderItem, optionIds));
 		}
@@ -763,15 +765,31 @@ public class OrderServiceImpl implements OrderService {
 		Dish dish = dishRepository.findById(dishId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
 		String userId = productInfo.getUserId();
+		List<Integer> choiceIds = productInfo.getChoiceIds();
+		List<Choice> choices = choiceRepository.findAllById(choiceIds);
+
+		Integer orderPrice = getPriceOfDishAndOptions(dish, choices);
 
 		return OrderItem.builder()
 			.order(order)
 			.dish(dish)
 			.userId(userId)
-			.orderPrice(productInfo.getPrice())
 			.quantity(productInfo.getQuantity())
+			.orderPrice(orderPrice)
 			.orderedAt(productInfo.getOrderedAt())
 			.build();
+	}
+
+	/**
+	 * 메뉴와 옵션을 선택했을 때, 해당 메뉴의 전체 가격을 반환한다.
+	 * @param dish : 선택한 메뉴 entity
+	 * @param choices : 선택한 세부 옵션 entity
+	 * @return
+	 */
+	private Integer getPriceOfDishAndOptions(Dish dish, List<Choice> choices) {
+		return dish.getPrice() + choices.stream()
+			.mapToInt(Choice::getPrice)
+			.sum();
 	}
 
 	/**

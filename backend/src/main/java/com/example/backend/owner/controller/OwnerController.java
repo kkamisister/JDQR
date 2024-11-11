@@ -20,7 +20,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.backend.common.dto.CommonResponse.*;
 import com.example.backend.dish.dto.DishRequest;
 import com.example.backend.dish.dto.DishResponse.DishSummaryResultDto;
@@ -84,15 +87,15 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "메뉴 추가 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	@PostMapping("/dish")
-	public ResponseEntity<ResponseWithMessage> addDish(@RequestBody DishRequest.DishInfo dishInfo,
+	@PostMapping(value = "/dish", consumes = {"multipart/form-data"})
+	public ResponseEntity<ResponseWithMessage> addDish(@RequestPart DishRequest.DishInfo dishInfo, @RequestPart MultipartFile imageFile,
 		HttpServletRequest request){
 		//2-1. 유저 확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
 		//2-2. db에 변경사항 저장
-		ResponseWithMessage responseWithMessage = ownerService.addDish(userId, dishInfo);
+		ResponseWithMessage responseWithMessage = ownerService.addDish(userId, dishInfo, imageFile);
 
 		return ResponseEntity.status(responseWithMessage.status())
 			.body(responseWithMessage);

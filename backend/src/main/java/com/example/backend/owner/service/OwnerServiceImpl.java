@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
+import com.example.backend.common.service.ImageS3Service;
+import com.example.backend.common.service.ImageS3ServiceImpl;
 import com.example.backend.dish.dto.ChoiceDto;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.repository.RestaurantRepository;
@@ -18,6 +20,7 @@ import com.example.backend.owner.dto.OptionVo;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.backend.common.dto.CommonResponse;
 import com.example.backend.common.exception.ErrorCode;
@@ -56,10 +59,11 @@ public class OwnerServiceImpl implements OwnerService{
 	private final OptionRepository optionRepository;
 	private final DishOptionRepository dishOptionRepository;
 	private final RestaurantRepository restaurantRepository;
+	private final ImageS3Service imageS3Service;
 
 	@Override
 	@Transactional
-	public CommonResponse.ResponseWithMessage addDish(Integer userId, DishRequest.DishInfo dishInfo) {
+	public CommonResponse.ResponseWithMessage addDish(Integer userId, DishRequest.DishInfo dishInfo, MultipartFile multipartfile) {
 
 		//해당하는 가게 주인이 존재하는지 찾는다.
 		Owner owner = ownerRepository.findById(userId)
@@ -71,7 +75,7 @@ public class OwnerServiceImpl implements OwnerService{
 			.orElseThrow(() -> new JDQRException(ErrorCode.FUCKED_UP_QR));
 
 		// s3에서 저장 한 후 반환된 imageUrl
-		String imageUrl = "";
+		String imageUrl = imageS3Service.uploadImageToS3(multipartfile);
 
 		Dish dish = Dish.of(dishInfo,dishCategory,imageUrl);
 

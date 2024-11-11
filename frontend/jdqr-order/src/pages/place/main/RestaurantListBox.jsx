@@ -43,9 +43,6 @@ const RestaurantListBox = ({ restaurants }) => {
         sx={{
           overflowY: "auto",
           flexGrow: 1,
-          display: "flex",
-          justifyContent: restaurants.length > 0 ? "flex-start" : "center",
-          alignItems: restaurants.length > 0 ? "flex-start" : "center",
           "&::-webkit-scrollbar": {
             display: "none",
           },
@@ -55,21 +52,10 @@ const RestaurantListBox = ({ restaurants }) => {
       >
         {restaurants.length > 0 ? (
           restaurants.map((restaurant, index) => (
-            <Box
-              key={index}
-              sx={{
-                marginBottom: index === restaurants.length - 1 ? "24px" : 0,
-              }}
-            >
-              <RestaurantItemCard restaurant={restaurant} />
-            </Box>
+            <RestaurantItemCard key={index} restaurant={restaurant} />
           ))
         ) : (
-          <Typography
-            color={colors.text.sub1}
-            fontSize={16}
-            sx={{ marginBottom: "24px" }}
-          >
+          <Typography color={colors.text.sub1} fontSize={16}>
             검색 결과가 없습니다
           </Typography>
         )}

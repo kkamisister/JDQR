@@ -3,8 +3,8 @@ import Header from "../../components/header/Header";
 import DishHeader from "./DishHeader";
 import DishList from "./DishList";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import axiosInstance from "../../utils/apis/axiosInstance";
 import { fetchDishMenu } from "../../utils/apis/dish";
+import LoadingSpinner from "../../components/Spinner/LoadingSpinner";
 
 const DishPage = () => {
   // useQuery({
@@ -32,9 +32,12 @@ const DishPage = () => {
         scrollbarWidth: "none",
       }}
     >
-      <Header title={data.tableName} />
+      <Header title={isLoading ? "" : data.tableName} />
       <DishHeader />
-      <DishList dishes={data.dishes} />
+      {isLoading && <LoadingSpinner message={"로딩 중입니다"} />}
+      {!isLoading && !isError && (
+        <DishList dishes={data.dishes} categories={data.dishCategories} />
+      )}
     </Box>
   );
 };

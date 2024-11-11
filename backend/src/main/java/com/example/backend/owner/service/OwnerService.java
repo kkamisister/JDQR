@@ -6,7 +6,10 @@ import static com.example.backend.dish.dto.DishResponse.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.backend.dish.dto.DishRequest;
+import com.example.backend.dish.dto.OptionDto;
 import com.example.backend.owner.dto.CategoryDto;
+import com.example.backend.owner.dto.OwnerRequest;
+import com.example.backend.owner.dto.OwnerRequest.OptionRequestDto;
 import com.example.backend.owner.dto.OwnerResponse.*;
 
 public interface OwnerService {
@@ -25,4 +28,6 @@ public interface OwnerService {
     WholeOptionResponseDto getWholeOptionInfo(Integer userId);
 
 	OptionResponseDto getIndividualOptionInfo(Integer userId, Integer optionId);
+
+	void createOption(Integer userId,OptionRequestDto optionDto);
 }

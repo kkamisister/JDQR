@@ -116,27 +116,31 @@ public class OrderServiceImpl implements OrderService {
 		// 2. 테이블 장바구니에 물품을 담는다
 		//<tableId,<userId,<hashCode,항목>>>
 		String key = "table::"+tableId;
-		log.warn("key : {}",key);
-		log.warn("userID : {}",productInfo.getUserId());
+		// log.warn("key : {}",key);
+		// log.warn("userID : {}",productInfo.getUserId());
 		Map<Integer,CartDto> cachedCartData = redisHashRepository.getCartDatas(key,productInfo.getUserId());
-		log.warn("cachedCartData : {}",cachedCartData);
+		// log.warn("cachedCartData : {}",cachedCartData);
 		if(!ObjectUtils.isEmpty(cachedCartData) && cachedCartData.containsKey(productInfo.hashCode())){ // 1. 기존에 동일한 물품이 있어서 거기에 더해지는 경우 -> 지금 담는 hashCode와 비교하여 동일한 것을 찾아서 추가
 
 			CartDto cartData = cachedCartData.get(productInfo.hashCode());
 			int currentQuantity = cartData.getQuantity();
 			int newQuantity = currentQuantity + productInfo.getQuantity();
 			if(newQuantity < 0)newQuantity = 0;
-			log.warn("newQuantity : {}",newQuantity);
-
+			// log.warn("newQuantity : {}",newQuantity);
 			cartData.setQuantity(newQuantity);
-			log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
-			log.warn("cartData : {}",cartData);
+			// log.warn("productInfo.hashCode() : {}",productInfo.hashCode());
+			// log.warn("cartData : {}",cartData);
+
 			cachedCartData.put(productInfo.hashCode(), cartData);
 
 			redisHashRepository.saveHashData(key, cartData.getUserId(), cachedCartData,20L);
 		}
 		else{ // 2. 새로운 물품인 경우 -> 리스트에 추가
 			cachedCartData = new ConcurrentHashMap<>();
+
+			// 여기서 저장한 품목에 대한 가격을 받아서 채워넣어야 함
+			setDishInfo(productInfo);
+
 			cachedCartData.put(productInfo.hashCode(), productInfo);
 			redisHashRepository.saveHashData(key, productInfo.getUserId(), cachedCartData,20L);
 		}
@@ -159,13 +163,36 @@ public class OrderServiceImpl implements OrderService {
 			.flatMap(map -> map.values().stream())
 			.collect(Collectors.toList());
 
-		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize);
+		int totalPrice = 0;
+		int totalQuantity = 0;
+		for(CartDto cartData : cartList){
+			totalPrice += cartData.getPrice() * cartData.getQuantity();
+			totalQuantity += cartData.getQuantity();
+		}
+
+		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize,totalPrice,totalQuantity);
 
 		// notificationService.sentToClient(tableId,sendData);
 		log.warn("sendData : {}",sendData);
 		messagingTemplate.convertAndSend("/sub/cart/"+tableId,sendData);
 	}
 
+	private void setDishInfo(CartDto productInfo) {
+		Dish dish = dishRepository.findById(productInfo.getDishId())
+			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+
+		log.warn("dish : {}",dish);
+
+		log.warn("choiceIds : {}",productInfo.getChoiceIds());
+		List<Choice> choices = choiceRepository.findAllById(productInfo.getChoiceIds());
+
+		int choicePrice = choices.stream().map(Choice::getPrice).mapToInt(p -> p).sum();
+		int price = dish.getPrice() + choicePrice;
+
+		productInfo.setPrice(price);
+		productInfo.setDishName(dish.getName());
+		productInfo.setDishCategoryName(dish.getDishCategory().getName());
+	}
 
 	/**
 	 * 테이블의 장바구니에서 productInfo를 가진 품목을 제거한다
@@ -220,7 +247,14 @@ public class OrderServiceImpl implements OrderService {
 			.flatMap(map -> map.values().stream())
 			.collect(Collectors.toList());
 
-		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize);
+		int totalPrice = 0;
+		int totalQuantity = 0;
+		for(CartDto cartData : cartList){
+			totalPrice += cartData.getPrice() * cartData.getQuantity();
+			totalQuantity += cartData.getQuantity();
+		}
+
+		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize,totalPrice,totalQuantity);
 
 		// notificationService.sentToClient(tableId,sendData);
 		messagingTemplate.convertAndSend("/sub/cart/"+tableId,sendData);

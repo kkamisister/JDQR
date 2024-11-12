@@ -12,10 +12,12 @@ public record CartResponse() {
 	public record CartInfo(
 		List<CartDto> cartList,
 		String tableName,
-		int peopleCnt
+		int peopleCnt,
+		int totalPrice,
+		int totalQuantity
 	) {
-		public static CartInfo of(List<CartDto> cartList, String tableName, int peopleCnt) {
-			return new CartInfo(cartList,tableName,peopleCnt);
+		public static CartInfo of(List<CartDto> cartList, String tableName, int peopleCnt,int totalPrice,int totalQuantity) {
+			return new CartInfo(cartList,tableName,peopleCnt,totalPrice,totalQuantity);
 		}
 	}
 

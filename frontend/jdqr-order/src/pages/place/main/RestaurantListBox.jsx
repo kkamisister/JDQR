@@ -43,9 +43,6 @@ const RestaurantListBox = ({ restaurants }) => {
         sx={{
           overflowY: "auto",
           flexGrow: 1,
-          display: "flex",
-          justifyContent: restaurants.length > 0 ? "flex-start" : "center",
-          alignItems: restaurants.length > 0 ? "flex-start" : "center",
           "&::-webkit-scrollbar": {
             display: "none",
           },

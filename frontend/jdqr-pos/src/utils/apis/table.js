@@ -61,7 +61,7 @@ export const renewTableUrl = async ({ tableId }) => {
  * 전체 테이블 조회
  * @returns {Object} - API 문서 참조
  */
-export const fetchTables = async () => {
+export const fetchTableList = async () => {
 	const response = await axiosInstance.get('/owner/table');
 	return response.data;
 };

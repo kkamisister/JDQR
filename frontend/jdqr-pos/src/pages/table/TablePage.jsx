@@ -10,19 +10,23 @@ import TableSettingGridBox from './table/TableSettingGridBox';
 import TableGridBox from './table/TableGridBox';
 import TableEditBox from './table/edit/TableEditBox';
 import QRCodeSettingDialog from './qr/QRCodeSettingDialog';
-
+import { useQuery } from '@tanstack/react-query';
+import { fetchTableList } from 'utils/apis/table';
 const SampleTableRequestData = tableData;
 
 const TablePage = () => {
+	const { isPending, data } = useQuery({
+		queryKey: ['tableList'], // keyword를 queryKey에 포함하여 키워드가 변경되면 새로운 요청 실행
+		queryFn: () => fetchTableList(),
+	});
+
 	const rightMenuPreset = {
 		ORDER: 'order',
 		ADD: 'add',
 		EDIT: 'edit',
 	};
 	Object.freeze(rightMenuPreset);
-	const [selectedTable, setSelectedTable] = useState(
-		SampleTableRequestData.data.tables[0]
-	);
+	const [selectedTable, setSelectedTable] = useState(null);
 	const handleTableClick = table => {
 		setrightMenu(rightMenuPreset.ORDER);
 		setSelectedTable(table);
@@ -47,7 +51,7 @@ const TablePage = () => {
 
 	const addNewTable = () => {};
 	const editCurrentTable = () => {};
-	return (
+	return data ? (
 		<Stack
 			direction="column"
 			sx={{ padding: '25px', width: '100%' }}
@@ -98,7 +102,7 @@ const TablePage = () => {
 							flexWrap: 'wrap',
 							height: 'fit-content',
 						}}>
-						{SampleTableRequestData.data.tables.map(table => (
+						{data.data.tables.map(table => (
 							<Box
 								key={table.name}
 								onClick={() => {
@@ -114,33 +118,32 @@ const TablePage = () => {
 					</Stack>
 				)}
 				{tableViewChecked && (
-					<TableSettingGridBox
-						tables={SampleTableRequestData.data.tables}
-					/>
+					<TableSettingGridBox tables={data.data.tables} />
 				)}
 				{/* 테이블 상세 주문 정보 */}
 				<Stack
 					spacing={1}
 					sx={{ height: '100%', justifyContent: 'space-between' }}>
-					{rightMenu === rightMenuPreset.ORDER && (
+					{rightMenu === rightMenuPreset.ORDER && selectedTable && (
 						<OrderDetailBox table={selectedTable} />
 					)}
 					{rightMenu === rightMenuPreset.ADD && (
 						<TableEditBox isEdit={false} />
 					)}
-					{rightMenu === rightMenuPreset.EDIT && (
+					{rightMenu === rightMenuPreset.EDIT && selectedTable && (
 						<TableEditBox table={selectedTable} isEdit={true} />
 					)}
 					<Stack spacing={1}>
-						<FlatButton
-							text="QR 보기"
-							onClick={() => {
-								handleClickOpen();
-							}}
-							color={colors.point.blue}
-						/>
-
-						{rightMenu === rightMenuPreset.EDIT && (
+						{selectedTable && (
+							<FlatButton
+								text="QR 보기"
+								onClick={() => {
+									handleClickOpen();
+								}}
+								color={colors.point.blue}
+							/>
+						)}
+						{rightMenu === rightMenuPreset.EDIT && selectedTable && (
 							<FlatButton
 								text="테이블 저장"
 								color={colors.point.red}
@@ -160,7 +163,7 @@ const TablePage = () => {
 							/>
 						)}
 
-						{rightMenu === rightMenuPreset.ORDER && (
+						{rightMenu === rightMenuPreset.ORDER && selectedTable && (
 							<FlatButton
 								text="테이블 수정"
 								color={colors.point.red}
@@ -172,12 +175,17 @@ const TablePage = () => {
 					</Stack>
 				</Stack>
 			</Stack>
-			<QRCodeSettingDialog
-				table={selectedTable}
-				open={open}
-				onClose={handleClose}
-			/>
+
+			{selectedTable && (
+				<QRCodeSettingDialog
+					table={selectedTable}
+					open={open}
+					onClose={handleClose}
+				/>
+			)}
 		</Stack>
+	) : (
+		<></>
 	);
 };
 

@@ -33,7 +33,7 @@ const StickerBox = forwardRef(({ table }, ref) => {
 				<Box sx={{ fontWeight: '600', fontSize: '30px' }}>{table.name}</Box>
 			</Stack>
 
-			<QRCodeBox url={'https://naver.com'} />
+			<QRCodeBox url={table.qrLink} />
 			<Box sx={{ fontWeight: '600', fontSize: '25px' }}>
 				QR코드로 주문하기
 			</Box>

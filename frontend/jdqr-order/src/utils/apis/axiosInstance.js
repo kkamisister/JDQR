@@ -19,7 +19,7 @@ const getCookieValue = (name) => {
 const initializeToken = async () => {
   const token = sessionStorage.getItem("tableToken");
   if (token) {
-    console.log("로컬 스토리지에서 토큰을 가져왔습니다.");
+    console.log("셋션 스토리지에서 토큰을 가져왔습니다.");
   } else {
     console.log("토큰이 없어 extractTableInfo를 호출합니다.");
     await extractTableInfo();

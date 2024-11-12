@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Stack, Typography, Box, Divider } from "@mui/material";
 import MapBackButtonHeader from "../../../components/header/MapBackButtonHeader";
 import { colors } from "../../../constants/colors";
@@ -11,13 +11,15 @@ import { useState, useMemo, useEffect } from "react";
 import NumberSelector from "../../../components/selector/NumberSelector";
 import BaseButton from "../../../components/button/BaseButton";
 import { Stomp } from "@stomp/stompjs";
+import { setUserCookie } from "../../../utils/apis/axiosInstance";
+import useWebSocketStore from "../../../stores/SocketStore";
 
 export default function DishDetailPage() {
+  const navigate = useNavigate();
   const { dishId } = useParams();
   const parsedDishId = Number(dishId);
   const [selectedOptions, setSelectedOptions] = useState({});
   const [quantity, setQuantity] = useState(1);
-  const [stompClient, setStompClient] = useState(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["dishDetail", parsedDishId],
@@ -25,27 +27,30 @@ export default function DishDetailPage() {
     enabled: !isNaN(parsedDishId),
   });
 
-  useEffect(() => {
-    const client = Stomp.client("wss://jdqr608.duckdns.org/ws");
-    client.connect({}, () => {
-      console.log("STOMP 연결 성공");
-      setStompClient(client);
-    });
+  const { client, connect } = useWebSocketStore();
 
-    return () => {
-      if (stompClient) {
-        stompClient.disconnect(() => {
-          console.log("STOMP 연결 종료");
-        });
-      }
-    };
-  }, []);
+  useEffect(() => {
+    if (!sessionStorage.getItem("userId")) {
+      setUserCookie();
+    }
+    if (!client) {
+      connect();
+    }
+  }, [client, connect]);
 
   const handleOptionChange = (optionId, choiceId) => {
-    setSelectedOptions((prev) => ({
-      ...prev,
-      [optionId]: choiceId,
-    }));
+    setSelectedOptions((prev) => {
+      if (prev[optionId] === choiceId) {
+        const updatedOptions = { ...prev };
+        delete updatedOptions[optionId];
+        return updatedOptions;
+      }
+
+      return {
+        ...prev,
+        [optionId]: choiceId,
+      };
+    });
   };
 
   const handleQuantityChange = (newQuantity) => {
@@ -79,20 +84,17 @@ export default function DishDetailPage() {
   }, [data, selectedOptionsTotalPrice, quantity]);
 
   const handleAddToCart = () => {
-    if (stompClient && stompClient.connected) {
+    if (client && client.connected) {
       const postData = {
-        userId: sessionStorage.getItem,
+        userId: sessionStorage.getItem("userId"),
         dishId: parsedDishId,
-        dishName: data.dishName,
-        dishCategoryId: data.dishCategoryId,
-        dishCategoryName: data.dishCategoryName,
         choiceIds: Object.values(selectedOptions),
         price: data.price,
         quantity,
       };
-
-      stompClient.send("/pub/cart/add", {}, JSON.stringify(postData));
+      client.send("/pub/cart/add", {}, JSON.stringify(postData));
       console.log(`${data.dishName} 장바구니에 담기 요청 전송`);
+      navigate("/cart");
     } else {
       console.error("STOMP 클라이언트가 연결되지 않았습니다.");
     }

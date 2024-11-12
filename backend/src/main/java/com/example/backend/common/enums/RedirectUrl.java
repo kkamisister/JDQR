@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum RedirectUrl {
 
-	FRONT("http://localhost:3000");
+	FRONT("https://jdqr608.duckdns.org/dish");
 
 	private final String explain;
 }

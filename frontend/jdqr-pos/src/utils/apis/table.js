@@ -40,7 +40,7 @@ export const removeTable = async ({ tableId }) => {
  * @returns {Promise} - API 문서 참조
  */
 export const editTable = async ({ tableId, name, color, people }) => {
-	return axiosInstance.put(`/onwer/table`, {
+	return axiosInstance.put(`/owner/table`, {
 		tableId,
 		name,
 		color,
@@ -61,7 +61,7 @@ export const renewTableUrl = async ({ tableId }) => {
  * 전체 테이블 조회
  * @returns {Object} - API 문서 참조
  */
-export const fetchTables = async () => {
+export const fetchTableList = async () => {
 	const response = await axiosInstance.get('/owner/table');
 	return response.data;
 };
@@ -72,6 +72,6 @@ export const fetchTables = async () => {
  * @returns {Promise} - API 문서 참조
  */
 export const fetchTableDetail = async ({ tableId }) => {
-	const response = await axiosInstance.get(`/onwer/table?tableId=${tableId}`);
+	const response = await axiosInstance.get(`/owner/table?tableId=${tableId}`);
 	return response.data.data;
 };

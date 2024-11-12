@@ -8,17 +8,38 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// tableId와 token을 URL에서 추출하여 저장
-axiosInstance.extractTableInfo = () => {
-  const params = new URLSearchParams(window.location.search);
-  const tableId = params.get("tableId");
-  const token = params.get("token");
-  if (tableId && token) {
-    localStorage.setItem("tableId", tableId);
-    localStorage.setItem("tableToken", token);
-    console.log("tableId와 token이 성공적으로 저장되었습니다.");
+// tableToken을 확인하고 없으면 extractTableInfo 호출
+const initializeToken = async () => {
+  const token = localStorage.getItem("tableToken");
+  if (token) {
+    console.log("로컬 스토리지에서 토큰을 가져왔습니다.");
   } else {
-    console.warn("URL에서 tableId 또는 token을 찾을 수 없습니다.");
+    console.log("토큰이 없어 extractTableInfo를 호출합니다.");
+    await axiosInstance.extractTableInfo();
+  }
+};
+
+// tableId와 token을 URL에서 추출하여 저장
+axiosInstance.extractTableInfo = async () => {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const tableId = params.get("tableId");
+    const token = params.get("token");
+    if (tableId && token) {
+      localStorage.setItem("tableId", tableId);
+      localStorage.setItem("tableToken", token);
+      console.log("tableId와 token이 성공적으로 저장되었습니다.");
+
+      await axiosInstance.setUserCookie();
+    } else {
+      localStorage.setItem("tableId", "6721aa9b0d22a923091eef73");
+      localStorage.setItem("tableToken", "dummyTableToken");
+      console.log("일단 dummy토큰 넣었음");
+
+      await axiosInstance.setUserCookie();
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -48,7 +69,9 @@ axiosInstance.setUserCookie = async () => {
   }
 
   try {
-    const response = await axiosInstance.get("order/cart/cookie");
+    const response = await axiosInstance.get(
+      "https://jdqr608.duckdns.org/api/v1/order/cart/cookie"
+    );
     console.log("쿠키 발급 성공");
     return response.data;
   } catch (error) {
@@ -56,5 +79,8 @@ axiosInstance.setUserCookie = async () => {
     throw new Error("쿠키 발급 중 오류가 발생했습니다.");
   }
 };
+
+// 초기화 함수 호출
+initializeToken();
 
 export default axiosInstance;

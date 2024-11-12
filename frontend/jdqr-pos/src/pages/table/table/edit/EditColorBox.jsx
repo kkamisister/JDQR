@@ -20,6 +20,9 @@ const EditColorBox = ({ currentColorCode, setTableColor }) => {
 						<EditColorPickerBox
 							color={colorCode}
 							isSelected={currentColorCode === colorCode}
+							onClick={() => {
+								setTableColor(colorCode);
+							}}
 						/>
 					);
 				})}

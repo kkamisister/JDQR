@@ -44,18 +44,18 @@ const HomePage = () => {
   const { data: restaurantsData } = useQuery({
     queryKey: ["restaurants", bounds, people, together],
     queryFn: async () => {
-      console.log("파라미터는....이렇게 생겼다지...", {
-        bounds,
-        people,
-        together,
-      })
+      // console.log("파라미터는....이렇게 생겼다지...", {
+      //   bounds,
+      //   people,
+      //   together,
+      // })
       const response = await fetchRestaurants(bounds, people, together)
-      console.log("api 응답은....이렇게 생겼다지....:", response)
+      // console.log("api 응답은....이렇게 생겼다지....:", response)
       return response
     },
     enabled: !!bounds, // bounds가 설정되었을 때만 쿼리 활성화
   })
-  console.log("당신은...데이터를...불러왔지..:", restaurantsData)
+  // console.log("당신은...데이터를...불러왔지..:", restaurantsData)
 
   const handleBoundsChange = (newBounds) => {
     setBounds(newBounds)

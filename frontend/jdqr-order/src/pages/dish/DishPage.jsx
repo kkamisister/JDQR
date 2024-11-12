@@ -7,14 +7,6 @@ import { fetchDishMenu } from "../../utils/apis/dish";
 import LoadingSpinner from "../../components/Spinner/LoadingSpinner";
 
 const DishPage = () => {
-  // useQuery({
-  //   queryKey: ["initialTableInfo"],
-  //   queryFn: async () => {
-  //     axiosInstance.extractTableInfo();
-  //     await axiosInstance.setUserCoookie();
-  //   },
-  // });
-
   const { data, isLoading, isError } = useQuery({
     queryKey: ["dishList"],
     queryFn: fetchDishMenu,

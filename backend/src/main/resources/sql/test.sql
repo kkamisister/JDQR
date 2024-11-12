@@ -63,9 +63,10 @@ VALUES (1, 1, NOW(), NOW(), 'Appetizers', 'ACTIVE'),
        (10, 1, NOW(), NOW(), 'Combos', 'ACTIVE'),
        -- 진짜 데이터
        (11, 11, NOW(), NOW(), '점심', 'ACTIVE'),
-       (12, 11, NOW(), NOW(), '본차림', 'ACTIVE')
-    #        (12, 11, NOW(), NOW(), '본차림', 'ACTIVE'),
-#        (12, 11, NOW(), NOW(), '본차림', 'ACTIVE'),
+       (12, 11, NOW(), NOW(), '본차림', 'ACTIVE'),
+       (13, 12, NOW(), NOW(), '커피', 'ACTIVE'),
+       (14, 12, NOW(), NOW(), '밀크티', 'ACTIVE')
+
 #        (12, 11, NOW(), NOW(), '본차림', 'ACTIVE'),
 #        (12, 11, NOW(), NOW(), '본차림', 'ACTIVE'),
 #        (12, 11, NOW(), NOW(), '본차림', 'ACTIVE')
@@ -98,7 +99,18 @@ VALUES (1, 1, 500, NOW(), NOW(), 'Crispy French Fries', 'french_fries.jpg', 'Fre
        (19, 11, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_19.jfif', '점심) 한우꽃게된장찌개밥상', '["한정"]', 'ACTIVE'),
        (20, 11, 11000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_20.jfif', '점심) 한돈파김지전골밥상', '["한정"]', 'ACTIVE'),
        (21, 11, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_21.jfif', '점심) 한우차돌짬뽕라면밥상', '["한정"]', 'ACTIVE'),
-       (22, 11, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_22.jfif', '점심) 갓김치비빔냉면밥상', '["한정"]', 'ACTIVE')
+       (22, 11, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_22.jfif', '점심) 갓김치비빔냉면밥상', '["한정"]', 'ACTIVE'),
+
+       #커피
+       (23, 13, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_21.jfif', '점심) 한우차돌짬뽕라면밥상', '["한정"]', 'ACTIVE'),
+       (24, 13, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_21.jfif', '점심) 한우차돌짬뽕라면밥상', '["한정"]', 'ACTIVE'),
+       (25, 13, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_21.jfif', '점심) 한우차돌짬뽕라면밥상', '["한정"]', 'ACTIVE'),
+       (26, 13, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_21.jfif', '점심) 한우차돌짬뽕라면밥상', '["한정"]', 'ACTIVE'),
+       #밀크티
+       (27, 14, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_21.jfif', '점심) 한우차돌짬뽕라면밥상', '["한정"]', 'ACTIVE'),
+       (28, 14, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_21.jfif', '점심) 한우차돌짬뽕라면밥상', '["한정"]', 'ACTIVE'),
+       (29, 14, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_21.jfif', '점심) 한우차돌짬뽕라면밥상', '["한정"]', 'ACTIVE'),
+       (30, 14, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_21.jfif', '점심) 한우차돌짬뽕라면밥상', '["한정"]', 'ACTIVE')
 ;
 
 -- -- 6. tag 테이블

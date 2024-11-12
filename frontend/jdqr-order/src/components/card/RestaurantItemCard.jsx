@@ -2,11 +2,12 @@ import { Avatar, Box, Chip, Stack, Typography } from "@mui/material"
 import React from "react"
 import { colors } from "../../constants/colors"
 
-const RestaurantItemCard = ({ restaurant, sx }) => {
+const RestaurantItemCard = ({ restaurant, sx, onClick }) => {
   return (
     <Stack
       direction="row"
       spacing={2}
+      onClick={onClick}
       sx={{
         backgroundColor: colors.background.white,
         padding: "10px",

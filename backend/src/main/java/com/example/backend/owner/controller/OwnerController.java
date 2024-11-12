@@ -1,6 +1,8 @@
 package com.example.backend.owner.controller;
 
 import com.example.backend.etc.dto.RestaurantDto;
+import com.example.backend.etc.dto.RestaurantResponse;
+import com.example.backend.etc.dto.RestaurantResponse.RestaurantBusinessDto;
 import com.example.backend.owner.dto.OwnerRequest.OptionRequestDto;
 import com.example.backend.owner.dto.OwnerResponse.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -267,14 +269,13 @@ public class OwnerController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "조회 완료"),
 	})
-	@GetMapping("/restaurant/{restaurantId}")
-	public ResponseEntity<ResponseWithData<RestaurantProfileDto>> getRestaurant(@PathVariable("restaurantId") Integer restaurantId,
-		HttpServletRequest request) {
+	@GetMapping("/restaurant")
+	public ResponseEntity<ResponseWithData<RestaurantProfileDto>> getRestaurant(HttpServletRequest request) {
 
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
-		RestaurantProfileDto restaurant = restaurantService.getRestaurant(restaurantId, userId);
+		RestaurantProfileDto restaurant = restaurantService.getRestaurant(userId);
 
 		ResponseWithData<RestaurantProfileDto> responseWithData = new ResponseWithData<>(
 			HttpStatus.OK.value(), "사업장 조회에 성공하였습니다.", restaurant);
@@ -309,17 +310,16 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "조회 완료"),
 	})
 	@GetMapping("/restaurant/status")
-	public ResponseEntity<ResponseWithData<RestaurantDto>> getBusinessStatus(@RequestParam("restaurantId") @Parameter(description = "식당ID", required = true) Integer restaurantId,
-		HttpServletRequest request){
+	public ResponseEntity<ResponseWithData<RestaurantBusinessDto>> getBusinessStatus(HttpServletRequest request){
 
 		// 유저확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
 		// db에 변경사항 저장
-		RestaurantDto restaurant = restaurantService.getBusinessStatus(restaurantId);
+		RestaurantBusinessDto restaurant = restaurantService.getBusinessStatus(userId);
 
-		ResponseWithData<RestaurantDto> responseWithData = new ResponseWithData<>(
+		ResponseWithData<RestaurantBusinessDto> responseWithData = new ResponseWithData<>(
 			HttpStatus.OK.value(), "사업장 조회에 성공하였습니다.", restaurant);
 
 		return ResponseEntity.status(responseWithData.status())
@@ -331,15 +331,14 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "변경 완료"),
 	})
 	@PutMapping("/restaurant/status")
-	public ResponseEntity<ResponseWithMessage> changeBusinessStatus(@RequestParam("restaurantId") @Parameter(description = "식당ID", required = true) Integer restaurantId,
-		HttpServletRequest request){
+	public ResponseEntity<ResponseWithMessage> changeBusinessStatus(HttpServletRequest request){
 
 		// 유저확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
 		// db에 변경사항 저장
-		restaurantService.updateBusinessStatus(restaurantId);
+		restaurantService.updateBusinessStatus(userId);
 
 		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(),
 			"영업여부가 변경되었습니다.");

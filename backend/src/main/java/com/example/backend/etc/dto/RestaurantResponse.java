@@ -34,4 +34,10 @@ public record RestaurantResponse() {
 		}
 
 	}
+
+	@Schema(name = "식당 영업여부 데이터",description = "식당 영업여부 조회 데이터")
+	public record RestaurantBusinessDto(
+		Boolean open
+	){
+	}
 }

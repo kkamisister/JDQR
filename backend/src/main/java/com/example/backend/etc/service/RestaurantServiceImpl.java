@@ -29,6 +29,7 @@ import com.example.backend.etc.dto.RestaurantCategoryDetail;
 import com.example.backend.etc.dto.RestaurantCategoryDto;
 import com.example.backend.etc.dto.RestaurantDto;
 import com.example.backend.etc.dto.RestaurantProfileDto;
+import com.example.backend.etc.dto.RestaurantResponse;
 import com.example.backend.etc.dto.RestaurantResponse.RestaurantInfo;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.entity.RestaurantCategory;
@@ -138,14 +139,14 @@ public class RestaurantServiceImpl implements RestaurantService {
 	 * @return
 	 */
 	@Override
-	public RestaurantProfileDto getRestaurant(Integer restaurantId, Integer userId) {
+	public RestaurantProfileDto getRestaurant(Integer userId) {
 
 		//1. 점주를 조회한다
-		ownerRepository.findById(userId)
+		Owner owner = ownerRepository.findById(userId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
 
 		//2. 식당을 조회한다
-		Restaurant restaurant = restaurantRepository.findById(restaurantId)
+		Restaurant restaurant = restaurantRepository.findByOwner(owner)
 			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
 
 		//3. 응답을 리턴한다
@@ -425,18 +426,22 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 	/**
 	 * 가맹점의 영업여부를 조회하는 메서드
-	 * @param restaurantId
+	 * @param userId
 	 * @return
 	 */
 	@Override
-	public RestaurantDto getBusinessStatus(Integer restaurantId) {
+	public RestaurantBusinessDto getBusinessStatus(Integer userId) {
+		//0. 점주를 조회한다
+		Owner owner = ownerRepository.findById(userId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
 
 		//1. 식당을 조회한다
-		Restaurant restaurant = restaurantRepository.findById(restaurantId)
+		Restaurant restaurant = restaurantRepository.findByOwner(owner)
 			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
 
-		//3. 응답을 리턴한다
-		RestaurantDto resDto = RestaurantDto.from(restaurant);
+		//2. 응답을 리턴한다
+		RestaurantBusinessDto resDto =
+			new RestaurantBusinessDto(restaurant.getOpen());
 
 		return resDto;
 	}

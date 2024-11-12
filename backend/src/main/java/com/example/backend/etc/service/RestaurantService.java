@@ -12,13 +12,13 @@ import com.example.backend.etc.dto.RestaurantResponse.RestaurantInfo;
 public interface RestaurantService {
 
 	RestaurantInfo getNearRestaurant(double minLat,double maxLat,double minLng,double maxLng,int people,boolean together);
-	RestaurantProfileDto getRestaurant(Integer restaurantId,Integer userId);
+	RestaurantProfileDto getRestaurant(Integer userId);
 	void createRestaurant(RestaurantProfileDto restaurantProfile,Integer userId);
 
 	RestaurantDetailInfo getRestaurantDetail(Integer restaurantId);
 
-	void updateBusinessStatus(Integer restaurantId);
-	RestaurantDto getBusinessStatus(Integer restaurantId);
+	void updateBusinessStatus(Integer userId);
+	RestaurantBusinessDto getBusinessStatus(Integer userId);
 
 	RestaurantInfo searchByKeyword(String keyword,double minLat,double maxLat,double minLng,double maxLng,int people,boolean together);
 

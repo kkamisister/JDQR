@@ -163,7 +163,7 @@ public class OrderServiceImpl implements OrderService {
 		// 3-4. 최종적으로 전송할 데이터
 		List<CartDto> cartList = allCartDatas.values().stream()
 			.flatMap(map -> map.values().stream())
-			// .sorted(Comparator.comparing(CartDto::getOrderedAt).reversed())
+			.sorted(Comparator.comparing(CartDto::getOrderedAt).reversed())
 			.collect(Collectors.toList());
 
 		int totalPrice = 0;

@@ -1,32 +1,24 @@
 import React, { useState } from "react"
 import { colors } from "../../../constants/colors"
-import { Button, Checkbox, Stack, Typography } from "@mui/material"
+import { Checkbox, Stack, Typography } from "@mui/material"
 import PeopleFilterButton from "../../../components/button/PeopleFilterButton"
 
-const PeopleFilter = () => {
+const PeopleFilter = ({ people, setPeople, together, setTogether }) => {
   const [activeIndex, setActiveIndex] = useState(null)
-  const [isChecked, setIsChecked] = useState(false)
 
   const peopleOptions = ["1인", "2인", "4인", "단체"]
 
   const handleButtonClick = (index) => {
-    setActiveIndex((prevIndex) => {
-      const newIndex = prevIndex === index ? null : index
-
-      if (newIndex === null) {
-        setIsChecked(false)
-      } else {
-        setIsChecked(true)
-      }
-      console.log(isChecked)
-      return newIndex
-    })
+    const peopleValues = [1, 2, 4, 5]
+    setPeople(peopleValues[index])
+    setActiveIndex(index)
   }
 
-  const isCheckboxDisabled = activeIndex === null
-
+  const handleCheckboxChange = (e) => {
+    setTogether(e.target.checked)
+  }
   const getFilterMessage = () => {
-    if (isChecked && activeIndex !== null) {
+    if (together && activeIndex !== null) {
       return `${peopleOptions[activeIndex]}석이 남아있는 식당을 보고 있어요`
     }
     return ""
@@ -60,13 +52,15 @@ const PeopleFilter = () => {
         <Typography
           fontSize={15}
           color={
-            isCheckboxDisabled ? colors.background.box : colors.main.primary400
+            activeIndex === null
+              ? colors.background.box
+              : colors.main.primary400
           }
         >
           함께 앉기
         </Typography>
         <Checkbox
-          checked={isChecked}
+          checked={together}
           sx={{
             color: colors.background.box,
             "&.Mui-checked": {
@@ -80,10 +74,10 @@ const PeopleFilter = () => {
               fontSize: 25,
             },
           }}
-          disabled={isCheckboxDisabled}
-          onChange={(e) => setIsChecked(e.target.checked)}
+          disabled={activeIndex === null} // 인원 수가 선택되지 않으면 비활성화
+          onChange={handleCheckboxChange}
         />
-        {isChecked && activeIndex !== null && (
+        {together && activeIndex !== null && (
           <Typography fontSize={14} color={colors.main.primary400}>
             {getFilterMessage()}
           </Typography>

@@ -5,28 +5,47 @@ import { colors } from "../../constants/colors";
 import DishItemCard from "../../components/card/DishItemCard";
 import { useNavigate } from "react-router-dom";
 import NumberSelector from "../../components/selector/NumberSelector";
+import { useSnackbar } from "notistack";
+import { Stomp } from "@stomp/stompjs";
 
 export default function CartList() {
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+  const [dishes, setDishes] = useState([]);
+  const [stompClient, setStompClient] = useState(null);
+
+  useEffect(() => {
+    const client = Stomp.client("wss://jdqr608.duckdns.org/ws");
+    client.connect({}, () => {
+      console.log("STOMP 연결 성공");
+      setStompClient(client);
+
+      // 장바구니 추가 메시지 구독
+      client.subscribe("/sub/cart/updates", (message) => {
+        const newDish = JSON.parse(message.body);
+
+        // 스낵바 알림 표시
+        enqueueSnackbar(`${newDish.dishName}이 장바구니에 추가되었습니다.`, {
+          variant: "success",
+        });
+
+        // 장바구니 데이터 상태에 새로운 아이템 추가
+        setDishes((prevDishes) => [...prevDishes, newDish]);
+      });
+    });
+
+    return () => {
+      if (stompClient) {
+        stompClient.disconnect(() => {
+          console.log("STOMP 연결 종료");
+        });
+      }
+    };
+  }, []);
 
   const onClose = (dishID) => {
     return;
   };
-  const [dishes, setDishes] = useState([]);
-  console.log(dishes);
-  useEffect(() => {
-    // sessionStorage에서 dishes 데이터 가져오기
-    const storedDishes = sessionStorage.getItem("cartList");
-    if (storedDishes) {
-      try {
-        const parsedDishes = JSON.parse(storedDishes);
-        setDishes(Array.isArray(parsedDishes) ? parsedDishes : []);
-      } catch (error) {
-        console.error("JSON 파싱 오류:", error);
-        setDishes([]);
-      }
-    }
-  }, []);
 
   const goToDish = () => {
     navigate("/dish");

@@ -1,16 +1,20 @@
 import React from "react"
 import RestaurantInfo from "./RestaurantInfo"
 import MapListContainer from "../../../components/container/MapListContainer"
+import DishTab from "../../../components/tab/DishTab"
+import RestaurantDetailDishItemCard from "../../../components/card/RestaurantDetailDishItemCard"
 
-const RestaurantDetailBox = () => {
+const RestaurantDetailBox = ({ categories, dishes }) => {
   return (
-    <MapListContainer
-      sx={{
-        backgroundColor: "white",
-        height: "50vh",
-      }}
-    >
+    <MapListContainer>
       <RestaurantInfo />
+      <DishTab dishCategories={categories} />
+
+      {dishes.map((dishCategory) =>
+        dishCategory.items.map((dish) => (
+          <RestaurantDetailDishItemCard key={dish.dishId} dish={dish} />
+        ))
+      )}
     </MapListContainer>
   )
 }

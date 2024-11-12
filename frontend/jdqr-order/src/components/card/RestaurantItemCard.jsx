@@ -2,18 +2,7 @@ import { Avatar, Box, Chip, Stack, Typography } from "@mui/material"
 import React from "react"
 import { colors } from "../../constants/colors"
 
-const RestaurantItemCard = ({
-  restaurantName,
-  restaurantCategories,
-  restaurant,
-  leftSeats,
-  leftTables,
-  open,
-  dishCategories,
-  dishes,
-  children,
-  sx,
-}) => {
+const RestaurantItemCard = ({ restaurant, sx }) => {
   return (
     <Stack
       direction="row"
@@ -25,100 +14,111 @@ const RestaurantItemCard = ({
         alignItems: "center",
         width: "100%",
         height: "80px",
-        alignItems: "center",
-        "&:hover": {
-          backgroundColor: colors.background.box,
-        },
-        transition: "all 0.3s ease", // transition 적용
         cursor: "pointer",
+        "&:hover": {
+          backgroundColor: colors.background.primary,
+        },
+        transition: "all 0.3s ease",
         ...sx,
       }}
     >
-      <Avatar // 1. 식당 이미지
+      <Avatar
+        src={restaurant.image}
+        alt={restaurant.restaurantName || "Restaurant Image"}
         sx={{
           borderRadius: "10px",
           width: 55,
           height: 55,
         }}
       />
-      <Stack // 2. 텍스트영역
+      <Stack
         direction="column"
         spacing={1}
-        sx={{
-          justifyContent: "flex-start",
-        }}
+        sx={{ justifyContent: "flex-start" }}
       >
         <Stack
-          direction="row"
-          spacing={1}
-          sx={{ flex: 1, alignItems: "center" }}
+          sx={{
+            flex: 1,
+            alignItems: "flex-start",
+            maxWidth: "130px",
+            flexDirection: "row",
+            "@media (max-width: 350px)": {
+              flexDirection: "column",
+            },
+          }}
         >
           <Typography
             fontSize={17}
             fontWeight={700}
+            sx={{ whiteSpace: "nowrap" }}
+          >
+            {restaurant.restaurantName}
+          </Typography>
+
+          <Stack
+            direction="row"
+            spacing={0.5}
             sx={{
-              whiteSpace: "nowrap",
+              "@media (max-width: 350px)": {
+                flexWrap: "wrap",
+              },
+              "@media (min-width: 350px)": {
+                paddingLeft: "10px",
+              },
             }}
           >
-            츄라우미
-            {/* {restaurantName} */}
-          </Typography>
-          <Typography
-            fontSize={14}
-            color={colors.text.sub1}
-            sx={{
-              whiteSpace: "nowrap",
-            }}
-          >
-            이자카야
-            {/* {restaurantCategories} */}
-          </Typography>
+            {restaurant.restaurantCategories.minor.map((category) => (
+              <Typography
+                key={category.restaurantCategoryId}
+                fontSize={14}
+                color={colors.text.sub1}
+                sx={{ whiteSpace: "nowrap" }}
+              >
+                {category.restaurantCategoryName}
+              </Typography>
+            ))}
+          </Stack>
         </Stack>
+
         <Stack
           direction="row"
           spacing={1}
           sx={{ flex: 1, alignItems: "center" }}
         >
           <Chip
-            label={open ? "영업중" : "영업종료"}
+            label={restaurant.open ? "영업중" : "영업종료"}
             sx={{
               width: "45px",
               fontSize: "9px",
               height: "22px",
               backgroundColor: colors.background.box,
-              color: open ? colors.point.red : colors.text.sub1,
+              color: restaurant.open ? colors.point.red : colors.text.sub1,
               ".MuiChip-label": {
-                padding: 0, // 내부 레이블의 패딩 제거
+                padding: 0,
               },
             }}
           />
-
           <Typography
             fontSize={12}
             fontWeight={600}
             color={colors.text.sub1}
-            sx={{
-              whiteSpace: "nowrap",
-            }}
+            sx={{ whiteSpace: "nowrap" }}
           >
-            최대 6인 테이블
+            최대 {restaurant.maxPeopleNum}인 테이블
           </Typography>
         </Stack>
       </Stack>
-      <Stack // 3. 좌석, 테이블 현황
+      <Stack
         direction="row"
         spacing={1}
-        sx={{
-          justifyContent: "space-evenly",
-          flex: 1,
-        }}
+        sx={{ justifyContent: "space-evenly", flex: 1 }}
       >
         <Stack
           direction="column"
           spacing={0.5}
           sx={{
             backgroundColor: "#ffffff",
-            padding: "4px, 8px",
+            padding: "4px 0",
             borderRadius: "8px",
             display: "flex",
             alignItems: "center",
@@ -131,9 +131,9 @@ const RestaurantItemCard = ({
           <Typography
             fontSize={15}
             fontWeight={600}
-            color={!open ? colors.main.primary300 : colors.text.main}
+            color={restaurant.open ? colors.main.primary300 : colors.text.main}
           >
-            {open ? { leftSeats } : "16석"}
+            {restaurant.open ? `${restaurant.restSeatNum}석` : "-"}
           </Typography>
           <Typography fontSize={9} color={colors.text.sub1}>
             잔여좌석
@@ -144,7 +144,7 @@ const RestaurantItemCard = ({
           spacing={0.5}
           sx={{
             backgroundColor: "#ffffff",
-            padding: "4px, 8px",
+            padding: "4px 0",
             borderRadius: "8px",
             display: "flex",
             alignItems: "center",
@@ -157,9 +157,9 @@ const RestaurantItemCard = ({
           <Typography
             fontSize={15}
             fontWeight={600}
-            color={!open ? colors.main.primary300 : colors.text.main}
+            color={restaurant.open ? colors.main.primary300 : colors.text.main}
           >
-            {open ? { leftTables } : "5T"}
+            {restaurant.open ? `${restaurant.restTableNum}T` : "-"}
           </Typography>
           <Typography fontSize={9} color={colors.text.sub1}>
             잔여테이블

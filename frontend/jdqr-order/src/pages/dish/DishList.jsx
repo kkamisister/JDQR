@@ -5,60 +5,14 @@ import { Box, Divider, Stack, Typography } from "@mui/material";
 import DishTab from "../../components/tab/DishTab";
 import DishItemCard from "../../components/card/DishItemCard";
 import { colors } from "../../constants/colors";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
-export default function DishList({ dishes }) {
-  const mockDish = {
-    status: 200,
-    message: "메뉴 조회에 성공하였습니다.",
-    data: {
-      dishId: 1,
-      dishName: "핫치킨 피자",
-      price: 12800,
-      description: "불닭볶음면보다 매운 피자🔥",
-      imageUrl: "https://example.com/image1.jpg",
-      options: [
-        {
-          optionId: 1,
-          optionName: "도우 변경",
-          choices: [
-            {
-              choiceId: 1,
-              choiceName: "치즈 추가",
-              price: 2000,
-            },
-            {
-              choiceId: 2,
-              choiceName: "고구마 무스 추가",
-              price: 2000,
-            },
-            {
-              choiceId: 3,
-              choiceName: "치즈 크러스트로 변경",
-              price: 4000,
-            },
-            {
-              choiceId: 4,
-              choiceName: "골드 크러스트로 변경",
-              price: 5000,
-            },
-          ],
-        },
-      ],
-      tags: ["인기"],
-    },
-  };
-
-  const categories = [
-    "인기 메뉴",
-    "아이거진짜좋은메뉴인데얼마나좋냐면",
-    "피자",
-    "파스타",
-    "리조또",
-    "사이드",
-    "음료/주류",
-  ];
+export default function DishList({ dishes, categories }) {
+  const navigate = useNavigate();
 
   const handleCategoryClick = (category) => {
+    // console.log("카테고리는 말이죵", category);
     scroller.scrollTo(category, {
       duration: 800,
       delay: 0,
@@ -67,29 +21,8 @@ export default function DishList({ dishes }) {
     });
   };
 
-  // 아이템을 세션 스토리지에 저장하고 리다이렉트하는 함수
-  const handleDishClick = (dish) => {
-    const cartItem = {
-      dishId: dish.dishId,
-      userId: "d8ba9920-08f6-4f65-b7df-811ae20e70d1", // 고정된 유저 ID
-      dishName: dish.dishName,
-      dishCategoryId: 1, // 카테고리 ID 예시 (실제 값으로 수정 필요)
-      dishCategoryName: dish.categoryName, // 카테고리 이름
-      optionIds: dish.options?.map((option) => option.optionId) || [], // 옵션 ID 목록
-      price: dish.price,
-      quantity: 1,
-      orderedAt: null,
-    };
-
-    // 기존 장바구니 아이템 가져오기
-    const existingCart = JSON.parse(sessionStorage.getItem("cartList")) || [];
-    // 새로운 아이템 추가
-    const updatedCart = [...existingCart, cartItem];
-    // 세션 스토리지에 저장
-    sessionStorage.setItem("cartList", JSON.stringify(updatedCart));
-
-    // /cart로 리다이렉트
-    window.location.href = "/cart";
+  const handleDishClick = (dishId) => {
+    navigate(`${dishId}`);
   };
 
   return (
@@ -102,6 +35,7 @@ export default function DishList({ dishes }) {
     >
       <DishSearchBar />
       <DishTab dishCategories={categories} onTabClick={handleCategoryClick} />
+
       <Box
         id="scrollable-dish-list"
         sx={{
@@ -117,8 +51,11 @@ export default function DishList({ dishes }) {
           scrollbarWidth: "none",
         }}
       >
-        {dishes.map((dishCategory, index) => (
-          <Element name={dishCategory.categoryName} key={index}>
+        {dishes.map((category, index) => (
+          <Element
+            name={category.dishCategoryName}
+            key={category.dishCategoryId}
+          >
             <Stack
               sx={{
                 bgcolor: colors.background.white,
@@ -133,15 +70,15 @@ export default function DishList({ dishes }) {
                   p: "10px",
                 }}
               >
-                {dishCategory.categoryName}
+                {category.dishCategoryName}
               </Typography>
-              {dishCategory.items.map((dish, dishIndex) => (
+              {category.items.map((dish, dishIndex) => (
                 <Box key={dish.dishId}>
                   <DishItemCard
                     dish={dish}
-                    onClick={() => handleDishClick(dish)}
+                    onClick={() => handleDishClick(dish.dishId)}
                   />
-                  {dishIndex < dishCategory.items.length - 1 && (
+                  {dishIndex < category.items.length - 1 && (
                     <Divider variant="middle" />
                   )}
                 </Box>

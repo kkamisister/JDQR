@@ -13,7 +13,7 @@ export default function CartList() {
   const { enqueueSnackbar } = useSnackbar();
   const [dishes, setDishes] = useState([]);
   const { client, connect } = useWebSocketStore();
-  const tableId = localStorage.getItem("tableId");
+  const tableId = sessionStorage.getItem("tableId");
 
   useEffect(() => {
     if (!client) {

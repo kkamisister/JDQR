@@ -7,21 +7,39 @@ import DishOptions from "./DishOptions";
 import { fetchDishDetail } from "../../../utils/apis/dish";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "../../../components/Spinner/LoadingSpinner";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import NumberSelector from "../../../components/selector/NumberSelector";
 import BaseButton from "../../../components/button/BaseButton";
+import { Stomp } from "@stomp/stompjs";
 
 export default function DishDetailPage() {
   const { dishId } = useParams();
   const parsedDishId = Number(dishId);
   const [selectedOptions, setSelectedOptions] = useState({});
   const [quantity, setQuantity] = useState(1);
+  const [stompClient, setStompClient] = useState(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["dishDetail", parsedDishId],
     queryFn: () => fetchDishDetail(parsedDishId),
     enabled: !isNaN(parsedDishId),
   });
+
+  useEffect(() => {
+    const client = Stomp.client("wss://jdqr608.duckdns.org/ws");
+    client.connect({}, () => {
+      console.log("STOMP 연결 성공");
+      setStompClient(client);
+    });
+
+    return () => {
+      if (stompClient) {
+        stompClient.disconnect(() => {
+          console.log("STOMP 연결 종료");
+        });
+      }
+    };
+  }, []);
 
   const handleOptionChange = (optionId, choiceId) => {
     setSelectedOptions((prev) => ({
@@ -47,6 +65,26 @@ export default function DishDetailPage() {
     const basePrice = data.price || 0;
     return (basePrice + selectedOptionsTotalPrice) * quantity;
   }, [data.price, selectedOptionsTotalPrice, quantity]);
+
+  const handleAddToCart = () => {
+    if (stompClient && stompClient.connected) {
+      const postData = {
+        userId: "yourUserId", // 필요시 유저 ID 하드코딩
+        dishId: parsedDishId,
+        dishName: data.dishName,
+        dishCategoryId: data.dishCategoryId,
+        dishCategoryName: data.dishCategoryName,
+        choiceIds: Object.values(selectedOptions),
+        price: data.price,
+        quantity: quantity,
+      };
+
+      stompClient.send("/pub/cart/add", {}, JSON.stringify(postData));
+      console.log(`${data.dishName} 장바구니에 담기 요청 전송`);
+    } else {
+      console.error("STOMP 클라이언트가 연결되지 않았습니다.");
+    }
+  };
 
   return (
     <>
@@ -173,7 +211,7 @@ export default function DishDetailPage() {
                 개
               </Stack>
             </Box>
-            <BaseButton count={quantity} onClick={() => console.log("잘됨")}>
+            <BaseButton count={quantity} onClick={handleAddToCart}>
               {totalSum.toLocaleString()}원 장바구니 담기
             </BaseButton>
           </>

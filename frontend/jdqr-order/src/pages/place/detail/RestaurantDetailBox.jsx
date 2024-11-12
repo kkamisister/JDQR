@@ -4,10 +4,10 @@ import MapListContainer from "../../../components/container/MapListContainer"
 import DishTab from "../../../components/tab/DishTab"
 import RestaurantDetailDishItemCard from "../../../components/card/RestaurantDetailDishItemCard"
 
-const RestaurantDetailBox = ({ categories, dishes }) => {
+const RestaurantDetailBox = ({ categories, dishes, restaurant }) => {
   return (
     <MapListContainer>
-      <RestaurantInfo />
+      <RestaurantInfo restaurant={restaurant} />
       <DishTab dishCategories={categories} />
 
       {dishes.map((dishCategory) =>

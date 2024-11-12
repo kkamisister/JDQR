@@ -4,6 +4,7 @@ import RestaurantItemCard from "../../../components/card/RestaurantItemCard"
 import PeopleFilter from "./PeopleFilter"
 import { colors } from "../../../constants/colors"
 import MapListContainer from "../../../components/container/MapListContainer"
+import { useNavigate } from "react-router-dom"
 
 const RestaurantListBox = ({
   restaurants,
@@ -12,6 +13,12 @@ const RestaurantListBox = ({
   together,
   setTogether,
 }) => {
+  const navigate = useNavigate()
+
+  const handleCardClick = (id) => {
+    navigate(`${id}`)
+  }
+
   return (
     <MapListContainer
       spacing={3}
@@ -63,7 +70,11 @@ const RestaurantListBox = ({
       >
         {restaurants.length > 0 ? (
           restaurants.map((restaurant, index) => (
-            <RestaurantItemCard key={index} restaurant={restaurant} />
+            <RestaurantItemCard
+              key={index}
+              restaurant={restaurant}
+              onClick={() => handleCardClick(restaurant.id)}
+            />
           ))
         ) : (
           <Box

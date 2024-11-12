@@ -6,47 +6,58 @@ import DishItemCard from "../../components/card/DishItemCard";
 import { useNavigate } from "react-router-dom";
 import NumberSelector from "../../components/selector/NumberSelector";
 import { useSnackbar } from "notistack";
-import { Stomp } from "@stomp/stompjs";
+import useWebSocketStore from "../../stores/SocketStore";
 
 export default function CartList() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [dishes, setDishes] = useState([]);
-  const [stompClient, setStompClient] = useState(null);
+  const { client, connect } = useWebSocketStore();
+  const tableId = localStorage.getItem("tableId");
 
   useEffect(() => {
-    const client = Stomp.client("wss://jdqr608.duckdns.org/ws");
-    client.connect({}, () => {
-      console.log("STOMP 연결 성공");
-      setStompClient(client);
+    if (!client) {
+      connect();
+    }
+  }, [client, connect]);
+  useEffect(() => {
+    console.log("현재 상품", dishes);
+  }, [dishes]);
+  useEffect(() => {
+    if (client && client.connected) {
+      console.log(
+        "아~~웹소켓 연결은 제대로 됐다니까?/sub/cart/updates 한번..가볼게"
+      );
+      const subscription = client.subscribe(
+        "/sub/cart/" + tableId,
+        (message) => {
+          console.log("받은메세지:", message.body);
+          const data = JSON.parse(message.body);
 
-      // 장바구니 추가 메시지 구독
-      client.subscribe("/sub/cart/updates", (message) => {
-        const newDish = JSON.parse(message.body);
+          setDishes(data.cartList);
 
-        // 스낵바 알림 표시
-        enqueueSnackbar(`${newDish.dishName}이 장바구니에 추가되었습니다.`, {
-          variant: "success",
-        });
+          enqueueSnackbar(`${"아이템"}이 장바구니에 추가되었습니다.`, {
+            variant: "success",
+          });
+        }
+      );
 
-        // 장바구니 데이터 상태에 새로운 아이템 추가
-        setDishes((prevDishes) => [...prevDishes, newDish]);
-      });
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [client, enqueueSnackbar]);
+
+  const onClose = (dishId) => {
+    setDishes((prevDishes) => {
+      const updatedDishes = prevDishes.filter((_, index) => index !== dishId);
+      return updatedDishes;
     });
 
-    return () => {
-      if (stompClient) {
-        stompClient.disconnect(() => {
-          console.log("STOMP 연결 종료");
-        });
-      }
-    };
-  }, []);
-
-  const onClose = (dishID) => {
-    return;
+    enqueueSnackbar(`메뉴가 장바구니에서 삭제되었습니다.`, {
+      variant: "error",
+    });
   };
-
   const goToDish = () => {
     navigate("/dish");
   };

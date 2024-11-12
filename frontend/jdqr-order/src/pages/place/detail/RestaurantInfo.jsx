@@ -2,7 +2,7 @@ import React from "react"
 import { Stack, Avatar, Typography, Chip } from "@mui/material"
 import { colors } from "../../../constants/colors"
 
-const RestaurantInfo = ({ open }) => {
+const RestaurantInfo = ({ restaurant, open }) => {
   return (
     <Stack
       direction="row"
@@ -17,6 +17,8 @@ const RestaurantInfo = ({ open }) => {
       }}
     >
       <Avatar // 1. 식당 이미지
+        src={restaurant.image}
+        alt={restaurant.restaurantName || "Restaurant Image"}
         sx={{
           borderRadius: "10px",
           width: 78,
@@ -41,7 +43,7 @@ const RestaurantInfo = ({ open }) => {
               whiteSpace: "nowrap",
             }}
           >
-            츄라우미
+            {restaurant.restaurantName}
           </Typography>
           <Typography
             fontSize={17}
@@ -50,7 +52,7 @@ const RestaurantInfo = ({ open }) => {
               whiteSpace: "nowrap",
             }}
           >
-            이자카야
+            {restaurant.restaurantCategories.major[0].restaurantCategoryName}
           </Typography>
         </Stack>
         <Stack
@@ -59,28 +61,28 @@ const RestaurantInfo = ({ open }) => {
           sx={{ flex: 1, alignItems: "center" }}
         >
           <Chip
-            label={"16석"}
+            label={`${restaurant.restSeatNum}석`}
             sx={{
               width: "55px",
               height: "30px",
               fontSize: "15px",
               borderRadius: "10px",
               backgroundColor: colors.background.box,
-              color: open ? colors.point.red : colors.text.sub1,
+              color: restaurant.open ? colors.point.red : colors.text.sub1,
               ".MuiChip-label": {
                 padding: 0,
               },
             }}
           />
           <Chip
-            label={"5T"}
+            label={`${restaurant.restTableNum}T`}
             sx={{
               width: "55px",
               height: "30px",
               fontSize: "15px",
               borderRadius: "10px",
               backgroundColor: colors.background.box,
-              color: open ? colors.point.red : colors.text.sub1,
+              color: restaurant.open ? colors.point.red : colors.text.sub1,
               ".MuiChip-label": {
                 padding: 0,
               },
@@ -94,7 +96,7 @@ const RestaurantInfo = ({ open }) => {
               whiteSpace: "nowrap",
             }}
           >
-            최대 6인 테이블
+            최대 {restaurant.maxPeopleNum}인 테이블
           </Typography>
         </Stack>
       </Stack>

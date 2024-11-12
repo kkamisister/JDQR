@@ -13,7 +13,7 @@ const useWebSocketStore = create((set) => ({
     console.log("이게토큰", token);
     client.connect(
       {
-        Authorization: token,
+        Authorization: `Bearer ${token}`,
       },
       () => {
         console.log("STOMP 연결 성공");

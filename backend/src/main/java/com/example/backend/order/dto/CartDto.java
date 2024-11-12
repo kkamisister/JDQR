@@ -26,6 +26,7 @@ public class CartDto {
 	private Integer dishCategoryId;
 	private String dishCategoryName;
 	private List<Integer> choiceIds;
+	private int price; // 기존 가격 + choice 가격을 합친 price
 	private int quantity;
 	private LocalDateTime orderedAt;
 

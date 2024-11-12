@@ -1,14 +1,14 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import RestaurantDetailPage from "./pages/place/detail/RestaurantDetailPage";
-import DishPage from "./pages/dish/DishPage";
-import CartPage from "./pages/cart/CartPage";
-import PaymentPage from "./pages/payment/PaymentPage";
-import { SnackbarProvider } from "notistack";
-import HomePage from "./pages/place/main/HomePage";
-import DishDetailPage from "./pages/dish/detail/DishDetailPage";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import RestaurantDetailPage from "./pages/place/detail/RestaurantDetailPage"
+import DishPage from "./pages/dish/DishPage"
+import CartPage from "./pages/cart/CartPage"
+import PaymentPage from "./pages/payment/PaymentPage"
+import { SnackbarProvider } from "notistack"
+import HomePage from "./pages/place/main/HomePage"
+import DishDetailPage from "./pages/dish/detail/DishDetailPage"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
           <Routes>
             <Route path="/place" element={<HomePage />} />
             <Route
-              path="/restaurant/detail/:restaurantId"
+              path="/place/:restaurantId"
               element={<RestaurantDetailPage />}
             />
             <Route path="/dish" element={<DishPage />} />
@@ -29,7 +29,7 @@ function App() {
         </BrowserRouter>
       </QueryClientProvider>
     </SnackbarProvider>
-  );
+  )
 }
 
-export default App;
+export default App

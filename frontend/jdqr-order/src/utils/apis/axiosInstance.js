@@ -17,7 +17,7 @@ const getCookieValue = (name) => {
 
 // tableToken을 확인하고 없으면 extractTableInfo 호출
 const initializeToken = async () => {
-  const token = localStorage.getItem("tableToken");
+  const token = sessionStorage.getItem("tableToken");
   if (token) {
     console.log("로컬 스토리지에서 토큰을 가져왔습니다.");
   } else {
@@ -33,14 +33,14 @@ const extractTableInfo = async () => {
     const tableId = params.get("tableId");
     const token = params.get("token");
     if (tableId && token) {
-      localStorage.setItem("tableId", tableId);
-      localStorage.setItem("tableToken", token);
+      sessionStorage.setItem("tableId", tableId);
+      sessionStorage.setItem("tableToken", token);
       console.log("tableId와 token이 성공적으로 저장되었습니다.");
 
       await setUserCookie();
     } else {
-      localStorage.setItem("tableId", "6721aa9b0d22a923091eef73");
-      localStorage.setItem("tableToken", "dummyTableToken");
+      sessionStorage.setItem("tableId", "6721aa9b0d22a923091eef73");
+      sessionStorage.setItem("tableToken", "dummyTableToken");
       console.log("일단 dummy토큰을 저장했음.");
 
       await setUserCookie();
@@ -52,7 +52,7 @@ const extractTableInfo = async () => {
 
 // 쿠키 발급 함수
 const setUserCookie = async () => {
-  const token = localStorage.getItem("tableToken");
+  const token = sessionStorage.getItem("tableToken");
 
   if (!token) {
     console.error("토큰이 존재하지 않아 쿠키 발급 요청을 할 수 없습니다.");
@@ -82,7 +82,7 @@ const setUserCookie = async () => {
 // 요청 시 Authorization 헤더에 token을 자동으로 추가
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("tableToken");
+    const token = sessionStorage.getItem("tableToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     } else {

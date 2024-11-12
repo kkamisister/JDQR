@@ -10,11 +10,17 @@ import TableSettingGridBox from './table/TableSettingGridBox';
 import TableGridBox from './table/TableGridBox';
 import TableEditBox from './table/edit/TableEditBox';
 import QRCodeSettingDialog from './qr/QRCodeSettingDialog';
-import { useQuery } from '@tanstack/react-query';
-import { fetchTableList } from 'utils/apis/table';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+	fetchTableList,
+	removeTable,
+	addTable,
+	editTable,
+} from 'utils/apis/table';
 const SampleTableRequestData = tableData;
 
 const TablePage = () => {
+	const queryClient = useQueryClient();
 	const { isPending, data } = useQuery({
 		queryKey: ['tableList'], // keyword를 queryKey에 포함하여 키워드가 변경되면 새로운 요청 실행
 		queryFn: () => fetchTableList(),
@@ -28,16 +34,16 @@ const TablePage = () => {
 	Object.freeze(rightMenuPreset);
 	const [selectedTable, setSelectedTable] = useState(null);
 	const handleTableClick = table => {
-		setrightMenu(rightMenuPreset.ORDER);
+		setRightMenu(rightMenuPreset.ORDER);
 		setSelectedTable(table);
 	};
 	const [tableViewChecked, setTableViewChecked] = useState(false);
-
+	const [newTableInfo, setNewTableInfo] = useState({});
 	const handleTableViewCheckedChange = event => {
 		setTableViewChecked(event.target.checked);
 	};
 
-	const [rightMenu, setrightMenu] = useState('order');
+	const [rightMenu, setRightMenu] = useState('order');
 
 	const [open, setOpen] = useState(false);
 
@@ -49,8 +55,14 @@ const TablePage = () => {
 		setOpen(false);
 	};
 
-	const addNewTable = () => {};
-	const editCurrentTable = () => {};
+	const addNewTable = async () => {
+		await addTable(newTableInfo);
+		queryClient.invalidateQueries('tableList');
+	};
+	const editCurrentTable = async () => {
+		await editTable(newTableInfo);
+		queryClient.invalidateQueries('tableList');
+	};
 	return data ? (
 		<Stack
 			direction="column"
@@ -66,21 +78,21 @@ const TablePage = () => {
 					direction="row"
 					sx={{ justifyContent: 'center', alignItems: 'center' }}>
 					<PageTitleBox title="주문 상태" />
-					<Typography sx={{ fontSize: '25px', fontWeight: '600' }}>
+					{/* <Typography sx={{ fontSize: '25px', fontWeight: '600' }}>
 						{'테이블로 보기'}
 					</Typography>
 					<Switch
 						checked={tableViewChecked}
 						onChange={handleTableViewCheckedChange}
 						sx={{ transform: 'scale(1.5)' }}
-					/>
+					/> */}
 				</Stack>
 				<FlatButton
 					text="테이블 추가"
 					fontColor={colors.main.primary700}
 					color={colors.main.primary100}
 					onClick={() => {
-						setrightMenu(rightMenuPreset.ADD);
+						setRightMenu(rightMenuPreset.ADD);
 					}}
 					sx={{ marginLeft: 'auto' }} // 오른쪽으로 치우침
 				/>
@@ -128,10 +140,14 @@ const TablePage = () => {
 						<OrderDetailBox table={selectedTable} />
 					)}
 					{rightMenu === rightMenuPreset.ADD && (
-						<TableEditBox isEdit={false} />
+						<TableEditBox isEdit={false} setTable={setNewTableInfo} />
 					)}
 					{rightMenu === rightMenuPreset.EDIT && selectedTable && (
-						<TableEditBox table={selectedTable} isEdit={true} />
+						<TableEditBox
+							table={selectedTable}
+							setTable={setNewTableInfo}
+							isEdit={true}
+						/>
 					)}
 					<Stack spacing={1}>
 						{selectedTable && (
@@ -168,7 +184,7 @@ const TablePage = () => {
 								text="테이블 수정"
 								color={colors.point.red}
 								onClick={() => {
-									setrightMenu(rightMenuPreset.EDIT);
+									setRightMenu(rightMenuPreset.EDIT);
 								}}
 							/>
 						)}

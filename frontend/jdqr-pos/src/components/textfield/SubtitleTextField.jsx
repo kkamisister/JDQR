@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, TextField } from '@mui/material';
 import { colors } from 'constants/colors';
-const SubtitleTextField = ({ title, placeholder }) => {
+const SubtitleTextField = ({ title, value, setValue }) => {
 	return (
 		<Box sx={{ width: '100%' }}>
 			<Typography
@@ -12,7 +12,10 @@ const SubtitleTextField = ({ title, placeholder }) => {
 			<TextField
 				sx={{ width: '100%' }}
 				size="small"
-				placeholder={placeholder}
+				value={value}
+				onChange={e => {
+					setValue(e.target.value);
+				}}
 			/>
 		</Box>
 	);

@@ -40,7 +40,7 @@ export const removeTable = async ({ tableId }) => {
  * @returns {Promise} - API 문서 참조
  */
 export const editTable = async ({ tableId, name, color, people }) => {
-	return axiosInstance.put(`/onwer/table`, {
+	return axiosInstance.put(`/owner/table`, {
 		tableId,
 		name,
 		color,
@@ -72,6 +72,6 @@ export const fetchTableList = async () => {
  * @returns {Promise} - API 문서 참조
  */
 export const fetchTableDetail = async ({ tableId }) => {
-	const response = await axiosInstance.get(`/onwer/table?tableId=${tableId}`);
+	const response = await axiosInstance.get(`/owner/table?tableId=${tableId}`);
 	return response.data.data;
 };

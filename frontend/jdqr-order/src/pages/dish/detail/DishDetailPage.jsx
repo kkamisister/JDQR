@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Stack, Typography, Box, Divider } from "@mui/material";
 import MapBackButtonHeader from "../../../components/header/MapBackButtonHeader";
 import { colors } from "../../../constants/colors";
@@ -11,13 +11,15 @@ import { useState, useMemo, useEffect } from "react";
 import NumberSelector from "../../../components/selector/NumberSelector";
 import BaseButton from "../../../components/button/BaseButton";
 import { Stomp } from "@stomp/stompjs";
+import { setUserCookie } from "../../../utils/apis/axiosInstance";
+import useWebSocketStore from "../../../stores/SocketStore";
 
 export default function DishDetailPage() {
+  const navigate = useNavigate();
   const { dishId } = useParams();
   const parsedDishId = Number(dishId);
   const [selectedOptions, setSelectedOptions] = useState({});
   const [quantity, setQuantity] = useState(1);
-  const [stompClient, setStompClient] = useState(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["dishDetail", parsedDishId],
@@ -25,27 +27,30 @@ export default function DishDetailPage() {
     enabled: !isNaN(parsedDishId),
   });
 
-  useEffect(() => {
-    const client = Stomp.client("wss://jdqr608.duckdns.org/ws");
-    client.connect({}, () => {
-      console.log("STOMP 연결 성공");
-      setStompClient(client);
-    });
+  const { client, connect } = useWebSocketStore();
 
-    return () => {
-      if (stompClient) {
-        stompClient.disconnect(() => {
-          console.log("STOMP 연결 종료");
-        });
-      }
-    };
-  }, []);
+  useEffect(() => {
+    if (!sessionStorage.getItem("userId")) {
+      setUserCookie();
+    }
+    if (!client) {
+      connect();
+    }
+  }, [client, connect]);
 
   const handleOptionChange = (optionId, choiceId) => {
-    setSelectedOptions((prev) => ({
-      ...prev,
-      [optionId]: choiceId,
-    }));
+    setSelectedOptions((prev) => {
+      if (prev[optionId] === choiceId) {
+        const updatedOptions = { ...prev };
+        delete updatedOptions[optionId];
+        return updatedOptions;
+      }
+
+      return {
+        ...prev,
+        [optionId]: choiceId,
+      };
+    });
   };
 
   const handleQuantityChange = (newQuantity) => {
@@ -53,34 +58,43 @@ export default function DishDetailPage() {
   };
 
   const selectedOptionsTotalPrice = useMemo(() => {
+    // data와 data.options가 없으면 0 반환
+    if (!data || !data.options) return 0;
+
     return Object.values(selectedOptions).reduce((sum, choiceId) => {
       const choice = data.options
-        ?.flatMap((option) => option.choices)
+        .flatMap((option) => option.choices)
         .find((c) => c.choiceId === choiceId);
       return sum + (choice ? choice.price : 0);
     }, 0);
-  }, [selectedOptions, data.options]);
+  }, [selectedOptions, data]);
 
   const totalSum = useMemo(() => {
+    if (!data) return 0; // data가 없으면 0 반환
     const basePrice = data.price || 0;
+
+    // data.options가 없는 경우 빈 배열로 처리
+    const options = data.options || [];
+
+    if (options.length === 0) {
+      return basePrice * quantity;
+    }
+
     return (basePrice + selectedOptionsTotalPrice) * quantity;
-  }, [data.price, selectedOptionsTotalPrice, quantity]);
+  }, [data, selectedOptionsTotalPrice, quantity]);
 
   const handleAddToCart = () => {
-    if (stompClient && stompClient.connected) {
+    if (client && client.connected) {
       const postData = {
-        userId: "yourUserId", // 필요시 유저 ID 하드코딩
+        userId: sessionStorage.getItem("userId"),
         dishId: parsedDishId,
-        dishName: data.dishName,
-        dishCategoryId: data.dishCategoryId,
-        dishCategoryName: data.dishCategoryName,
         choiceIds: Object.values(selectedOptions),
         price: data.price,
-        quantity: quantity,
+        quantity,
       };
-
-      stompClient.send("/pub/cart/add", {}, JSON.stringify(postData));
+      client.send("/pub/cart/add", {}, JSON.stringify(postData));
       console.log(`${data.dishName} 장바구니에 담기 요청 전송`);
+      navigate("/cart");
     } else {
       console.error("STOMP 클라이언트가 연결되지 않았습니다.");
     }
@@ -91,7 +105,8 @@ export default function DishDetailPage() {
       {isLoading ? (
         <LoadingSpinner message={"메뉴 정보 가져오는 중"} />
       ) : (
-        !isError && (
+        !isError &&
+        data && (
           <>
             {/* 이미지 && 뒤로가기 버튼 */}
             <Stack>
@@ -119,9 +134,10 @@ export default function DishDetailPage() {
                   {data.dishName}
                 </Typography>
                 <>
-                  {data.tags.map((tag, index) => (
-                    <DishTagChip label={tag} key={index} />
-                  ))}
+                  {data.tags?.length > 0 &&
+                    data.tags.map((tag, index) => (
+                      <DishTagChip label={tag} key={index} />
+                    ))}
                 </>
               </Stack>
 

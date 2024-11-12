@@ -1,5 +1,3 @@
-// axiosInstance.js
-
 import axios from "axios";
 
 const axiosInstance = axios.create({
@@ -15,12 +13,12 @@ const initializeToken = async () => {
     console.log("로컬 스토리지에서 토큰을 가져왔습니다.");
   } else {
     console.log("토큰이 없어 extractTableInfo를 호출합니다.");
-    await axiosInstance.extractTableInfo();
+    await extractTableInfo();
   }
 };
 
 // tableId와 token을 URL에서 추출하여 저장
-axiosInstance.extractTableInfo = async () => {
+const extractTableInfo = async () => {
   try {
     const params = new URLSearchParams(window.location.search);
     const tableId = params.get("tableId");
@@ -30,37 +28,21 @@ axiosInstance.extractTableInfo = async () => {
       localStorage.setItem("tableToken", token);
       console.log("tableId와 token이 성공적으로 저장되었습니다.");
 
-      await axiosInstance.setUserCookie();
+      await setUserCookie();
     } else {
       localStorage.setItem("tableId", "6721aa9b0d22a923091eef73");
       localStorage.setItem("tableToken", "dummyTableToken");
-      console.log("일단 dummy토큰 넣었음");
+      console.log("일단 dummy토큰을 저장했음.");
 
-      await axiosInstance.setUserCookie();
+      await setUserCookie();
     }
   } catch (error) {
     console.log(error);
   }
 };
 
-// 요청 시 Authorization 헤더에 token을 자동으로 추가
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("tableToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      console.warn("토큰이 없어 Authorization 헤더에 추가할 수 없습니다.");
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
 // 쿠키 발급 함수
-axiosInstance.setUserCookie = async () => {
+const setUserCookie = async () => {
   const token = localStorage.getItem("tableToken");
 
   if (!token) {
@@ -80,7 +62,24 @@ axiosInstance.setUserCookie = async () => {
   }
 };
 
-// 초기화 함수 호출
+// 요청 시 Authorization 헤더에 token을 자동으로 추가
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("tableToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      console.warn("토큰이 없어 Authorization 헤더에 추가할 수 없습니다.");
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// 모듈이 로드될 때 initializeToken 함수를 자동으로 실행
 initializeToken();
 
 export default axiosInstance;
+export { initializeToken, extractTableInfo, setUserCookie };

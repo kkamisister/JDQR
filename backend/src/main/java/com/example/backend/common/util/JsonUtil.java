@@ -3,6 +3,7 @@ package com.example.backend.common.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +24,8 @@ public class JsonUtil {
       mapper = new ObjectMapper();
       mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.registerModule(new JavaTimeModule());  // Java 8 날짜 및 시간 지원
+
     }
     return mapper;
   }

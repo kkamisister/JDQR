@@ -85,7 +85,8 @@ export default function DishDetailPage() {
 
   const handleAddToCart = () => {
     if (client && client.connected) {
-      const orderedAt = new Date().toISOString();
+      const orderedAt = new Date().getTime();
+
       console.log("주문시각은요.", orderedAt);
 
       const postData = {

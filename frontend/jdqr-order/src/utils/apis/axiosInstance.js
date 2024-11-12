@@ -51,6 +51,7 @@ const extractTableInfo = async () => {
 };
 
 // 쿠키 발급 함수
+// 쿠키 발급 함수
 const setUserCookie = async () => {
   const token = sessionStorage.getItem("tableToken");
 
@@ -62,17 +63,16 @@ const setUserCookie = async () => {
   try {
     let userId = sessionStorage.getItem("userId");
 
-    if (!userId) {
+    if (!userId || userId === "undefined") {
       const response = await axiosInstance.get(
         "https://jdqr608.duckdns.org/api/v1/order/cart/cookie"
       );
 
       userId = getCookieValue("JDQR-order-user-id");
       sessionStorage.setItem("userId", userId);
+    } else {
+      console.log("userId:", userId);
     }
-
-    // 이후 userId가 sessionStorage에 존재하면 정상적으로 진행됨
-    console.log("userId:", userId);
   } catch (error) {
     console.error("쿠키 발급 오류:", error);
     throw new Error("쿠키 발급 중 오류가 발생했습니다.");
@@ -97,6 +97,6 @@ axiosInstance.interceptors.request.use(
 
 // 모듈이 로드될 때 initializeToken 함수를 자동으로 실행
 initializeToken();
-
+setUserCookie();
 export default axiosInstance;
 export { initializeToken, extractTableInfo, setUserCookie };

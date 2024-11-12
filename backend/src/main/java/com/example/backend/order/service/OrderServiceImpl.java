@@ -3,6 +3,7 @@ package com.example.backend.order.service;
 import static com.example.backend.order.dto.CartResponse.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -109,6 +110,7 @@ public class OrderServiceImpl implements OrderService {
 	// @RedLock(key = "'table:' + #tableId", waitTime = 5000L,leaseTime = 1000L)
 	public void addItem(String tableId,CartDto productInfo) {
 
+		log.warn("productInfo : {}",productInfo);
 		// 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
 		dishRepository.findById(productInfo.getDishId())
 			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
@@ -161,6 +163,7 @@ public class OrderServiceImpl implements OrderService {
 		// 3-4. 최종적으로 전송할 데이터
 		List<CartDto> cartList = allCartDatas.values().stream()
 			.flatMap(map -> map.values().stream())
+			.sorted(Comparator.comparing(CartDto::getOrderedAt).reversed())
 			.collect(Collectors.toList());
 
 		int totalPrice = 0;

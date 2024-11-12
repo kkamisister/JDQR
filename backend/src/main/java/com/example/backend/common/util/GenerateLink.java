@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GenerateLink {
 
-	public static final String AUTH_PREFIX = "http://localhost:8080/api/v1/order/auth";
+	public static final String AUTH_PREFIX = "https://jdqr608.duckdns.org/api/v1/order/auth";
 	//20분
 	private final long TOKEN_VALIDITY_SECONDS = 1000 * 60 * 20L;
 

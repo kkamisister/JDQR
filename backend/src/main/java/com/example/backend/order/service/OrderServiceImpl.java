@@ -192,6 +192,7 @@ public class OrderServiceImpl implements OrderService {
 		productInfo.setPrice(price);
 		productInfo.setDishName(dish.getName());
 		productInfo.setDishCategoryName(dish.getDishCategory().getName());
+		productInfo.setDishCategoryId(dish.getDishCategory().getId());
 	}
 
 	/**

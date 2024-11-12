@@ -1,4 +1,5 @@
-use product;
+use
+product;
 
 -- 1. owners 테이블
 INSERT INTO `owners` (`id`, `created_at`, `updated_at`, `code`, `email`, `name`, `status`)
@@ -20,9 +21,12 @@ VALUES (1, 37.7749, -122.4194, b'1', 1, NOW(), NOW(), '123 Main St, San Francisc
         'Tasty Restaurant', '555-1234', '123456789', 'ACTIVE'),
        -- 진짜 데이터
        -- 진대감 역삼점
-       (11, 37.5027474950576, 127.03720072319, b'1', 11, NOW(), NOW(), '서울 강남구 봉은사로30길 75', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_11_0.jfif', 'Food', '진대감 역삼점',
+       (11, 37.5027474950576, 127.03720072319, b'1', 11, NOW(), NOW(), '서울 강남구 봉은사로30길 75',
+        'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_11_0.jfif', 'Food', '진대감 역삼점',
         '02-552-2472', '261-81-00884', 'ACTIVE'),
-       (12, 37.5010235882489, 127.034572307912, b'1', 12, NOW(), NOW(), '서울 강남구 강남대로94길 91', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_12.jfif', 'Food', '공차 역삼점',
+--     공차 역삼점
+       (12, 37.5010235882489, 127.034572307912, b'1', 12, NOW(), NOW(), '서울 강남구 강남대로94길 91',
+        'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_12.jfif', 'Food', '공차 역삼점',
         '02-779-7758', '214-88-84534', 'ACTIVE')
 ;
 
@@ -62,22 +66,25 @@ VALUES (1, 1, NOW(), NOW(), 'Appetizers', 'ACTIVE'),
        (9, 1, NOW(), NOW(), 'Sides', 'ACTIVE'),
        (10, 1, NOW(), NOW(), 'Combos', 'ACTIVE'),
        -- 진짜 데이터
+       -- 진대감 역삼점
        (11, 11, NOW(), NOW(), '점심', 'ACTIVE'),
-       (12, 11, NOW(), NOW(), '본차림', 'ACTIVE')
-    #        (12, 11, NOW(), NOW(), '본차림', 'ACTIVE'),
-#        (12, 11, NOW(), NOW(), '본차림', 'ACTIVE'),
-#        (12, 11, NOW(), NOW(), '본차림', 'ACTIVE'),
-#        (12, 11, NOW(), NOW(), '본차림', 'ACTIVE'),
-#        (12, 11, NOW(), NOW(), '본차림', 'ACTIVE')
+       (12, 11, NOW(), NOW(), '본차림', 'ACTIVE'),
 
+       -- 공차 역삼점
+       (13, 12, NOW(), NOW(), '밀크티', 'ACTIVE'),
+       (14, 12, NOW(), NOW(), '오리지널 티', 'ACTIVE'),
+       (15, 12, NOW(), NOW(), '커피', 'ACTIVE'),
+       (16, 12, NOW(), NOW(), '스무디', 'ACTIVE')
 ;
 
 -- 6. dish 테이블
-INSERT INTO `dish` (`id`, `dish_category_id`, `price`, `created_at`, `updated_at`, `description`, `image`, `name`, `tags`,
+INSERT INTO `dish` (`id`, `dish_category_id`, `price`, `created_at`, `updated_at`, `description`, `image`, `name`,
+                    `tags`,
                     `status`)
 VALUES (1, 1, 500, NOW(), NOW(), 'Crispy French Fries', 'french_fries.jpg', 'French Fries', '[]', 'ACTIVE'),
        (2, 2, 700, NOW(), NOW(), 'Cheesy Nachos', 'nachos.jpg', 'Nachos', '[]', 'ACTIVE'),
-       (3, 3, 1500, NOW(), NOW(), 'Grilled Chicken Sandwich', 'chicken_sandwich.jpg', 'Chicken Sandwich', '[]', 'ACTIVE'),
+       (3, 3, 1500, NOW(), NOW(), 'Grilled Chicken Sandwich', 'chicken_sandwich.jpg', 'Chicken Sandwich', '[]',
+        'ACTIVE'),
        (4, 4, 1300, NOW(), NOW(), 'Veggie Burger', 'veggie_burger.jpg', 'Veggie Burger', '[]', 'ACTIVE'),
        (5, 5, 1200, NOW(), NOW(), 'Steak Burrito', 'burrito.jpg', 'Burrito', '[]', 'ACTIVE'),
        (6, 6, 800, NOW(), NOW(), 'Chocolate Cake', 'chocolate_cake.jpg', 'Chocolate Cake', '[]', 'ACTIVE'),
@@ -87,18 +94,75 @@ VALUES (1, 1, 500, NOW(), NOW(), 'Crispy French Fries', 'french_fries.jpg', 'Fre
        (10, 10, 1000, NOW(), NOW(), 'Pizza Combo', 'pizza_combo.jpg', 'Pizza Combo', '[]', 'ACTIVE'),
 
 -- 진짜 데이터
-       (11, 11, 14000, NOW(), NOW(), '(평일 점심한정)', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_11.jfif', '점심) 즉석한우불고기', '["한정", "시그니처"]', 'ACTIVE'),
-       (12, 12, 29000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_12.jfif', '한우차돌삼합', '[]', 'ACTIVE'),
-       (13, 12, 119000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_13.jfif', '한우투뿔모듬', '[]', 'ACTIVE'),
-       (14, 12, 55000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_14.jfif', '한우파김치전골', '[]', 'ACTIVE'),
-       (15, 12, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_15.jfif', '한우꽃게된장찌개', '[]', 'ACTIVE'),
-       (16, 12, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_16.jfif', '한우차돌짬뽕라면', '[]', 'ACTIVE'),
-       (17, 12, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_17.jfif', '갓김치물냉면', '[]', 'ACTIVE'),
-       (18, 12, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_18.jfif', '갓김치비빔냉면', '[]', 'ACTIVE'),
-       (19, 11, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_19.jfif', '점심) 한우꽃게된장찌개밥상', '["한정"]', 'ACTIVE'),
-       (20, 11, 11000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_20.jfif', '점심) 한돈파김지전골밥상', '["한정"]', 'ACTIVE'),
-       (21, 11, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_21.jfif', '점심) 한우차돌짬뽕라면밥상', '["한정"]', 'ACTIVE'),
-       (22, 11, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_22.jfif', '점심) 갓김치비빔냉면밥상', '["한정"]', 'ACTIVE')
+       -- 진대감 역삼점
+       (11, 11, 14000, NOW(), NOW(), '(평일 점심한정)', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_11.jfif',
+        '점심) 즉석한우불고기', '["한정", "시그니처"]', 'ACTIVE'),
+       (12, 12, 29000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_12.jfif', '한우차돌삼합',
+        '[]', 'ACTIVE'),
+       (13, 12, 119000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_13.jfif', '한우투뿔모듬',
+        '[]', 'ACTIVE'),
+       (14, 12, 55000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_14.jfif', '한우파김치전골',
+        '[]', 'ACTIVE'),
+       (15, 12, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_15.jfif', '한우꽃게된장찌개',
+        '[]', 'ACTIVE'),
+       (16, 12, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_16.jfif', '한우차돌짬뽕라면',
+        '[]', 'ACTIVE'),
+       (17, 12, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_17.jfif', '갓김치물냉면',
+        '[]', 'ACTIVE'),
+       (18, 12, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_18.jfif', '갓김치비빔냉면',
+        '[]', 'ACTIVE'),
+       (19, 11, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_19.jfif',
+        '점심) 한우꽃게된장찌개밥상', '["한정"]', 'ACTIVE'),
+       (20, 11, 11000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_20.jfif',
+        '점심) 한돈파김지전골밥상', '["한정"]', 'ACTIVE'),
+       (21, 11, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_21.jfif',
+        '점심) 한우차돌짬뽕라면밥상', '["한정"]', 'ACTIVE'),
+       (22, 11, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_22.png',
+        '점심) 갓김치비빔냉면밥상', '["한정"]', 'ACTIVE'),
+
+
+       (23, 13, 5300, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_23.png',
+        '딸기 쥬얼리 밀크티', '', 'ACTIVE'),
+       (24, 13, 5100, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_24.png',
+        '코코넛 밀크', '', 'ACTIVE'),
+       (25, 13, 4900, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_25.png',
+        '코코넛 블랙 밀크티', '', 'ACTIVE'),
+       (26, 13, 4500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_26.png',
+        '블랙 밀크티', '["인기"]', 'ACTIVE'),
+       (27, 13, 4500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_27.png',
+        '얼그레이 밀크티', '', 'ACTIVE'),
+       (28, 13, 4500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_28.png',
+        '자스민 밀크티', '', 'ACTIVE'),
+       (29, 13, 4500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_29.png',
+        '우롱 밀크티', '', 'ACTIVE'),
+       (30, 13, 4500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_30.png',
+        '타로 밀크티', '["인기"]', 'ACTIVE'),
+
+       (31, 14, 4000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_31.png',
+        '블랙티', '', 'ACTIVE'),
+       (32, 14, 4000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_32.png',
+        '얼그레이 스파클링 티', '', 'ACTIVE'),
+       (33, 14, 4000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_33.png',
+        '우롱티', '', 'ACTIVE'),
+       (34, 14, 4000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_34.png',
+        '자스민티', '', 'ACTIVE'),
+       (35, 14, 4300, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_35.png',
+        '블랙 스파클링 티', '', 'ACTIVE'),
+       (36, 14, 4300, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_36.png',
+        '우롱 스파클링 티', '', 'ACTIVE'),
+
+       (37, 15, 3700, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_31.png',
+        '아메리카노', '', 'ACTIVE'),
+       (38, 15, 4200, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_32.png',
+        '얼그레이 아메리카노', '', 'ACTIVE'),
+       (39, 15, 4500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_33.png',
+        '카페 모카', '', 'ACTIVE'),
+       (40, 15, 4500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_34.png',
+        '바닐라 카페라떼', '', 'ACTIVE'),
+       (41, 15, 5200, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_35.png',
+        '공차슈페너', '', 'ACTIVE'),
+
+
 ;
 
 -- -- 6. tag 테이블
@@ -159,7 +223,8 @@ VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
        (7, 7, 2, NOW(), NOW(), 'ACTIVE'), -- Garlic Bread: Whole Wheat Bread
        (8, 8, 1, NOW(), NOW(), 'ACTIVE'), -- Caesar Salad: Large Size
        (9, 9, 2, NOW(), NOW(), 'ACTIVE'), -- Onion Rings: No Salt
-       (10, 10, 2, NOW(), NOW(), 'ACTIVE'); -- Pizza Combo: Extra Ice
+       (10, 10, 2, NOW(), NOW(), 'ACTIVE');
+-- Pizza Combo: Extra Ice
 
 -- 10. orders 테이블
 INSERT INTO `orders` (`id`, `menu_cnt`, `created_at`, `updated_at`, `table_id`, `order_status`, `payment_method`,

@@ -53,30 +53,42 @@ export default function DishDetailPage() {
   };
 
   const selectedOptionsTotalPrice = useMemo(() => {
+    // data와 data.options가 없으면 0 반환
+    if (!data || !data.options) return 0;
+
     return Object.values(selectedOptions).reduce((sum, choiceId) => {
       const choice = data.options
-        ?.flatMap((option) => option.choices)
+        .flatMap((option) => option.choices)
         .find((c) => c.choiceId === choiceId);
       return sum + (choice ? choice.price : 0);
     }, 0);
-  }, [selectedOptions, data.options]);
+  }, [selectedOptions, data]);
 
   const totalSum = useMemo(() => {
+    if (!data) return 0; // data가 없으면 0 반환
     const basePrice = data.price || 0;
+
+    // data.options가 없는 경우 빈 배열로 처리
+    const options = data.options || [];
+
+    if (options.length === 0) {
+      return basePrice * quantity;
+    }
+
     return (basePrice + selectedOptionsTotalPrice) * quantity;
-  }, [data.price, selectedOptionsTotalPrice, quantity]);
+  }, [data, selectedOptionsTotalPrice, quantity]);
 
   const handleAddToCart = () => {
     if (stompClient && stompClient.connected) {
       const postData = {
-        userId: "yourUserId", // 필요시 유저 ID 하드코딩
+        userId: sessionStorage.getItem,
         dishId: parsedDishId,
         dishName: data.dishName,
         dishCategoryId: data.dishCategoryId,
         dishCategoryName: data.dishCategoryName,
         choiceIds: Object.values(selectedOptions),
         price: data.price,
-        quantity: quantity,
+        quantity,
       };
 
       stompClient.send("/pub/cart/add", {}, JSON.stringify(postData));
@@ -91,7 +103,8 @@ export default function DishDetailPage() {
       {isLoading ? (
         <LoadingSpinner message={"메뉴 정보 가져오는 중"} />
       ) : (
-        !isError && (
+        !isError &&
+        data && (
           <>
             {/* 이미지 && 뒤로가기 버튼 */}
             <Stack>
@@ -119,9 +132,10 @@ export default function DishDetailPage() {
                   {data.dishName}
                 </Typography>
                 <>
-                  {data.tags.map((tag, index) => (
-                    <DishTagChip label={tag} key={index} />
-                  ))}
+                  {data.tags?.length > 0 &&
+                    data.tags.map((tag, index) => (
+                      <DishTagChip label={tag} key={index} />
+                    ))}
                 </>
               </Stack>
 

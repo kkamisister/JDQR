@@ -5,7 +5,13 @@ import PeopleFilter from "./PeopleFilter"
 import { colors } from "../../../constants/colors"
 import MapListContainer from "../../../components/container/MapListContainer"
 
-const RestaurantListBox = ({ restaurants }) => {
+const RestaurantListBox = ({
+  restaurants,
+  people,
+  setPeople,
+  together,
+  setTogether,
+}) => {
   return (
     <MapListContainer
       spacing={3}
@@ -30,7 +36,12 @@ const RestaurantListBox = ({ restaurants }) => {
         />
       </Stack>
 
-      <PeopleFilter />
+      <PeopleFilter
+        people={people}
+        setPeople={setPeople}
+        together={together}
+        setTogether={setTogether}
+      />
 
       <Divider
         sx={{
@@ -55,9 +66,18 @@ const RestaurantListBox = ({ restaurants }) => {
             <RestaurantItemCard key={index} restaurant={restaurant} />
           ))
         ) : (
-          <Typography color={colors.text.sub1} fontSize={16}>
-            검색 결과가 없습니다
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <Typography color={colors.text.sub1} fontSize={16}>
+              검색 결과가 없습니다
+            </Typography>
+          </Box>
         )}
       </Box>
     </MapListContainer>

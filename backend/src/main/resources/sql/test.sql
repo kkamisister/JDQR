@@ -151,51 +151,41 @@ VALUES (1, 1, 500, NOW(), NOW(), 'Crispy French Fries', 'french_fries.jpg', 'Fre
        (36, 14, 4300, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_36.png',
         '우롱 스파클링 티', '', 'ACTIVE'),
 
-       (37, 15, 3700, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_31.png',
+       (37, 15, 3700, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_37.png',
         '아메리카노', '', 'ACTIVE'),
-       (38, 15, 4200, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_32.png',
+       (38, 15, 4200, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_38.png',
         '얼그레이 아메리카노', '', 'ACTIVE'),
-       (39, 15, 4500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_33.png',
+       (39, 15, 4500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_39.png',
         '카페 모카', '', 'ACTIVE'),
-       (40, 15, 4500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_34.png',
+       (40, 15, 4500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_40.png',
         '바닐라 카페라떼', '', 'ACTIVE'),
-       (41, 15, 5200, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_35.png',
+       (41, 15, 5200, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_41.png',
         '공차슈페너', '', 'ACTIVE'),
 
-
+       (42, 16, 5300, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_42.png',
+        '밀크 쿠앤크 스무디', '', 'ACTIVE'),
+       (43, 16, 5700, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_43.png',
+        '브라운슈가 치즈폼 스무디', '', 'ACTIVE'),
+       (44, 16, 5700, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_44.png',
+        '딸기 쿠키 스무디', '', 'ACTIVE'),
+       (45, 16, 5700, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_45.png',
+        '초코멜로 스무디', '', 'ACTIVE'),
+       (46, 16, 5700, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_46.png',
+        '제주 그린 스무디', '', 'ACTIVE'),
+       (47, 16, 5300, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_47.png',
+        '청포도 스무디', '', 'ACTIVE')
 ;
-
--- -- 6. tag 테이블
--- INSERT INTO `tag` (`id`, `created_at`, `updated_at`, `name`, `status`)
--- VALUES (1, NOW(), NOW(), 'Spicy', 'ACTIVE'),
---        (2, NOW(), NOW(), 'Vegan', 'ACTIVE'),
---        (3, NOW(), NOW(), 'Popular', 'ACTIVE'),
---        (4, NOW(), NOW(), 'Gluten-Free', 'ACTIVE'),
---        (5, NOW(), NOW(), 'Low-Calorie', 'ACTIVE'),
---        (6, NOW(), NOW(), 'New', 'ACTIVE'),
---        (7, NOW(), NOW(), 'Seasonal', 'ACTIVE'),
---        (8, NOW(), NOW(), 'Family-Sized', 'ACTIVE'),
---        (9, NOW(), NOW(), 'Chef Special', 'ACTIVE'),
---        (10, NOW(), NOW(), 'Kid-Friendly', 'ACTIVE');
---
--- -- 7. dish_tag 테이블
--- INSERT INTO `dish_tag` (`dish_id`, `id`, `tag_id`, `created_at`, `updated_at`, `status`)
--- VALUES (1, 1, 3, NOW(), NOW(), 'ACTIVE'),
---        (2, 2, 1, NOW(), NOW(), 'ACTIVE'),
---        (3, 3, 3, NOW(), NOW(), 'ACTIVE'),
---        (4, 4, 2, NOW(), NOW(), 'ACTIVE'),
---        (5, 5, 4, NOW(), NOW(), 'ACTIVE'),
---        (6, 6, 5, NOW(), NOW(), 'ACTIVE'),
---        (7, 7, 6, NOW(), NOW(), 'ACTIVE'),
---        (8, 8, 7, NOW(), NOW(), 'ACTIVE'),
---        (9, 9, 8, NOW(), NOW(), 'ACTIVE'),
---        (10, 10, 9, NOW(), NOW(), 'ACTIVE');
-
 -- 7. options 테이블
 INSERT INTO `options` (`id`, `restaurant_id`, `max_choice_count`, `mandatory`, `created_at`, `updated_at`, `name`,
                        `status`)
 VALUES (1, 1, 1, b'1', NOW(), NOW(), 'Size', 'ACTIVE'),
-       (2, 1, 3, b'0', NOW(), NOW(), 'Extra Option', 'ACTIVE')
+       (2, 1, 3, b'0', NOW(), NOW(), 'Extra Option', 'ACTIVE'),
+
+--        공차 역삼점
+       (3, 12, 1, b'1', NOW(), NOW(), 'SUGAR 선택', 'ACTIVE'),
+       (4, 12, 2, b'0', NOW(), NOW(), '토핑 선택', 'ACTIVE'),
+       (5, 12, 1, b'1', NOW(), NOW(), 'ICE 선택', 'ACTIVE'),
+       (6, 12, 1, b'0', NOW(), NOW(), '토핑 선택', 'ACTIVE'),
 ;
 
 
@@ -210,10 +200,31 @@ VALUES (1, 1, 100, NOW(), NOW(), 'Small Size', 'ACTIVE'),
        (7, 2, 250, NOW(), NOW(), 'Double Meat', 'ACTIVE'),
        (8, 2, 0, NOW(), NOW(), 'No Onion', 'ACTIVE'),
        (9, 2, 150, NOW(), NOW(), 'Whole Wheat Bread', 'ACTIVE'),
-       (10, 2, 50, NOW(), NOW(), 'Extra Ice', 'ACTIVE');
+       (10, 2, 50, NOW(), NOW(), 'Extra Ice', 'ACTIVE'),
+
+       --        공차 역삼점
+       (21, 5, 0, NOW(), NOW(), '얼음 보통', 'ACTIVE'),
+       (22, 5, 0, NOW(), NOW(), '얼음 가득', 'ACTIVE'),
+       (23, 5, 0, NOW(), NOW(), '얼음 적게', 'ACTIVE'),
+       (24, 4, 500, NOW(), NOW(), '펄', 'ACTIVE'),
+       (25, 4, 500, NOW(), NOW(), '미니펄', 'ACTIVE'),
+       (26, 4, 500, NOW(), NOW(), '화이트펄', 'ACTIVE'),
+       (27, 4, 500, NOW(), NOW(), '알로에', 'ACTIVE'),
+       (28, 4, 500, NOW(), NOW(), '코코넛', 'ACTIVE'),
+       (29, 4, 500, NOW(), NOW(), '밀크폼', 'ACTIVE'),
+       (30, 4, 700, NOW(), NOW(), '치즈폼', 'ACTIVE'),
+       (31, 3, 0, NOW(), NOW(), '0%', 'ACTIVE'),
+       (32, 3, 0, NOW(), NOW(), '30%', 'ACTIVE'),
+       (33, 3, 0, NOW(), NOW(), '50%', 'ACTIVE'),
+       (34, 3, 0, NOW(), NOW(), '70%', 'ACTIVE'),
+       (35, 3, 0, NOW(), NOW(), '100%', 'ACTIVE'),
+       (36, 6, 500, NOW(), NOW(), '화이트펄', 'ACTIVE'),
+       (37, 6, 500, NOW(), NOW(), '알로에', 'ACTIVE'),
+       (38, 6, 500, NOW(), NOW(), '코코넛', 'ACTIVE')
+;
 
 -- 9. dish_options 테이블
-INSERT INTO `dish_options` (`dish_id`, `id`, `option_id`, `created_at`, `updated_at`, `status`)
+INSERT INTO `dish_options` (`id`, `dish_id`, `option_id`, `created_at`, `updated_at`, `status`)
 VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
        (2, 2, 2, NOW(), NOW(), 'ACTIVE'), -- Nachos: Extra Cheese
        (3, 3, 1, NOW(), NOW(), 'ACTIVE'), -- Chicken Sandwich: Double Meat
@@ -223,7 +234,62 @@ VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
        (7, 7, 2, NOW(), NOW(), 'ACTIVE'), -- Garlic Bread: Whole Wheat Bread
        (8, 8, 1, NOW(), NOW(), 'ACTIVE'), -- Caesar Salad: Large Size
        (9, 9, 2, NOW(), NOW(), 'ACTIVE'), -- Onion Rings: No Salt
-       (10, 10, 2, NOW(), NOW(), 'ACTIVE');
+       (10, 10, 2, NOW(), NOW(), 'ACTIVE'),
+
+--        진짜 데이터
+       (11, 23, 3, NOW(), NOW(), 'ACTIVE'),
+       (12, 23, 4, NOW(), NOW(), 'ACTIVE'),
+       (13, 24, 3, NOW(), NOW(), 'ACTIVE'),
+       (14, 24, 4, NOW(), NOW(), 'ACTIVE'),
+       (15, 25, 3, NOW(), NOW(), 'ACTIVE'),
+       (16, 25, 4, NOW(), NOW(), 'ACTIVE'),
+       (17, 26, 3, NOW(), NOW(), 'ACTIVE'),
+       (18, 26, 4, NOW(), NOW(), 'ACTIVE'),
+       (19, 26, 5, NOW(), NOW(), 'ACTIVE'),
+       (20, 27, 3, NOW(), NOW(), 'ACTIVE'),
+       (21, 27, 4, NOW(), NOW(), 'ACTIVE'),
+       (22, 27, 5, NOW(), NOW(), 'ACTIVE'),
+       (23, 28, 3, NOW(), NOW(), 'ACTIVE'),
+       (24, 28, 4, NOW(), NOW(), 'ACTIVE'),
+       (25, 28, 5, NOW(), NOW(), 'ACTIVE'),
+       (26, 29, 3, NOW(), NOW(), 'ACTIVE'),
+       (27, 29, 4, NOW(), NOW(), 'ACTIVE'),
+       (28, 29, 5, NOW(), NOW(), 'ACTIVE'),
+       (29, 30, 3, NOW(), NOW(), 'ACTIVE'),
+       (30, 30, 4, NOW(), NOW(), 'ACTIVE'),
+       (31, 30, 5, NOW(), NOW(), 'ACTIVE'),
+       (32, 31, 3, NOW(), NOW(), 'ACTIVE'),
+       (33, 31, 4, NOW(), NOW(), 'ACTIVE'),
+       (34, 31, 5, NOW(), NOW(), 'ACTIVE'),
+       (35, 32, 3, NOW(), NOW(), 'ACTIVE'),
+       (36, 32, 6, NOW(), NOW(), 'ACTIVE'),
+       (37, 33, 3, NOW(), NOW(), 'ACTIVE'),
+       (38, 33, 4, NOW(), NOW(), 'ACTIVE'),
+       (39, 33, 5, NOW(), NOW(), 'ACTIVE'),
+       (40, 34, 3, NOW(), NOW(), 'ACTIVE'),
+       (41, 34, 4, NOW(), NOW(), 'ACTIVE'),
+       (42, 34, 5, NOW(), NOW(), 'ACTIVE'),
+       (43, 35, 3, NOW(), NOW(), 'ACTIVE'),
+       (44, 35, 6, NOW(), NOW(), 'ACTIVE'),
+       (45, 36, 3, NOW(), NOW(), 'ACTIVE'),
+       (46, 36, 6, NOW(), NOW(), 'ACTIVE'),
+       (47, 37, 3, NOW(), NOW(), 'ACTIVE'),
+       (48, 37, 4, NOW(), NOW(), 'ACTIVE'),
+       (49, 38, 3, NOW(), NOW(), 'ACTIVE'),
+       (50, 38, 4, NOW(), NOW(), 'ACTIVE'),
+       (51, 39, 3, NOW(), NOW(), 'ACTIVE'),
+       (52, 39, 4, NOW(), NOW(), 'ACTIVE'),
+       (53, 40, 3, NOW(), NOW(), 'ACTIVE'),
+       (54, 40, 4, NOW(), NOW(), 'ACTIVE'),
+       (55, 41, 3, NOW(), NOW(), 'ACTIVE'),
+       (56, 41, 4, NOW(), NOW(), 'ACTIVE'),
+       (57, 42, 4, NOW(), NOW(), 'ACTIVE'),
+       (58, 43, 4, NOW(), NOW(), 'ACTIVE'),
+       (59, 44, 4, NOW(), NOW(), 'ACTIVE'),
+       (60, 45, 4, NOW(), NOW(), 'ACTIVE'),
+       (61, 46, 4, NOW(), NOW(), 'ACTIVE'),
+       (62, 47, 4, NOW(), NOW(), 'ACTIVE')
+;
 -- Pizza Combo: Extra Ice
 
 -- 10. orders 테이블

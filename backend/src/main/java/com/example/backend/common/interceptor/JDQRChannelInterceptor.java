@@ -47,6 +47,7 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+		log.warn("preSend : {}",accessor);
 
 		// CONNECT 프레임에 대해서만 처리
 		if (StompCommand.CONNECT.equals(accessor.getCommand())) {
@@ -89,24 +90,42 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 	public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
+		log.warn("postSend : {}",accessor);
+
 		// DISCONNECT 프레임에 대해서만 처리
 		if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
 			decrementOnlineUserCount("6721aa9b0d22a923091eef73");  // 인원수 감소
+
+			// 목적지를 찾는다
+			String dest = (String)accessor.getSessionAttributes().get("destination");
+
+			// log.warn("dest : {}",dest);
+
+			// /sub/cart의 경우에만 이벤트를 호출한다
+			if(dest.equals("/sub/cart")){
+				String tableId = (String)accessor.getSessionAttributes().get("tableId");
+
+				// log.warn("tableId :  {}",tableId);
+
+				// 여기에다가 구독시 tableId에 속한 장바구니 데이터를 보내는 이벤트 설정
+				publisher.publishEvent(new CartEvent(tableId));
+			}
+
 		}
 		if(StompCommand.SUBSCRIBE.equals(accessor.getCommand())){
 			String destination = accessor.getDestination(); // 구독 요청의 URL 확인
 
-			// log.warn("구독요청 들어옴!!!!");
-			// log.warn("destination : {}",destination);
+			if (destination != null && destination.contains("/sub/cart")) {
 
-			if (destination != null && destination.contains("/sub/cart/")) {
+				String dest = destination.substring(0,destination.lastIndexOf("/"));
+				// log.warn("dest : {}",dest);
 				String tableId = destination.substring(destination.lastIndexOf("/") + 1);
 
+				// 추후 경로 구분을 위한 destination 설정
+				accessor.getSessionAttributes().put("destination", dest);
+
 				// 여기에다가 구독시 tableId에 속한 장바구니 데이터를 보내는 이벤트 설정
-				// log.warn("이벤트 보냄!!!");
 				publisher.publishEvent(new CartEvent(tableId));
-				// log.warn("message : {}",message);
-				// return message;
 
 			} else {
 				log.warn("구독 요청에 예상치 않은 destination: {}", destination);

@@ -23,6 +23,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +35,24 @@ import lombok.extern.slf4j.Slf4j;
 public class TableController {
 
 	private final TableService tableService;
+
+	@Operation(summary = "테이블 이름 조회", description = "테이블 이름을 조회하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "테이블 이름 조회완료"),
+	})
+	@GetMapping("/name")
+	public ResponseEntity<ResponseWithData<TableNameDto>> getTableName(HttpServletRequest request){
+
+		String tableId = (String)request.getAttribute("tableId");
+		log.warn("tableId : {}",tableId);
+
+		TableNameDto tableName = tableService.getTableName(tableId);
+		ResponseWithData<TableNameDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(),"테이블 이름 조회에 성공하였습니다",tableName);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
+	}
+
 
 	@Operation(summary = "전체 테이블 조회", description = "전체 테이블을 조회하는 api")
 	@ApiResponses(value = {
@@ -100,7 +120,7 @@ public class TableController {
 		@ApiResponse(responseCode = "200", description = "테이블 생성 완료"),
 	})
 	@PostMapping("")
-	public ResponseEntity<ResponseWithMessage> createTable(@RequestBody TableInfo tableInfo, HttpServletRequest request) {
+	public ResponseEntity<ResponseWithMessage> createTable(@RequestBody @Valid TableInfo tableInfo, HttpServletRequest request) {
 
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
@@ -139,7 +159,7 @@ public class TableController {
 		@ApiResponse(responseCode = "200", description = "테이블 수정 완료"),
 	})
 	@PutMapping("")
-	public ResponseEntity<ResponseWithMessage> updateTable(@RequestBody TableInfo tableInfo,
+	public ResponseEntity<ResponseWithMessage> updateTable(@RequestBody @Valid TableInfo tableInfo,
 		HttpServletRequest request) {
 
 		String id = (String)request.getAttribute("userId");

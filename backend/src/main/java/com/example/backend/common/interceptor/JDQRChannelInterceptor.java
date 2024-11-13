@@ -83,8 +83,6 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 				throw new IllegalArgumentException("토큰 검증 실패");
 			}
 		}
-
-
 		return message;
 	}
 	@Override

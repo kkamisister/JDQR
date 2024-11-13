@@ -63,8 +63,8 @@ VALUES (1, 11, 1, NOW(), NOW(), 'ACTIVE'), -- Tasty Restaurant: Fast Food
        (11, 11, 11, NOW(), NOW(), 'ACTIVE'),
        (12, 16, 12, NOW(), NOW(), 'ACTIVE'),
        (13, 11, 13, NOW(), NOW(), 'ACTIVE'),
-       (14, 11, 14, NOW(), NOW(), 'ACTIVE'),
-       (15, 11, 15, NOW(), NOW(), 'ACTIVE'),
+       (14, 12, 14, NOW(), NOW(), 'ACTIVE'),
+       (15, 11, 15, NOW(), NOW(), 'ACTIVE')
 ;
 
 -- 5. dish_categories 테이블
@@ -88,7 +88,20 @@ VALUES (1, 1, NOW(), NOW(), 'Appetizers', 'ACTIVE'),
        (13, 12, NOW(), NOW(), '밀크티', 'ACTIVE'),
        (14, 12, NOW(), NOW(), '오리지널 티', 'ACTIVE'),
        (15, 12, NOW(), NOW(), '커피', 'ACTIVE'),
-       (16, 12, NOW(), NOW(), '스무디', 'ACTIVE')
+       (16, 12, NOW(), NOW(), '스무디', 'ACTIVE'),
+
+--        오봉집 역삼점
+       (17, 13, NOW(), NOW(), '메인 메뉴', 'ACTIVE'),
+       (18, 13, NOW(), NOW(), '사이드', 'ACTIVE'),
+
+--        바스버거
+       (19, 14, NOW(), NOW(), '버거', 'ACTIVE'),
+       (20, 14, NOW(), NOW(), '세트 메뉴', 'ACTIVE'),
+       (21, 14, NOW(), NOW(), '사이드', 'ACTIVE'),
+       (22, 14, NOW(), NOW(), '음료', 'ACTIVE'),
+
+--        메인메뉴
+       (23, 15, NOW(), NOW(), '메인 메뉴', 'ACTIVE')
 ;
 
 -- 6. dish 테이블
@@ -134,7 +147,7 @@ VALUES (1, 1, 500, NOW(), NOW(), 'Crispy French Fries', 'french_fries.jpg', 'Fre
        (22, 11, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_22.png',
         '점심) 갓김치비빔냉면밥상', '["한정"]', 'ACTIVE'),
 
-
+--     공차 역삼점
        (23, 13, 5300, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_23.png',
         '딸기 쥬얼리 밀크티', '', 'ACTIVE'),
        (24, 13, 5100, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_24.png',
@@ -187,7 +200,59 @@ VALUES (1, 1, 500, NOW(), NOW(), 'Crispy French Fries', 'french_fries.jpg', 'Fre
        (46, 16, 5700, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_46.png',
         '제주 그린 스무디', '', 'ACTIVE'),
        (47, 16, 5300, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_47.png',
-        '청포도 스무디', '', 'ACTIVE')
+        '청포도 스무디', '', 'ACTIVE'),
+
+--     오봉집 역삼점
+       (48, 17, 58000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_48.jpg',
+        '낙지오봉스페셜', '["대표메뉴"]', 'ACTIVE'),
+       (49, 17, 56000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_49.jpg',
+        '오징어오봉스페셜', '["대표메뉴"]', 'ACTIVE'),
+       (50, 17, 33000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_50.jpg',
+        '오봉보쌈', '', 'ACTIVE'),
+       (51, 17, 14000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_51.jpg',
+        '직화낙지볶음', '', 'ACTIVE'),
+       (52, 17, 13000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_52.jpg',
+        '직화제낙볶음', '', 'ACTIVE'),
+       (53, 17, 11000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_53.jpg',
+        '직화제육볶음', '', 'ACTIVE'),
+       (54, 18, 9000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_54.jpg',
+        '쟁반막국수', '', 'ACTIVE'),
+       (55, 18, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_55.jpg',
+        '바지락칼국수', '', 'ACTIVE'),
+       (56, 18, 17000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_56.jpg',
+        '직화오돌뼈주먹밥', '', 'ACTIVE'),
+       (57, 18, 15000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_57.jpg',
+        '쫀득편육', '', 'ACTIVE'),
+
+--     바스버거
+       (58, 19, 8500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_58.png',
+        '바스버거', '["인기"]', 'ACTIVE'),
+       (59, 19, 7400, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_59.png',
+        '치즈버거', '', 'ACTIVE'),
+       (60, 19, 12200, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_60.png',
+        '머쉬룸버거', '', 'ACTIVE'),
+       (61, 19, 15000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_61.png',
+        '탐욕버거', '', 'ACTIVE'),
+       (62, 19, 12200, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_62.png',
+        '더블베이컨치즈버거', '', 'ACTIVE'),
+       (63, 19, 10500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_63.png',
+        '하와이안버거', '["인기"]', 'ACTIVE'),
+       (64, 22, 3500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_64.png',
+        '펩시콜라', '', 'ACTIVE'),
+       (65, 22, 2500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_65.png',
+        '사이다', '', 'ACTIVE'),
+       (66, 22, 5000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_66.png',
+        '바스라거', '', 'ACTIVE'),
+       (67, 22, 2500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_67.png',
+        '마운틴듀', '', 'ACTIVE'),
+
+--     농민백암순대
+       (68, 23, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_68.jpg',
+        '국밥', '', 'ACTIVE'),
+       (69, 23, 36000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_69.jpg',
+        '모듬 수육', '', 'ACTIVE'),
+       (70, 23, 13000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_70.jpg',
+        '토종순대', '', 'ACTIVE')
 ;
 -- 7. options 테이블
 INSERT INTO `options` (`id`, `restaurant_id`, `max_choice_count`, `mandatory`, `created_at`, `updated_at`, `name`,
@@ -200,6 +265,17 @@ VALUES (1, 1, 1, b'1', NOW(), NOW(), 'Size', 'ACTIVE'),
        (4, 12, 2, b'0', NOW(), NOW(), '토핑 선택', 'ACTIVE'),
        (5, 12, 1, b'1', NOW(), NOW(), 'ICE 선택', 'ACTIVE'),
        (6, 12, 1, b'0', NOW(), NOW(), '토핑 선택', 'ACTIVE'),
+
+--        바스버거
+       (7, 14, 1, b'0', NOW(), NOW(), '양파 선택(B)', 'ACTIVE'),
+       (8, 14, 2, b'0', NOW(), NOW(), '버거 토핑 추가 선택(A)', 'ACTIVE'),
+       (9, 14, 4, b'0', NOW(), NOW(), '추가 선택', 'ACTIVE'),
+       (10, 14, 1, b'1', NOW(), NOW(), '패티 선택', 'ACTIVE'),
+       (11, 14, 1, b'0', NOW(), NOW(), '양파 선택(A)', 'ACTIVE'),
+       (12, 14, 6, b'0', NOW(), NOW(), '버거 토핑 추가 선택(B)', 'ACTIVE'),
+
+--        농민백암순대
+       (13, 15, 1, b'1', NOW(), NOW(), '양 선택', 'ACTIVE')
 ;
 
 
@@ -234,7 +310,31 @@ VALUES (1, 1, 100, NOW(), NOW(), 'Small Size', 'ACTIVE'),
        (35, 3, 0, NOW(), NOW(), '100%', 'ACTIVE'),
        (36, 6, 500, NOW(), NOW(), '화이트펄', 'ACTIVE'),
        (37, 6, 500, NOW(), NOW(), '알로에', 'ACTIVE'),
-       (38, 6, 500, NOW(), NOW(), '코코넛', 'ACTIVE')
+       (38, 6, 500, NOW(), NOW(), '코코넛', 'ACTIVE'),
+
+       --        바스버거
+       (39, 7, 0, NOW(), NOW(), '구운양파 추가', 'ACTIVE'),
+       (40, 7, 0, NOW(), NOW(), '구운양파로 변경', 'ACTIVE'),
+       (41, 8, 1000, NOW(), NOW(), '계란프라이 추가', 'ACTIVE'),
+       (42, 8, 1000, NOW(), NOW(), '해쉬브라운 추가', 'ACTIVE'),
+       (43, 9, 2500, NOW(), NOW(), '제임스 감', 'ACTIVE'),
+       (44, 9, 5300, NOW(), NOW(), '버팔로 치킨 윙 (4P)', 'ACTIVE'),
+       (45, 9, 8900, NOW(), NOW(), '버팔로 치킨 윙 (6P)', 'ACTIVE'),
+       (46, 9, 10600, NOW(), NOW(), '버팔로 치킨 윙 (10P)', 'ACTIVE'),
+       (47, 10, 0, NOW(), NOW(), '싱글', 'ACTIVE'),
+       (48, 10, 3500, NOW(), NOW(), '더블', 'ACTIVE'),
+       (49, 10, 7000, NOW(), NOW(), '트리플', 'ACTIVE'),
+       (50, 11, 0, NOW(), NOW(), '생양파 X', 'ACTIVE'),
+       (51, 11, 0, NOW(), NOW(), '생양파 추가', 'ACTIVE'),
+       (52, 11, 0, NOW(), NOW(), '구운양파로 변경', 'ACTIVE'),
+       (53, 12, 0, NOW(), NOW(), '구운양파 추가', 'ACTIVE'),
+       (54, 12, 1000, NOW(), NOW(), '체다치즈 추가', 'ACTIVE'),
+       (55, 12, 1000, NOW(), NOW(), '계란프라이 추가', 'ACTIVE'),
+       (56, 12, 1000, NOW(), NOW(), '해쉬브라운 추가', 'ACTIVE'),
+       (57, 12, 1000, NOW(), NOW(), '베이컨 추가', 'ACTIVE'),
+       (58, 12, 3500, NOW(), NOW(), '더블(패티&치즈) 추가', 'ACTIVE'),
+       (59, 13, 0, NOW(), NOW(), '보통', 'ACTIVE'),
+       (60, 13, 2000, NOW(), NOW(), '특', 'ACTIVE')
 ;
 
 -- 9. dish_options 테이블
@@ -251,6 +351,7 @@ VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
        (10, 10, 2, NOW(), NOW(), 'ACTIVE'),
 
 --        진짜 데이터
+--        공차 역삼점
        (11, 23, 3, NOW(), NOW(), 'ACTIVE'),
        (12, 23, 4, NOW(), NOW(), 'ACTIVE'),
        (13, 24, 3, NOW(), NOW(), 'ACTIVE'),
@@ -302,9 +403,28 @@ VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
        (59, 44, 4, NOW(), NOW(), 'ACTIVE'),
        (60, 45, 4, NOW(), NOW(), 'ACTIVE'),
        (61, 46, 4, NOW(), NOW(), 'ACTIVE'),
-       (62, 47, 4, NOW(), NOW(), 'ACTIVE')
+       (62, 47, 4, NOW(), NOW(), 'ACTIVE'),
+--        바스버거
+       (63, 58, 10, NOW(), NOW(), 'ACTIVE'),
+       (64, 58, 11, NOW(), NOW(), 'ACTIVE'),
+       (65, 58, 12, NOW(), NOW(), 'ACTIVE'),
+       (66, 58, 9, NOW(), NOW(), 'ACTIVE'),
+       (67, 59, 7, NOW(), NOW(), 'ACTIVE'),
+       (68, 59, 8, NOW(), NOW(), 'ACTIVE'),
+       (69, 59, 9, NOW(), NOW(), 'ACTIVE'),
+       (70, 60, 12, NOW(), NOW(), 'ACTIVE'),
+       (71, 60, 9, NOW(), NOW(), 'ACTIVE'),
+       (72, 61, 7, NOW(), NOW(), 'ACTIVE'),
+       (73, 61, 9, NOW(), NOW(), 'ACTIVE'),
+       (74, 62, 12, NOW(), NOW(), 'ACTIVE'),
+       (75, 62, 9, NOW(), NOW(), 'ACTIVE'),
+       (76, 63, 12, NOW(), NOW(), 'ACTIVE'),
+       (77, 63, 9, NOW(), NOW(), 'ACTIVE'),
+
+--        농민백암순대
+       (78, 68, 13, NOW(), NOW(), 'ACTIVE')
+--        (79, 44, 4, NOW(), NOW(), 'ACTIVE'),
 ;
--- Pizza Combo: Extra Ice
 
 -- 10. orders 테이블
 INSERT INTO `orders` (`id`, `menu_cnt`, `created_at`, `updated_at`, `table_id`, `order_status`, `payment_method`,

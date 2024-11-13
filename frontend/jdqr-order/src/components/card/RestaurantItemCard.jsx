@@ -105,7 +105,9 @@ const RestaurantItemCard = ({ restaurant, sx, onClick }) => {
             color={colors.text.sub1}
             sx={{ whiteSpace: "nowrap" }}
           >
-            최대 {restaurant.maxPeopleNum}인 테이블
+            {restaurant.maxPeopleNum > 0
+              ? `최대 ${restaurant.maxPeopleNum}인 테이블`
+              : "잔여 테이블 없음"}
           </Typography>
         </Stack>
       </Stack>
@@ -132,7 +134,11 @@ const RestaurantItemCard = ({ restaurant, sx, onClick }) => {
           <Typography
             fontSize={15}
             fontWeight={600}
-            color={restaurant.open ? colors.main.primary300 : colors.text.main}
+            color={
+              restaurant.open && restaurant.restSeatNum > 0
+                ? colors.main.primary500
+                : colors.text.main
+            }
           >
             {restaurant.open ? `${restaurant.restSeatNum}석` : "-"}
           </Typography>
@@ -158,7 +164,11 @@ const RestaurantItemCard = ({ restaurant, sx, onClick }) => {
           <Typography
             fontSize={15}
             fontWeight={600}
-            color={restaurant.open ? colors.main.primary300 : colors.text.main}
+            color={
+              restaurant.open && restaurant.restTableNum > 0
+                ? colors.main.primary500
+                : colors.text.main
+            }
           >
             {restaurant.open ? `${restaurant.restTableNum}T` : "-"}
           </Typography>

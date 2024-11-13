@@ -57,8 +57,6 @@ const KakaoMap = ({
           top: 0,
           width: "100%",
           height: "100%",
-          // backgroundColor: "rgba(255, 255, 255, 0.7)", // 맵 배경을 살짝 옅게
-          // filter: "brightness(0.9)",
         }}
         level={3}
         draggable
@@ -75,7 +73,28 @@ const KakaoMap = ({
             size: { width: 35, height: 35 },
           }}
         />
-        <MarkerClusterer averageCenter={true} minLevel={3}>
+        <MarkerClusterer
+          averageCenter={true}
+          minLevel={3}
+          styles={[
+            {
+              width: "50px",
+              height: "50px",
+              background: "rgba(255, 0, 0, 0.6)",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "14px",
+              fontWeight: "bold",
+              textAlign: "center",
+            },
+          ]}
+          calculator={(size) => {
+            return size < 10 ? 10 : size < 30 ? 20 : 30
+          }}
+        >
           {/* 식당 마커 추가 */}
           {restaurants?.map((restaurant) => (
             <CustomOverlayMap
@@ -86,7 +105,7 @@ const KakaoMap = ({
               }}
               yAnchor={1}
             >
-              <Stack alignItems="center" spacing={1}>
+              <Stack alignItems="center" spacing={0.5}>
                 <Stack
                   sx={{
                     padding: "5px",
@@ -98,7 +117,7 @@ const KakaoMap = ({
                     color: colors.text.white,
                     borderRadius: "8px",
                     boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-                    width: "70px",
+                    width: "75px",
                     height: "40px",
                     display: "flex",
                     alignItems: "center",
@@ -117,7 +136,12 @@ const KakaoMap = ({
                     <Typography>영업 종료</Typography>
                   )}
                 </Stack>
-                <Typography fontSize={16} fontWeight={600}>
+                <Typography
+                  fontSize={16}
+                  fontWeight={700}
+                  borderRadius={20}
+                  bgcolor="rgba(255, 255, 255, 0.642)"
+                >
                   {restaurant.restaurantName}
                 </Typography>
               </Stack>

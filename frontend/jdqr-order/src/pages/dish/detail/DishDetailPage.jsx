@@ -12,6 +12,7 @@ import NumberSelector from "../../../components/selector/NumberSelector";
 import BaseButton from "../../../components/button/BaseButton";
 import { setUserCookie } from "../../../utils/apis/axiosInstance";
 import useWebSocketStore from "../../../stores/SocketStore";
+import Footer from "../../../components/footer/Footer";
 
 export default function DishDetailPage() {
   const navigate = useNavigate();
@@ -233,6 +234,7 @@ export default function DishDetailPage() {
                 개
               </Stack>
             </Box>
+            <Footer />
             <BaseButton count={quantity} onClick={handleAddToCart}>
               {totalSum.toLocaleString()}원 장바구니 담기
             </BaseButton>

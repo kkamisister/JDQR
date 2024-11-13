@@ -19,6 +19,8 @@ public record DishResponse() {
 		@JsonInclude(JsonInclude.Include.NON_NULL)
 		String tableId,
 		@JsonInclude(JsonInclude.Include.NON_NULL)
+		String restaurantName,
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 		String tableName,
 		@JsonInclude(JsonInclude.Include.NON_NULL)
 		Integer peopleCount,

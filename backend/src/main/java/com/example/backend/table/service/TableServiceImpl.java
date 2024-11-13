@@ -266,4 +266,19 @@ public class TableServiceImpl implements TableService{
 
 		return tableDetailInfo;
 	}
+
+	/**
+	 * 테이블 ID로 테이블 이름을 반환하는 API
+	 * @param tableId
+	 */
+	@Override
+	public TableNameDto getTableName(String tableId) {
+		//1. 테이블 찾기
+		Table table = tableRepository.findById(tableId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
+
+		TableNameDto tableNameDto = new TableNameDto(table.getName());
+
+		return tableNameDto;
+	}
 }

@@ -36,6 +36,24 @@ public class TableController {
 
 	private final TableService tableService;
 
+	@Operation(summary = "테이블 이름 조회", description = "테이블 이름을 조회하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "테이블 이름 조회완료"),
+	})
+	@GetMapping("/name")
+	public ResponseEntity<ResponseWithData<TableNameDto>> getTableName(HttpServletRequest request){
+
+		String tableId = (String)request.getAttribute("tableId");
+		log.warn("tableId : {}",tableId);
+
+		TableNameDto tableName = tableService.getTableName(tableId);
+		ResponseWithData<TableNameDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(),"테이블 이름 조회에 성공하였습니다",tableName);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
+	}
+
+
 	@Operation(summary = "전체 테이블 조회", description = "전체 테이블을 조회하는 api")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "전체 테이블 조회완료"),

@@ -23,6 +23,12 @@ public record TableResponse() {
 
 	}
 
+	@Schema(name = "테이블 이름 정보",description = "테이블 이름정보를 담은 DTO")
+	public record TableNameDto(
+		String tableName
+	){
+
+	}
 	@Schema(name = "테이블 정보",description = "전체 테이블의 정보를 담은 DTO")
 	public record TableResultDto(
 		@ArraySchema(schema = @Schema(implementation = TableDetailInfo.class))

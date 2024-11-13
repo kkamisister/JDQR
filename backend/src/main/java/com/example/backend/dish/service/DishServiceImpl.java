@@ -116,6 +116,7 @@ public class DishServiceImpl implements DishService {
 		DishSummaryResultDto dishSummaryResultDto = DishSummaryResultDto.builder()
 			.tableId(tableId)
 			.tableName(table.getName())
+			.restaurantName(restaurant.getName())
 			.peopleCount(currentUserCnt)
 			.dishCategories(dishCategories)
 			.dishes(dishSummaryInfoList)

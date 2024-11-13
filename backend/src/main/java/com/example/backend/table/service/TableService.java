@@ -14,4 +14,6 @@ public interface TableService {
 	QRInfo createQR(String tableId,Integer userId);
 	TableResultDto getAllTables(Integer userId);
 	TableDetailInfo getTable(String tableId,Integer userId);
+
+	TableNameDto getTableName(String tableId);
 }

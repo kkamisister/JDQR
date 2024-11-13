@@ -96,7 +96,9 @@ const RestaurantInfo = ({ restaurant, open }) => {
               whiteSpace: "nowrap",
             }}
           >
-            최대 {restaurant.maxPeopleNum}인 테이블
+            {restaurant.maxPeopleNum > 0
+              ? `최대 ${restaurant.maxPeopleNum}인 테이블`
+              : "잔여 테이블 없음"}
           </Typography>
         </Stack>
       </Stack>

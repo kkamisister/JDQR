@@ -52,7 +52,7 @@ public class JDQRFilter extends OncePerRequestFilter {
         if (accessToken.equals("dummyAccessToken") || accessToken.equals("dummyTableToken")){
             // Bearer token에 "dummyAccessToken"을 입력하면, dummy user 정보로 인증된 후 넘어감
             if (accessToken.equals("dummyAccessToken")) {
-                request.setAttribute("userId","1");
+                request.setAttribute("userId","12");
             }
             if(accessToken.equals("dummyTableToken")){
                 request.setAttribute("tableId","6721aa9b0d22a923091eef73");

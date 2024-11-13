@@ -13,7 +13,7 @@ export default function CartList() {
   const { enqueueSnackbar } = useSnackbar();
   const [dishes, setDishes] = useState([]);
   const { client, connect } = useWebSocketStore();
-  const tableId = localStorage.getItem("tableId");
+  const tableId = sessionStorage.getItem("tableId");
 
   useEffect(() => {
     if (!client) {
@@ -32,15 +32,13 @@ export default function CartList() {
         "/sub/cart/" + tableId,
         (message) => {
           console.log("받은메세지:", message.body);
-          const newDish = JSON.parse(message.body);
+          const data = JSON.parse(message.body);
 
-          // 스낵바 알림 표시
-          enqueueSnackbar(`${newDish.dishName}이 장바구니에 추가되었습니다.`, {
+          setDishes(data.cartList);
+
+          enqueueSnackbar(`${"아이템"}이 장바구니에 추가되었습니다.`, {
             variant: "success",
           });
-
-          // 장바구니 데이터 상태에 새로운 아이템 추가
-          setDishes((prevDishes) => [...prevDishes, newDish]);
         }
       );
 

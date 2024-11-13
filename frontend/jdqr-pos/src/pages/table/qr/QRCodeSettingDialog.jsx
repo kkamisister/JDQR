@@ -37,13 +37,13 @@ const QRCodeSettingDialog = ({ onClose, open, table }) => {
 	};
 
 	const buttonMenuList = [
-		{ text: 'URL 복사', onClick: () => handleCopy(table.url) },
+		{ text: 'URL 복사', onClick: () => handleCopy(table.qrLink) },
 		{
 			text: '이미지 파일(.png) 저장',
 			onClick: () => onDownloadBtn(),
 		},
 		{ text: '프린트하기', onClick: () => printQrSticker() },
-		{ text: 'QR 코드 재생성', onClick: () => handleCopy(table.url) },
+		{ text: 'QR 코드 재생성', onClick: () => handleCopy(table.qrLink) },
 	];
 
 	return (
@@ -77,7 +77,7 @@ const QRCodeSettingDialog = ({ onClose, open, table }) => {
 									{'URL 주소'}
 								</Box>
 								<Box>
-									<a href={table.url}>{table.url}</a>
+									<a href={table.qrLink}>{table.qrLink}</a>
 								</Box>
 							</Stack>
 						</Stack>

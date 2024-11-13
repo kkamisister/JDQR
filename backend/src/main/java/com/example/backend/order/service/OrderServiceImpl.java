@@ -188,6 +188,8 @@ public class OrderServiceImpl implements OrderService {
 
 		log.warn("choiceIds : {}",productInfo.getChoiceIds());
 		List<Choice> choices = choiceRepository.findAllById(productInfo.getChoiceIds());
+		List<String> choiceNames = choices.stream().map(Choice::getName)
+			.toList();
 
 		int choicePrice = choices.stream().map(Choice::getPrice).mapToInt(p -> p).sum();
 		int price = dish.getPrice() + choicePrice;
@@ -196,6 +198,7 @@ public class OrderServiceImpl implements OrderService {
 		productInfo.setDishName(dish.getName());
 		productInfo.setDishCategoryName(dish.getDishCategory().getName());
 		productInfo.setDishCategoryId(dish.getDishCategory().getId());
+		productInfo.setChoiceNames(choiceNames);
 	}
 
 	/**

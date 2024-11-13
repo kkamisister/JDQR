@@ -53,7 +53,6 @@ const DishPage = () => {
 	/**
 	 * 카테고리 탭 관련 상태 처리
 	 */
-	const [categoryList, setCategoryList] = useState([]);
 	const [categoryTabValue, setCategoryTabValue] = useState(0);
 	const handleCategoryTabValueChange = (event, newValue) => {
 		setCategoryTabValue(newValue);
@@ -144,7 +143,7 @@ const DishPage = () => {
 						},
 					}}>
 					{dishList !== undefined &&
-						dishList.data.dishCategories.map((category, index) => (
+						dishList.data.dishes.map((category, index) => (
 							<Tab
 								sx={{
 									color: `${colors.text.main} !important`,
@@ -152,15 +151,21 @@ const DishPage = () => {
 										categoryTabValue === index ? 'bold' : 'normal',
 									fontSize: '30px',
 								}}
-								label={category}
+								label={category.dishCategoryName}
 								{...a11yProps(index)}
 							/>
 						))}
 				</Tabs>
-				{dishList !== undefined &&
+				{dishList &&
 					dishList.data.dishes.map((category, index) => (
-						<CustomTabPanel value={categoryTabValue} index={index}>
-							<DishList dishItems={category.items} />
+						<CustomTabPanel
+							key={`tab-panel-${index}`}
+							value={categoryTabValue}
+							index={index}>
+							<DishList
+								key={`tab-DishList-${index}`}
+								dishItems={category.items}
+							/>
 						</CustomTabPanel>
 					))}
 			</Stack>

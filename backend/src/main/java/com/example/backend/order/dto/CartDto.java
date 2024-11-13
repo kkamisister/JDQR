@@ -32,6 +32,7 @@ public class CartDto {
 	private String dishName;
 	private Integer dishCategoryId;
 	private String dishCategoryName;
+	private List<String> choiceNames;
 	private List<Integer> choiceIds;
 	private int price; // 기존 가격 + choice 가격을 합친 price
 	@Positive(message = "수량은 음수일 수 없습니다")

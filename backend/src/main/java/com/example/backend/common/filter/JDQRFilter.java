@@ -40,8 +40,8 @@ public class JDQRFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = resolveToken(request);
 
-        log.warn("request : {}",request);
-        log.warn("accessToken : {}",accessToken);
+        // log.warn("request : {}",request);
+        // log.warn("accessToken : {}",accessToken);
 
         if(StringUtils.isEmpty(accessToken)){
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"유효하지 않은 구성의 JWT 토큰입니다.");

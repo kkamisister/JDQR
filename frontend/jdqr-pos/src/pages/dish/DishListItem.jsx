@@ -1,7 +1,6 @@
 import React from 'react';
-import { Box, Typography, Stack, Chip } from '@mui/material';
+import { Typography, Stack } from '@mui/material';
 import { colors } from 'constants/colors';
-
 import { darken } from '@mui/system';
 const DishListItem = ({ name, price, tags }) => {
 	return (
@@ -22,14 +21,14 @@ const DishListItem = ({ name, price, tags }) => {
 				cursor: 'pointer',
 			}}>
 			<Stack>
-				<Typography sx={{ fontSize: '25px', fontWeight: '600' }}>
+				<Typography sx={{ fontSize: '22px', fontWeight: '600' }}>
 					{name}
 				</Typography>
-				<Typography sx={{ fontSize: '25px', fontWeight: '600' }}>
+				<Typography sx={{ fontSize: '22px', fontWeight: '600' }}>
 					{`${price.toLocaleString('ko-KR')}원`}
 				</Typography>
 			</Stack>
-			<Stack direction="row" spacing={1}>
+			{/* <Stack direction="row" spacing={1}>
 				{tags.map(label => (
 					<Chip
 						sx={{
@@ -41,7 +40,7 @@ const DishListItem = ({ name, price, tags }) => {
 						label={label}
 					/>
 				))}
-			</Stack>
+			</Stack> */}
 		</Stack>
 	);
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import DishListItem from './DishListItem';
 import { Box } from '@mui/material';
-const DishList = () => {
+const DishList = ({ dishItems }) => {
 	return (
 		<Box
 			direction="row"
@@ -14,36 +14,14 @@ const DishList = () => {
 				justifyContent: 'flex-start',
 				alignItems: 'flex-start',
 			}}>
-			<DishListItem
-				name="감자탕(중)"
-				price={32000}
-				tags={['인기메뉴', '대표메뉴']}
-			/>
-			<DishListItem
-				name="감자탕(중)"
-				price={32000}
-				tags={['인기메뉴', '대표메뉴']}
-			/>
-			<DishListItem
-				name="감자탕(중)"
-				price={32000}
-				tags={['인기메뉴', '대표메뉴']}
-			/>
-			<DishListItem
-				name="감자탕(중)"
-				price={32000}
-				tags={['인기메뉴', '대표메뉴']}
-			/>
-			<DishListItem
-				name="감자탕(중)"
-				price={32000}
-				tags={['인기메뉴', '대표메뉴']}
-			/>
-			<DishListItem
-				name="감자탕(중)"
-				price={32000}
-				tags={['인기메뉴', '대표메뉴']}
-			/>
+			{dishItems.map((dish, idx) => (
+				<DishListItem
+					key={`${dish.dishName}-idx`}
+					name={dish.dishName}
+					price={dish.price}
+					tags={dish.tags}
+				/>
+			))}
 		</Box>
 	);
 };

@@ -4,10 +4,15 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { colors } from "../../constants/colors";
 import { useNavigate } from "react-router-dom";
+import { getTableName } from "../../utils/apis/table";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Header({ title, BackPage = false }) {
+  const { data: tableName, isLoading } = useQuery({
+    queryKey: ["tableName"],
+    queryFn: getTableName,
+  });
   const navigate = useNavigate();
-  const tableName = "여기 바꿔야함";
   const backToPrevPage = () => {
     navigate(-1);
   };
@@ -41,14 +46,16 @@ export default function Header({ title, BackPage = false }) {
         >
           {title}
         </Typography>
-        <Chip
-          label={tableName}
-          sx={{
-            bgcolor: colors.main.primary500,
-            borderRadius: "10px",
-            color: colors.text.white,
-          }}
-        />
+        {tableName && (
+          <Chip
+            label={tableName}
+            sx={{
+              bgcolor: colors.main.primary500,
+              borderRadius: "10px",
+              color: colors.text.white,
+            }}
+          />
+        )}
       </Toolbar>
     </AppBar>
   );

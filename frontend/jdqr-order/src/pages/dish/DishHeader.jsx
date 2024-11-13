@@ -13,6 +13,9 @@ export default function DishHeader() {
   const navigate = useNavigate();
   const { client, connect } = useWebSocketStore();
   const [orderCnt, setOrderCnt] = useState(0);
+  const [peopleCnt, setPeopleCnt] = useState();
+  const [cartList, setCartList] = useState([]);
+
   let tableId = sessionStorage.getItem("tableId");
 
   const goToCart = () => {
@@ -35,11 +38,17 @@ export default function DishHeader() {
     }
     if (client && client.connected) {
       console.log("일단 웹소켓 연결은 됨;;");
-      const subscription = client.subscribe("sub/cart" + tableId, (message) => {
-        console.log("이것이 멧쉐지", message.body);
-      });
+      const subscription = client.subscribe(
+        "/sub/cart/" + tableId,
+        (message) => {
+          console.log("이것이 멧쉐지", message.body);
+          const response = JSON.parse(message.body);
+          setCartList(response.cartList);
+          setPeopleCnt(response.peopleCnt);
+        }
+      );
     }
-  });
+  }, [client]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["orderList"],
@@ -89,7 +98,7 @@ export default function DishHeader() {
             py: 1.5,
           }}
         >
-          {`장바구니 ${12}건`}
+          {`장바구니 ${cartList?.length || 0}건`}
         </Button>
       </Stack>
       <Button
@@ -101,12 +110,12 @@ export default function DishHeader() {
           p: 1,
         }}
       >
-        <Typography
-          color={colors.text.sub1}
-          fontWeight="bold"
-        >{`${7}명`}</Typography>
+        <Typography color={colors.text.sub1} fontWeight="bold">
+          {peopleCnt > 1 && <span>총</span>}
+          {`${peopleCnt || 1}명`}
+        </Typography>
         <Typography color={colors.text.sub1}>
-          이 함께 주문하고 있어요!
+          이 {peopleCnt > 1 && <span>함께</span>} 주문하고 있어요!
         </Typography>
       </Button>
     </Stack>

@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Stack, Typography, Box, Divider } from "@mui/material";
+import { Stack, Typography, Box, Divider, Avatar } from "@mui/material";
 import MapBackButtonHeader from "../../../components/header/MapBackButtonHeader";
 import { colors } from "../../../constants/colors";
 import DishTagChip from "../../../components/chip/DishTagChip";
@@ -10,7 +10,6 @@ import LoadingSpinner from "../../../components/Spinner/LoadingSpinner";
 import { useState, useMemo, useEffect } from "react";
 import NumberSelector from "../../../components/selector/NumberSelector";
 import BaseButton from "../../../components/button/BaseButton";
-import { Stomp } from "@stomp/stompjs";
 import { setUserCookie } from "../../../utils/apis/axiosInstance";
 import useWebSocketStore from "../../../stores/SocketStore";
 
@@ -85,7 +84,8 @@ export default function DishDetailPage() {
 
   const handleAddToCart = () => {
     if (client && client.connected) {
-      const orderedAt = new Date().toISOString();
+      const orderedAt = new Date().getTime();
+
       console.log("주문시각은요.", orderedAt);
 
       const postData = {
@@ -115,12 +115,13 @@ export default function DishDetailPage() {
           <>
             {/* 이미지 && 뒤로가기 버튼 */}
             <Stack>
-              <Box
-                component="img"
-                src="https://cdn.dominos.co.kr/admin/upload/goods/20230619_F33836Pn.jpg"
+              <Avatar
+                src={data.image}
                 sx={{
                   objectFit: "cover",
-                  maxHeight: "200px",
+                  height: "200px",
+                  borderRadius: 0,
+                  width: "100%",
                 }}
               />
               <MapBackButtonHeader />

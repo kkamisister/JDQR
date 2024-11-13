@@ -1,4 +1,4 @@
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { Avatar, Box, IconButton, Stack, Typography } from "@mui/material";
 import { colors } from "../../constants/colors";
 import DishTagChip from "../chip/DishTagChip";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -89,10 +89,9 @@ const DishItemCard = ({
           </Typography>
         </Stack>
         {hasImage && (
-          <Box
-            component="img"
+          <Avatar
             alt={dish.dishName}
-            src="https://cdn.dominos.co.kr/admin/upload/goods/20230619_F33836Pn.jpg"
+            src={dish.image}
             sx={{
               width: 120,
               height: 120,

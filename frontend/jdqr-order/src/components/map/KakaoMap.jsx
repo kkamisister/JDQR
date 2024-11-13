@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react"
-import { Stack } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import {
   Map,
   MapMarker,
   useKakaoLoader,
-  customOverlay,
+  MarkerClusterer,
+  CustomOverlayMap,
 } from "react-kakao-maps-sdk"
-import activeMapmarker from "../../assets/images/mapmarker1.png"
-import inactiveMapmarker from "../../assets/images/mapmarker2.png"
-
-const { kakao } = window
+import currLocatMapmarker from "../../assets/images/currLocatMapmarker.png"
+import { colors } from "../../constants/colors"
 
 const KakaoMap = ({
   onBoundsChange,
@@ -65,74 +64,55 @@ const KakaoMap = ({
         onDragEnd={(map) => handleBoundsChanged(map)}
         onZoomChanged={(map) => handleBoundsChanged(map)}
         bounds={bounds}
-        onCreate={(map) => {
-          // 클러스터러 생성
-          const clusterer = new kakao.maps.MarkerClusterer({
-            map: map,
-            averageCenter: true,
-            minLevel: 4,
-          })
-
-          if (restaurants) {
-            const overlays = restaurants.map((restaurant) => {
-              const overlayContent = `
-              <div class="custom-overlay" style="box-shadow: none;">
-                <img src=${
-                  restaurant.open && restaurant.restTableNum > 0
-                    ? activeMapmarker
-                    : inactiveMapmarker
-                } style="width: 80px; height: 60px;" />
-                <p>${restaurant.restaurantName}</p>
-              </div>`
-
-              const overlay = new kakao.maps.CustomOverlay({
-                position: new kakao.maps.LatLng(restaurant.lat, restaurant.lng),
-                content: overlayContent,
-                clickable: true,
-              })
-
-              return overlay
-            })
-
-            clusterer.addMarkers(overlays)
-          }
-        }}
       >
-        {/* 기본 위치 마커 (현재 위치)
+        {/* 현재 위치 마커 */}
         <MapMarker
           position={location}
           image={{
-            src: "https://cdn-icons-png.flaticon.com/128/2098/2098567.png",
-            size: {
-              width: 35,
-              height: 35,
-            },
+            src: currLocatMapmarker,
+            size: { width: 35, height: 35 },
           }}
         />
-
-        {/* restaurants가 존재할 때 각 식당들의 위치에 마커 추가 */}
-        {/* {restaurants &&
-          restaurants.map((restaurant) => (
-            <MapMarker
+        <MarkerClusterer averageCenter={true} minLevel={4}>
+          {/* 식당 마커 추가 */}
+          {restaurants?.map((restaurant) => (
+            <CustomOverlayMap
               key={restaurant.id}
               position={{
                 lat: restaurant.lat,
                 lng: restaurant.lng,
               }}
-              image={{
-                src:
-                  restaurant.open && restaurant.restTableNum > 0
-                    ? activeMapmarker
-                    : inactiveMapmarker,
-                size: { width: 80, height: 60 },
-              }}
-              onClick={() => {
-                console.log(
-                  `Clicked on restaurant: ${restaurant.restaurantName}`
-                )
-              }}
-            />
-          ))} */}
+              yAnchor={1}
+            >
+              <Stack alignItems="center" spacing={1}>
+                <Stack
+                  sx={{
+                    padding: "5px",
+                    fontSize: "12px",
+                    backgroundColor:
+                      restaurant.open && restaurant.restTableNum > 0
+                        ? colors.main.primary500
+                        : colors.text.sub2,
+                    color: colors.text.white,
+                    borderRadius: "8px",
+                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                    textAlign: "center",
+                    width: "80px",
+                  }}
+                >
+                  {restaurant.open ? (
+                    <Stack>
+                      {restaurant.restSeatNum}석 / {restaurant.restTableNum} T
+                    </Stack>
+                  ) : (
+                    <Typography>영업 종료</Typography>
+                  )}
+                </Stack>
+                <Typography>{restaurant.restaurantName}</Typography>
+              </Stack>
+            </CustomOverlayMap>
+          ))}
+        </MarkerClusterer>
       </Map>
     </Stack>
   )

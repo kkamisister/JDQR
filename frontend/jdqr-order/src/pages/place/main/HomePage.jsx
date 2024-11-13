@@ -21,6 +21,7 @@ const HomePage = () => {
   const [selectedCategory, setCategory] = useState("")
 
   useEffect(() => {
+    // 사용자 현위치
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {

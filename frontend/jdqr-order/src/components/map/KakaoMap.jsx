@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react"
 import { Stack } from "@mui/material"
-import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk"
+import {
+  Map,
+  MapMarker,
+  useKakaoLoader,
+  customOverlay,
+} from "react-kakao-maps-sdk"
 import activeMapmarker from "../../assets/images/mapmarker1.png"
 import inactiveMapmarker from "../../assets/images/mapmarker2.png"
+
+const { kakao } = window
 
 const KakaoMap = ({
   onBoundsChange,
@@ -16,6 +23,7 @@ const KakaoMap = ({
     lng: 127.03956684373539,
   })
   const [bounds, setBounds] = useState(initialBounds || null)
+  const [selectedMapmarker, setSelectedMapmarker] = useState(null)
 
   const isLoaded = useKakaoLoader()
 
@@ -57,8 +65,40 @@ const KakaoMap = ({
         onDragEnd={(map) => handleBoundsChanged(map)}
         onZoomChanged={(map) => handleBoundsChanged(map)}
         bounds={bounds}
+        onCreate={(map) => {
+          // 클러스터러 생성
+          const clusterer = new kakao.maps.MarkerClusterer({
+            map: map,
+            averageCenter: true,
+            minLevel: 4,
+          })
+
+          if (restaurants) {
+            const overlays = restaurants.map((restaurant) => {
+              const overlayContent = `
+              <div class="custom-overlay" style="box-shadow: none;">
+                <img src=${
+                  restaurant.open && restaurant.restTableNum > 0
+                    ? activeMapmarker
+                    : inactiveMapmarker
+                } style="width: 80px; height: 60px;" />
+                <p>${restaurant.restaurantName}</p>
+              </div>`
+
+              const overlay = new kakao.maps.CustomOverlay({
+                position: new kakao.maps.LatLng(restaurant.lat, restaurant.lng),
+                content: overlayContent,
+                clickable: true,
+              })
+
+              return overlay
+            })
+
+            clusterer.addMarkers(overlays)
+          }
+        }}
       >
-        {/* 기본 위치 마커 (현재 위치) */}
+        {/* 기본 위치 마커 (현재 위치)
         <MapMarker
           position={location}
           image={{
@@ -71,7 +111,7 @@ const KakaoMap = ({
         />
 
         {/* restaurants가 존재할 때 각 식당들의 위치에 마커 추가 */}
-        {restaurants &&
+        {/* {restaurants &&
           restaurants.map((restaurant) => (
             <MapMarker
               key={restaurant.id}
@@ -80,17 +120,19 @@ const KakaoMap = ({
                 lng: restaurant.lng,
               }}
               image={{
-                src: isActive ? activeMapmarker : inactiveMapmarker,
+                src:
+                  restaurant.open && restaurant.restTableNum > 0
+                    ? activeMapmarker
+                    : inactiveMapmarker,
                 size: { width: 80, height: 60 },
               }}
-              // onClick={() => { // 추후 로직 수정
-              //   setIsActive(!isActive)
-              //   console.log(
-              //     `Clicked on restaurant: ${restaurant.restaurantName}`
-              //   )
-              // }}
+              onClick={() => {
+                console.log(
+                  `Clicked on restaurant: ${restaurant.restaurantName}`
+                )
+              }}
             />
-          ))}
+          ))} */}
       </Map>
     </Stack>
   )

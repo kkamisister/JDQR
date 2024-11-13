@@ -27,30 +27,44 @@ VALUES (1, 37.7749, -122.4194, b'1', 1, NOW(), NOW(), '123 Main St, San Francisc
 --     공차 역삼점
        (12, 37.5010235882489, 127.034572307912, b'1', 12, NOW(), NOW(), '서울 강남구 강남대로94길 91',
         'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_12.jfif', 'Food', '공차 역삼점',
-        '02-779-7758', '214-88-84534', 'ACTIVE')
+        '02-779-7758', '214-88-84534', 'ACTIVE'),
+--     오봉집 역삼역점
+       (13, 37.5021681398693, 127.035769697653, b'1', 13, NOW(), NOW(), '서울특별시 강남구 논현로93길 4',
+        'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_13.jpg', 'Food', '오봉집 역삼역점',
+        '02-554-4490', '212-86-08370', 'ACTIVE'),
+--     바스버거
+       (14, 37.4996347605088, 127.035838830564, b'1', 14, NOW(), NOW(), '서울특별시 강남구 테헤란로26길 10 성보빌딩 지하1층',
+        'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_14.jpg', 'Food', '바스버거',
+        '02-568-6654', '106-87-05191', 'ACTIVE'),
+--     농민백암순대 본점
+       (15, 37.5037329376349, 127.052982069884, b'1', 15, NOW(), NOW(), '서울특별시 강남구 선릉로86길 40-4',
+        'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_15.jpg', 'Food', '농민백암순대 본점',
+        '02-555-9603', '254-12-01439', 'ACTIVE'),
 ;
 
 -- 3. restaurant_categories 테이블
 INSERT INTO `restaurant_categories` (`id`, `created_at`, `updated_at`, `name`, `category_type`, `status`)
-VALUES (1, NOW(), NOW(), 'Fast Food', 'MAJOR', 'ACTIVE'),
-
-       -- 진짜 데이터
-       (11, NOW(), NOW(), '한식', 'MAJOR', 'ACTIVE'),
-       (12, NOW(), NOW(), '양식', 'MAJOR', 'ACTIVE'),
-       (13, NOW(), NOW(), '중식', 'MAJOR', 'ACTIVE'),
-       (14, NOW(), NOW(), '일식', 'MAJOR', 'ACTIVE'),
-       (15, NOW(), NOW(), '술집', 'MAJOR', 'ACTIVE'),
-       (16, NOW(), NOW(), '카페', 'MAJOR', 'ACTIVE')
+VALUES
+    -- 진짜 데이터
+    (11, NOW(), NOW(), '한식', 'MAJOR', 'ACTIVE'),
+    (12, NOW(), NOW(), '양식', 'MAJOR', 'ACTIVE'),
+    (13, NOW(), NOW(), '중식', 'MAJOR', 'ACTIVE'),
+    (14, NOW(), NOW(), '일식', 'MAJOR', 'ACTIVE'),
+    (15, NOW(), NOW(), '술집', 'MAJOR', 'ACTIVE'),
+    (16, NOW(), NOW(), '카페', 'MAJOR', 'ACTIVE')
 ;
 
 -- 4. restaurant_category_map 테이블
 INSERT INTO `restaurant_category_map` (`id`, `restaurant_category_id`, `restaurant_id`, `created_at`, `updated_at`,
                                        `status`)
-VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- Tasty Restaurant: Fast Food
+VALUES (1, 11, 1, NOW(), NOW(), 'ACTIVE'), -- Tasty Restaurant: Fast Food
 
 --        진짜 데이터
        (11, 11, 11, NOW(), NOW(), 'ACTIVE'),
-       (12, 16, 12, NOW(), NOW(), 'ACTIVE')
+       (12, 16, 12, NOW(), NOW(), 'ACTIVE'),
+       (13, 11, 13, NOW(), NOW(), 'ACTIVE'),
+       (14, 11, 14, NOW(), NOW(), 'ACTIVE'),
+       (15, 11, 15, NOW(), NOW(), 'ACTIVE'),
 ;
 
 -- 5. dish_categories 테이블

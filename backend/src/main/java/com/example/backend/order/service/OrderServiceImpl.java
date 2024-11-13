@@ -70,7 +70,6 @@ public class OrderServiceImpl implements OrderService {
 	private final SimpMessagingTemplate messagingTemplate;
 	private final TossWebClient tossWebClient;
     private final OrderPaymentRepository orderPaymentRepository;
-	private final OptionRepository optionRepository;
 
 	/**
 	 * tableName으로 qrCode를 찾아서, 해당 코드에 token을 더한 주소를 반환

@@ -7,7 +7,6 @@ import { useQuery } from "@tanstack/react-query"
 import { useParams } from "react-router-dom"
 
 const RestaurantDetailPage = () => {
-  // const [restaurantId, setRestaurantId] = useState(null)
   const { restaurantId } = useParams()
 
   const { data: restaurantData, error } = useQuery({

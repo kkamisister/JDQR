@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Stack, Typography } from "@mui/material"
+import { Stack, Typography, Box } from "@mui/material"
 import {
   Map,
   MapMarker,
@@ -57,6 +57,8 @@ const KakaoMap = ({
           top: 0,
           width: "100%",
           height: "100%",
+          // backgroundColor: "rgba(255, 255, 255, 0.7)", // 맵 배경을 살짝 옅게
+          // filter: "brightness(0.9)",
         }}
         level={3}
         draggable
@@ -73,7 +75,7 @@ const KakaoMap = ({
             size: { width: 35, height: 35 },
           }}
         />
-        <MarkerClusterer averageCenter={true} minLevel={4}>
+        <MarkerClusterer averageCenter={true} minLevel={3}>
           {/* 식당 마커 추가 */}
           {restaurants?.map((restaurant) => (
             <CustomOverlayMap
@@ -88,7 +90,7 @@ const KakaoMap = ({
                 <Stack
                   sx={{
                     padding: "5px",
-                    fontSize: "12px",
+                    fontSize: "13px",
                     backgroundColor:
                       restaurant.open && restaurant.restTableNum > 0
                         ? colors.main.primary500
@@ -96,19 +98,28 @@ const KakaoMap = ({
                     color: colors.text.white,
                     borderRadius: "8px",
                     boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-                    textAlign: "center",
-                    width: "80px",
+                    width: "70px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
                   {restaurant.open ? (
-                    <Stack>
-                      {restaurant.restSeatNum}석 / {restaurant.restTableNum} T
-                    </Stack>
+                    restaurant.restTableNum > 0 ? (
+                      <Stack>
+                        {restaurant.restSeatNum}석 / {restaurant.restTableNum}T
+                      </Stack>
+                    ) : (
+                      <Stack>{restaurant.restTableNum} Table</Stack>
+                    )
                   ) : (
                     <Typography>영업 종료</Typography>
                   )}
                 </Stack>
-                <Typography>{restaurant.restaurantName}</Typography>
+                <Typography fontSize={16} fontWeight={600}>
+                  {restaurant.restaurantName}
+                </Typography>
               </Stack>
             </CustomOverlayMap>
           ))}

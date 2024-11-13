@@ -370,7 +370,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 			}
 
 			// 인원수가 기본값이 아닌 경우, 남은 좌석 수가 인원수보다 적고 열지 않았으면 해당 식당을 건너뜀
-			if((people > 0 && restSeatNum < people) && !restaurant.getOpen()){
+			if((people > 0 && restSeatNum < people) || !restaurant.getOpen()){
 				continue;
 			}
 

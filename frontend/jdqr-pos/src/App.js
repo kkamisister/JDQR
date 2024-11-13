@@ -29,13 +29,16 @@ const App = () => {
 					<QueryClientProvider client={queryClient}>
 						<BrowserRouter>
 							<Routes>
-								<Route index element={<LoginPage />} />
+								<Route path="/owner" element={<LoginPage />} />
 								<Route element={<DefaultLayout />}>
-									<Route path="/table" element={<TablePage />} />
-									<Route path="/dish" element={<DishPage />} />
-									<Route path="/employee" element={<EmployeePage />} />
+									<Route path="/owner/table" element={<TablePage />} />
+									<Route path="/owner/dish" element={<DishPage />} />
 									<Route
-										path="/restaurant"
+										path="/owner/employee"
+										element={<EmployeePage />}
+									/>
+									<Route
+										path="/owner/restaurant"
 										element={<RestaurantPage />}
 									/>
 								</Route>

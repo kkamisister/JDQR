@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Stack, TextField, Typography } from '@mui/material';
 import { colors } from 'constants/colors';
-import SubtitleTextField from 'components/textfield/SubtitleTextField';
+import SubtitleTextField from 'components/input/SubtitleTextField';
 import EditColorBox from './EditColorBox';
 import FlatButton from 'components/button/FlatButton';
 import { removeTable } from 'utils/apis/table';

@@ -4,10 +4,10 @@ import SidebarMenuBox from './SidebarMenuBox';
 import { colors } from 'constants/colors';
 import { useLocation, useNavigate } from 'react-router-dom';
 const menuList = [
-	{ name: '테이블', path: '/table' },
-	{ name: '메뉴', path: '/dish' },
-	{ name: '직원 호출', path: '/employee' },
-	{ name: '사업장', path: '/restaurant' },
+	{ name: '테이블', path: '/owner/table' },
+	{ name: '메뉴', path: '/owner/dish' },
+	{ name: '직원 호출', path: '/owner/employee' },
+	{ name: '사업장', path: '/owner/restaurant' },
 ];
 const Sidebar = () => {
 	const location = useLocation();

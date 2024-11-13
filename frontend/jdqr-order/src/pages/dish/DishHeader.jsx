@@ -12,8 +12,12 @@ import { useQuery } from "@tanstack/react-query";
 export default function DishHeader() {
   const navigate = useNavigate();
   const { client, connect } = useWebSocketStore();
-  const [orderCnt, setOrderCnt] = useState(20);
+  const [orderCnt, setOrderCnt] = useState(0);
   let tableId = sessionStorage.getItem("tableId");
+
+  const goToCart = () => {
+    navigate("/cart");
+  };
 
   useEffect(() => {
     if (!sessionStorage.getItem("userId")) {
@@ -37,20 +41,19 @@ export default function DishHeader() {
     }
   });
 
-  useEffect(() => {
-    if (data) {
-      setOrderCnt(data.orders.length);
-    }
-  }, [data]);
-
-  const goToCart = () => {
-    navigate("/cart");
-  };
-
   const { data, isLoading } = useQuery({
     queryKey: ["orderList"],
     queryFn: fetchOrderList,
   });
+
+  useEffect(() => {
+    if (data?.orders) {
+      setOrderCnt(data.orders.length);
+      console.log(data.orders);
+    } else {
+      setOrderCnt(0);
+    }
+  }, [data]);
 
   return (
     <Stack

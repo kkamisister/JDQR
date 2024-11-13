@@ -4,6 +4,7 @@ import static com.example.backend.order.dto.CartResponse.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -138,7 +139,7 @@ public class OrderServiceImpl implements OrderService {
 			redisHashRepository.saveHashData(key, cartData.getUserId(), cachedCartData,20L);
 		}
 		else{ // 2. 새로운 물품인 경우 -> 리스트에 추가
-			cachedCartData = new ConcurrentHashMap<>();
+			if(ObjectUtils.isEmpty(cachedCartData))cachedCartData = new ConcurrentHashMap<>();
 
 			// 여기서 저장한 품목에 대한 가격을 받아서 채워넣어야 함
 			setDishInfo(productInfo);
@@ -153,7 +154,7 @@ public class OrderServiceImpl implements OrderService {
 		Map<String, Map<Integer,CartDto>> allCartDatas = redisHashRepository.getAllCartDatas(tableId);
 
 		// 3-2. 현재 테이블과 연결된 사람수를 받아온다
-		int subscriberSize = notificationService.getSubscriberSize(tableId);
+		Integer subscriberSize = redisHashRepository.getCurrentUserCnt(tableId);
 
 		// 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
 		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
@@ -241,7 +242,7 @@ public class OrderServiceImpl implements OrderService {
 		// log.warn("allCartDatas : {}",allCartDatas);
 
 		// 3-2. 현재 테이블과 연결된 사람수를 받아온다
-		int subscriberSize = notificationService.getSubscriberSize(tableId);
+		Integer subscriberSize = redisHashRepository.getCurrentUserCnt(tableId);
 
 		// 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
 		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));

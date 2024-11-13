@@ -12,6 +12,7 @@ const PeopleFilter = ({ people, setPeople, together, setTogether }) => {
     if (activeIndex === index) {
       setActiveIndex(null)
       setPeople(0)
+      setTogether(false)
     } else {
       const peopleValues = [1, 2, 4, 5]
       setPeople(peopleValues[index])

@@ -4,14 +4,14 @@ import SearchIcon from "@mui/icons-material/Search"
 import RestaurantCategoryButton from "../button/RestaurantCategoryButton"
 import { colors } from "../../constants/colors"
 
-const MapDefaultHeader = ({ majorCategories, setKeyword }) => {
+const MapDefaultHeader = ({ majorCategories, setKeyword, setCategory }) => {
   const [activeIndex, setActiveIndex] = useState(null)
-  const [isChecked, setIsChecked] = useState(false)
 
   const handleButtonClick = (index) => {
+    const category = majorCategories[index]
     setActiveIndex((prevIndex) => {
       const newIndex = prevIndex === index ? null : index
-      setIsChecked(newIndex !== null)
+      setCategory(newIndex !== null ? category : "")
       return newIndex
     })
   }

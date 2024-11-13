@@ -17,8 +17,8 @@ const HomePage = () => {
     lat: 37.50125774784631,
     lng: 127.03956684373539,
   })
-
   const [keyword, setKeyword] = useState("")
+  const [selectedCategory, setCategory] = useState("")
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -47,8 +47,16 @@ const HomePage = () => {
   }, [])
 
   const { data: restaurantsData } = useQuery({
-    queryKey: ["restaurants", bounds, people, together, keyword],
+    queryKey: [
+      "restaurants",
+      bounds,
+      people,
+      together,
+      keyword,
+      selectedCategory,
+    ],
     queryFn: async () => {
+      // keyword 여부에 따라 다른 api 호출
       if (keyword) {
         console.log("파라미터는....이렇게 생겼다지...", {
           bounds,
@@ -81,6 +89,14 @@ const HomePage = () => {
     setBounds(newBounds)
   }
 
+  const filteredRestaurants = selectedCategory
+    ? restaurantsData?.restaurants?.filter((restaurant) =>
+        restaurant.restaurantCategories.major.some(
+          (category) => category.restaurantCategoryName === selectedCategory
+        )
+      )
+    : restaurantsData?.restaurants || []
+
   return (
     <Stack>
       <Stack
@@ -95,6 +111,7 @@ const HomePage = () => {
         <MapDefaultHeader
           majorCategories={restaurantsData?.majorCategories || []}
           setKeyword={setKeyword}
+          setCategory={setCategory}
         />
       </Stack>
 
@@ -112,7 +129,8 @@ const HomePage = () => {
           onBoundsChange={handleBoundsChange}
           initialLocation={location} // 초기 위치 전달
           initialBounds={bounds} // 초기 bounds 전달
-          restaurants={restaurantsData?.restaurants || []}
+          // restaurants={restaurantsData?.restaurants || []}
+          restaurants={filteredRestaurants || []}
         />
       </Stack>
 
@@ -128,7 +146,8 @@ const HomePage = () => {
         }}
       >
         <RestaurantListBox
-          restaurants={restaurantsData?.restaurants || []}
+          // restaurants={restaurantsData?.restaurants || []}
+          restaurants={filteredRestaurants || []}
           people={people}
           setPeople={setPeople}
           together={together}

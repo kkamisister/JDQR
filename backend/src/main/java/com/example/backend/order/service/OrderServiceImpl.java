@@ -2,13 +2,9 @@ package com.example.backend.order.service;
 
 import static com.example.backend.order.dto.CartResponse.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.Map;
 
 import com.example.backend.common.annotation.RedLock;
 import com.example.backend.common.client.toss.TossWebClient;
@@ -22,12 +18,10 @@ import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.Choice;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.ChoiceRepository;
-import com.example.backend.dish.repository.OptionRepository;
+import com.example.backend.order.dto.*;
 import com.example.backend.order.dto.CartRequest.*;
-import com.example.backend.order.dto.OptionDetailDto;
 import com.example.backend.order.dto.OrderRequest.*;
 import com.example.backend.order.dto.OrderResponse.*;
-import com.example.backend.order.dto.OrderResponseVo;
 import com.example.backend.order.entity.*;
 import com.example.backend.order.enums.OrderStatus;
 import com.example.backend.order.enums.PaymentMethod;
@@ -41,7 +35,6 @@ import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
 import com.example.backend.common.redis.repository.RedisHashRepository;
 import com.example.backend.common.util.GenerateLink;
-import com.example.backend.order.dto.CartDto;
 import com.example.backend.notification.service.NotificationService;
 import com.example.backend.table.entity.Table;
 import com.example.backend.table.repository.TableRepository;
@@ -62,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
 	private final RedisHashRepository redisHashRepository;
 	private final OrderRepository orderRepository;
 	private final OrderItemRepository orderItemRepository;
-	private final OrderItemOptionRepository orderItemOptionRepository;
+	private final OrderItemChoiceRepository orderItemChoiceRepository;
 	private final DishRepository dishRepository;
 	private final ChoiceRepository choiceRepository;
 	private final PaymentRepository paymentRepository;
@@ -463,6 +456,64 @@ public class OrderServiceImpl implements OrderService {
 			.build();
 	}
 
+	@Transactional
+	@Override
+	public void addDummyOrderData(DummyOrderDto dummyOrderDto) {
+		String tableId = dummyOrderDto.getTableId();
+
+		// 1. Orders table에 저장
+		Order order = Order.builder()
+			.tableId(tableId)
+			.orderStatus(OrderStatus.PAID)
+			.paymentMethod(dummyOrderDto.getPaymentMethod())
+			.build();
+
+		Order savedOrder = orderRepository.save(order);
+		String userId = UUID.randomUUID().toString();
+
+		// 2. order_items table에 저장
+		List<DummyDishDto> dummyDishDtos = dummyOrderDto.getDummyDishDtos();
+		for (DummyDishDto dummyDishDto : dummyDishDtos) {
+			Dish dish = dishRepository.findById(dummyDishDto.getDishId())
+				.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+
+			OrderItem orderItem = OrderItem.builder()
+				.order(savedOrder)
+				.dish(dish)
+				.userId(userId)
+				.quantity(dummyDishDto.getQuantity())
+				.paidQuantity(dummyDishDto.getQuantity())
+				.orderPrice(dummyDishDto.getPrice())
+				.orderStatus(OrderStatus.PAID)
+				.build();
+
+			List<Integer> choiceIds = dummyDishDto.getChoiceIds();
+			OrderItem savedOrderItem = orderItemRepository.save(orderItem);
+
+			List<Choice> choices = choiceRepository.findAllById(choiceIds);
+			Map<Integer, Choice> choiceIdMap = new HashMap<>(choices.size());
+			for (Choice choice : choices) {
+				choiceIdMap.put(choice.getId(), choice);
+			}
+
+			// orderItemChoices 저장
+			List<OrderItemChoice> orderItemChoices = choiceIds.stream()
+				.map(choiceId -> {
+					Choice choice = choiceIdMap.get(choiceId);
+					return OrderItemChoice.builder()
+						.orderItem(orderItem)
+						.choice(choice)
+						.build();
+				})
+				.toList();
+
+			orderItemChoiceRepository.saveAll(orderItemChoices);
+
+		}
+
+
+	}
+
 	/**
 	 * {tossOrderId}에 해당하는 주문의 결제가 모두 끝났는지를 판단한다.
 	 *
@@ -767,7 +818,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		// DB에 저장
-		orderItemOptionRepository.saveAll(orderItemChoices);
+		orderItemChoiceRepository.saveAll(orderItemChoices);
 	}
 
 	// orderItem과 해당 orderItem에 포함된 optionId 리스트를 이용해서, orderItemOption 리스트를 만드는 메서드

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.example.backend.order.dto.CartRequest.*;
 import com.example.backend.order.dto.CartResponse.*;
+import com.example.backend.order.dto.DummyOrderDto;
 import com.example.backend.order.dto.OrderResponse.*;
 import org.springframework.http.ResponseEntity;
 import com.example.backend.common.dto.CommonResponse.*;
@@ -113,6 +114,12 @@ public class OrderController {
 		String tableId = (String)attributes.get("tableId");
 		log.warn("테이블 id : {}",tableId);
 		orderService.addItem(tableId,productInfo);
+	}
+
+	// todo: order data 삽입용 api. 데이터 삽입 이후 삭제
+	@PostMapping("/dummy")
+	public void addDummyOrderData(@RequestBody DummyOrderDto productInfo){
+		orderService.addDummyOrderData(productInfo);
 	}
 
 

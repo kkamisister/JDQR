@@ -4,7 +4,10 @@ import { Stack } from "@mui/material"
 import KakaoMap from "../../../components/map/KakaoMap"
 import RestaurantListBox from "./RestaurantListBox"
 import MapDefaultHeader from "../../../components/header/MapDefaultHeader"
-import { fetchRestaurants } from "../../../utils/apis/place"
+import {
+  fetchRestaurants,
+  fetchRestaurantSearch,
+} from "../../../utils/apis/place"
 
 const HomePage = () => {
   const [bounds, setBounds] = useState(null)
@@ -14,6 +17,8 @@ const HomePage = () => {
     lat: 37.50125774784631,
     lng: 127.03956684373539,
   })
+
+  const [keyword, setKeyword] = useState("")
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -42,24 +47,35 @@ const HomePage = () => {
   }, [])
 
   const { data: restaurantsData } = useQuery({
-    queryKey: ["restaurants", bounds, people, together],
+    queryKey: ["restaurants", bounds, people, together, keyword],
     queryFn: async () => {
-      // console.log("파라미터는....이렇게 생겼다지...", {
-      //   bounds,
-      //   people,
-      //   together,
-      // })
-      const response = await fetchRestaurants({
-        ...bounds,
-        people,
-        together,
-      })
-      // console.log("api 응답은....이렇게 생겼다지....:", response)
-      return response
+      if (keyword) {
+        console.log("파라미터는....이렇게 생겼다지...", {
+          bounds,
+          people,
+          together,
+          keyword,
+        })
+        const response = await fetchRestaurantSearch({
+          ...bounds,
+          people,
+          together,
+          keyword,
+        })
+        console.log("api 응답은....이렇게 생겼다지....:", response)
+        return response
+      } else {
+        const response = await fetchRestaurants({
+          ...bounds,
+          people,
+          together,
+        })
+        return response
+      }
     },
-    enabled: !!bounds, // bounds가 설정되었을 때만 쿼리 활성화
+    enabled: !!bounds,
   })
-  // console.log("당신은...데이터를...불러왔지..:", restaurantsData)
+  console.log("당신은...데이터를...불러왔지..:", restaurantsData)
 
   const handleBoundsChange = (newBounds) => {
     setBounds(newBounds)
@@ -78,6 +94,7 @@ const HomePage = () => {
       >
         <MapDefaultHeader
           majorCategories={restaurantsData?.majorCategories || []}
+          setKeyword={setKeyword}
         />
       </Stack>
 

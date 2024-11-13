@@ -49,7 +49,11 @@ const HomePage = () => {
       //   people,
       //   together,
       // })
-      const response = await fetchRestaurants(bounds, people, together)
+      const response = await fetchRestaurants({
+        ...bounds,
+        people,
+        together,
+      })
       // console.log("api 응답은....이렇게 생겼다지....:", response)
       return response
     },

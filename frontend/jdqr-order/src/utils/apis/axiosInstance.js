@@ -51,7 +51,6 @@ const extractTableInfo = async () => {
 };
 
 // 쿠키 발급 함수
-// 쿠키 발급 함수
 const setUserCookie = async () => {
   const token = sessionStorage.getItem("tableToken");
 

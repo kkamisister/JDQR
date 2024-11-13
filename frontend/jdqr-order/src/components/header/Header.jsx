@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function Header({ title, BackPage = false }) {
   const navigate = useNavigate();
-
+  const tableName = "여기 바꿔야함";
   const backToPrevPage = () => {
     navigate(-1);
   };
@@ -42,7 +42,7 @@ export default function Header({ title, BackPage = false }) {
           {title}
         </Typography>
         <Chip
-          label="3번 테이블"
+          label={tableName}
           sx={{
             bgcolor: colors.main.primary500,
             borderRadius: "10px",

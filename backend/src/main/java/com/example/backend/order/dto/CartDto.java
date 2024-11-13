@@ -7,6 +7,8 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,14 +24,18 @@ import lombok.ToString;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @ToString
 public class CartDto {
+
+	@NotNull(message = "음식 ID는 Null일 수 없습니다")
 	private Integer dishId;
+	@NotNull(message = "유저 ID는 Null일 수 없습니다")
 	private String userId;
 	private String dishName;
 	private Integer dishCategoryId;
 	private String dishCategoryName;
 	private List<Integer> choiceIds;
 	private int price; // 기존 가격 + choice 가격을 합친 price
-	private int quantity;
+	@Positive(message = "수량은 음수일 수 없습니다")
+	private Integer quantity;
 	private LocalDateTime orderedAt;
 
 	@Override

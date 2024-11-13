@@ -23,6 +23,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -100,7 +102,7 @@ public class TableController {
 		@ApiResponse(responseCode = "200", description = "테이블 생성 완료"),
 	})
 	@PostMapping("")
-	public ResponseEntity<ResponseWithMessage> createTable(@RequestBody TableInfo tableInfo, HttpServletRequest request) {
+	public ResponseEntity<ResponseWithMessage> createTable(@RequestBody @Valid TableInfo tableInfo, HttpServletRequest request) {
 
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
@@ -139,7 +141,7 @@ public class TableController {
 		@ApiResponse(responseCode = "200", description = "테이블 수정 완료"),
 	})
 	@PutMapping("")
-	public ResponseEntity<ResponseWithMessage> updateTable(@RequestBody TableInfo tableInfo,
+	public ResponseEntity<ResponseWithMessage> updateTable(@RequestBody @Valid TableInfo tableInfo,
 		HttpServletRequest request) {
 
 		String id = (String)request.getAttribute("userId");

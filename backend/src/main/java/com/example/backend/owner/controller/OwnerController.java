@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -290,7 +291,7 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "조회 완료"),
 	})
 	@PostMapping("/restaurant")
-	public ResponseEntity<ResponseWithMessage> createRestaurant(@RequestBody RestaurantProfileDto restaurantProfile,
+	public ResponseEntity<ResponseWithMessage> createRestaurant(@RequestBody @Valid RestaurantProfileDto restaurantProfile,
 		HttpServletRequest request) {
 
 		String id = (String)request.getAttribute("userId");

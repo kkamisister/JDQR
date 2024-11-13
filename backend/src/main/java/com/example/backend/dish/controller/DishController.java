@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,7 +60,8 @@ public class DishController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@GetMapping("/{dishId}")
-	public ResponseEntity<ResponseWithData<DishDetailInfo>> getDish(@PathVariable("dishId") Integer dishId,HttpServletRequest request){
+	public ResponseEntity<ResponseWithData<DishDetailInfo>> getDish(
+		@PathVariable("dishId") @NotNull(message = "메뉴ID는 Null일 수 없습니다") Integer dishId,HttpServletRequest request){
 
 		String tableId = (String)request.getAttribute("tableId");
 		DishDetailInfo dish = dishService.getDish(dishId, tableId);
@@ -78,8 +80,10 @@ public class DishController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@GetMapping("/search")
-	public ResponseEntity<ResponseWithData<DishSearchResultDto>> searchDish(@RequestParam("keyword") @Parameter(description = "메뉴검색 키워드", required = true) String keyword,
-		@RequestParam("restaurantId") @Parameter(description = "메뉴검색 키워드", required = true) Integer restaurantId,
+	public ResponseEntity<ResponseWithData<DishSearchResultDto>> searchDish(
+		@RequestParam("keyword") @Parameter(description = "메뉴검색 키워드", required = true) String keyword,
+		@RequestParam("restaurantId") @Parameter(description = "메뉴검색 키워드", required = true)
+		@NotNull(message = "식당 ID는 Null일 수 없습니다") Integer restaurantId,
 		HttpServletRequest request){
 
 		DishSearchResultDto searchedDishes = dishService.getSearchedDishes(keyword, restaurantId);

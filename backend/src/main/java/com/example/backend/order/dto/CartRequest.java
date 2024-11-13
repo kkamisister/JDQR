@@ -6,6 +6,7 @@ import com.example.backend.order.enums.PaymentMethod;
 import com.example.backend.order.dto.OrderRequest.*;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 
 public record CartRequest() {
@@ -23,6 +24,7 @@ public record CartRequest() {
     @Builder
     public record PaymentRequestDto(
         PaymentMethod type,
+        @Positive(message = "사람 수는 음수일 수 없습니다.")
         Integer peopleNum,
         Integer serveNum,
         List<OrderItemRequestDto> orderItemInfos

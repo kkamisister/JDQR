@@ -24,6 +24,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,8 +48,10 @@ public class RestaurantController {
 	@GetMapping("/restaurant/keyword")
 	public ResponseEntity<ResponseWithData<RestaurantInfo>> restaurantSearchByKeyword(
 		@RequestParam("keyword") String keyword,
-		@RequestParam(value = "minLat",defaultValue = "30") double minLat,@RequestParam(value = "maxLat",defaultValue = "50") double maxLat,
-		@RequestParam(value = "minLng",defaultValue = "100") double minLng,@RequestParam(value = "maxLng",defaultValue = "150") double maxLng,
+		@RequestParam(value = "minLat",defaultValue = "30") @Min(value = 33, message = "대한민국을 벗어날 수 없습니다") double minLat,
+		@RequestParam(value = "maxLat",defaultValue = "50") @Max(value = 43, message = "대한민국을 벗어날 수 없습니다") double maxLat,
+		@RequestParam(value = "minLng",defaultValue = "100") @Min(value = 124, message = "대한민국을 벗어날 수 없습니다") double minLng,
+		@RequestParam(value = "maxLng",defaultValue = "150") @Max(value = 132, message = "대한민국을 벗어날 수 없습니다") double maxLng,
 		@RequestParam(value = "people",required = false, defaultValue = "0") int people,
 		@RequestParam(value = "together",required = false, defaultValue = "false") boolean together){
 
@@ -65,8 +72,10 @@ public class RestaurantController {
 	})
 	@GetMapping("/restaurant")
 	public ResponseEntity<ResponseWithData<RestaurantInfo>> getNearRestaurant(
-		@RequestParam(value = "minLat",defaultValue = "30") double minLat,@RequestParam(value = "maxLat",defaultValue = "50") double maxLat,
-		@RequestParam(value = "minLng",defaultValue = "100") double minLng,@RequestParam(value = "maxLng",defaultValue = "150") double maxLng,
+		@RequestParam(value = "minLat",defaultValue = "30") @Min(value = 33, message = "대한민국을 벗어날 수 없습니다") double minLat,
+		@RequestParam(value = "maxLat",defaultValue = "50") @Max(value = 43, message = "대한민국을 벗어날 수 없습니다") double maxLat,
+		@RequestParam(value = "minLng",defaultValue = "100") @Min(value = 124, message = "대한민국을 벗어날 수 없습니다") double minLng,
+		@RequestParam(value = "maxLng",defaultValue = "150") @Max(value = 132, message = "대한민국을 벗어날 수 없습니다") double maxLng,
 		@RequestParam(value = "people",required = false, defaultValue = "0") int people,
 		@RequestParam(value = "together",required = false, defaultValue = "false") boolean together){
 
@@ -86,7 +95,8 @@ public class RestaurantController {
 		@ApiResponse(responseCode = "200", description = "조회 완료"),
 	})
 	@GetMapping("/restaurant/{restaurantId}")
-	public ResponseEntity<ResponseWithData<RestaurantDetailInfo>> getRestaurantDetail(@PathVariable("restaurantId") Integer restaurantId){
+	public ResponseEntity<ResponseWithData<RestaurantDetailInfo>> getRestaurantDetail(
+		@PathVariable("restaurantId") @NotNull(message = "아이디는 NULL 일 수 없습니다") Integer restaurantId){
 
 		RestaurantDetailInfo restaurantDetail = restaurantService.getRestaurantDetail(restaurantId);
 

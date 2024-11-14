@@ -21,7 +21,7 @@ const MapBackButtonHeader = () => {
           left: "0",
           width: "100%",
           backgroundColor: "white",
-          padding: "10px 20px",
+          padding: "10px 10px",
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
           alignItems: "center",
         }}

@@ -1,10 +1,10 @@
 import React, { useState } from "react"
-import KakaoMap from "../../../components/map/KakaoMap"
 import RestaurantDetailBox from "./RestaurantDetailBox"
 import MapBackButtonHeader from "../../../components/header/MapBackButtonHeader"
 import { fetchRestaurantDetail } from "../../../utils/apis/place"
 import { useQuery } from "@tanstack/react-query"
 import { useParams } from "react-router-dom"
+import { Stack } from "@mui/material"
 
 const RestaurantDetailPage = () => {
   const { restaurantId } = useParams()
@@ -27,8 +27,8 @@ const RestaurantDetailPage = () => {
   }
 
   return (
-    <>
-      <div
+    <Stack>
+      <Stack
         style={{
           position: "fixed",
           top: 0,
@@ -38,41 +38,25 @@ const RestaurantDetailPage = () => {
         }}
       >
         <MapBackButtonHeader />
-      </div>
-      <div
+      </Stack>
+
+      <Stack
         style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        <KakaoMap />
-      </div>
-      <div
-        style={{
-          position: "relative",
-          bottom: -700,
-          left: 0,
-          right: 0,
-          maxHeight: "80vh",
+          marginTop: "60px",
           overflowY: "auto",
-          zIndex: 1,
         }}
       >
         {restaurantData ? (
           <RestaurantDetailBox
             categories={restaurantData.dishInfo.dishCategories}
             dishes={restaurantData.dishInfo.dishes}
-            restaurant={restaurantData.restaurant} // restaurant 정보를 추가로 전달
+            restaurant={restaurantData.restaurant}
           />
         ) : (
           <div>로딩 중...</div>
         )}
-      </div>
-    </>
+      </Stack>
+    </Stack>
   )
 }
 

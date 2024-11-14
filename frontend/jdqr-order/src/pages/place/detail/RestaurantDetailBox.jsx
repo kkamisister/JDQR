@@ -1,12 +1,12 @@
 import React from "react"
 import RestaurantInfo from "./RestaurantInfo"
-import MapListContainer from "../../../components/container/MapListContainer"
 import DishTab from "../../../components/tab/DishTab"
 import RestaurantDetailDishItemCard from "../../../components/card/RestaurantDetailDishItemCard"
+import { Stack } from "@mui/material"
 
 const RestaurantDetailBox = ({ categories, dishes, restaurant }) => {
   return (
-    <MapListContainer>
+    <Stack padding="10px" height="100%">
       <RestaurantInfo restaurant={restaurant} />
       <DishTab dishCategories={categories} />
 
@@ -15,7 +15,7 @@ const RestaurantDetailBox = ({ categories, dishes, restaurant }) => {
           <RestaurantDetailDishItemCard key={dish.dishId} dish={dish} />
         ))
       )}
-    </MapListContainer>
+    </Stack>
   )
 }
 

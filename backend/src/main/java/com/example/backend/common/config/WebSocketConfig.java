@@ -1,12 +1,17 @@
 package com.example.backend.common.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+import com.example.backend.common.handler.CustomHandshakeHandler;
 import com.example.backend.common.interceptor.JDQRChannelInterceptor;
 
 import lombok.RequiredArgsConstructor;
@@ -44,4 +49,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	public void configureClientInboundChannel(ChannelRegistration registration) {
 		registration.interceptors(jdqrChannelInterceptor);
 	}
+
+	// @Override
+	// public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
+	// 	// JSON 형식의 메시지를 처리하기 위해 Jackson 메시지 컨버터 추가
+	// 	messageConverters.add(new MappingJackson2MessageConverter());
+	// 	return true; // 추가 컨버터 사용을 기본으로 설정
+	// }
+
 }

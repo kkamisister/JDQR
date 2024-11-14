@@ -47,7 +47,8 @@ public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implem
             .on(orderItem.dish.eq(dish))
             .join(dishCategory)
             .on(dish.dishCategory.eq(dishCategory))
-            .where(order.tableId.eq(tableId))
+            .where(order.tableId.eq(tableId)
+                .and(order.orderStatus.eq(OrderStatus.PENDING)))
             .fetch()
             ;
     }

@@ -29,6 +29,9 @@ public class ImageS3ServiceImpl implements ImageS3Service{
 
     @Override
     public String uploadImageToS3(MultipartFile image) { //이미지를 S3에 업로드하고 이미지의 url을 반환
+
+        if (image == null || image.isEmpty()) return "";
+
         try {
             byte[] fileContent = image.getBytes();
             ByteArrayInputStream inputStream = new ByteArrayInputStream(fileContent);

@@ -1,7 +1,6 @@
 package com.example.backend.owner.controller;
 
-import com.example.backend.etc.dto.RestaurantDto;
-import com.example.backend.etc.dto.RestaurantResponse;
+import com.example.backend.common.util.JsonUtil;
 import com.example.backend.etc.dto.RestaurantResponse.RestaurantBusinessDto;
 import com.example.backend.owner.dto.OwnerRequest.OptionRequestDto;
 import com.example.backend.owner.dto.OwnerResponse.*;
@@ -29,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.backend.common.dto.CommonResponse.*;
-import com.example.backend.dish.dto.DishRequest;
+import com.example.backend.dish.dto.DishRequest.*;
 import com.example.backend.dish.dto.DishResponse.DishSummaryResultDto;
 import com.example.backend.etc.dto.RestaurantProfileDto;
 import com.example.backend.etc.service.RestaurantService;
@@ -91,9 +90,12 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "메뉴 추가 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	@PostMapping(value = "/dish", consumes = {"multipart/form-data"})
-	public ResponseEntity<ResponseWithMessage> addDish(@RequestPart DishRequest.DishInfo dishInfo, @RequestPart MultipartFile imageFile,
+	@PostMapping(value = "/dish")
+	public ResponseEntity<ResponseWithMessage> addDish(@RequestParam(name = "dishInfo") String json, @RequestParam(name = "imageFile", required = false) MultipartFile imageFile,
 		HttpServletRequest request){
+
+		DishInfo dishInfo = JsonUtil.read(json, DishInfo.class);
+
 		//2-1. 유저 확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
@@ -132,10 +134,14 @@ public class OwnerController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	@PutMapping("/dish")
-	public ResponseEntity<ResponseWithMessage> updateDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) Integer dishId,
-		@RequestParam(value = "image", required = false) MultipartFile imageFile,
-		@RequestBody DishRequest.DishInfo dishInfo,
+	public ResponseEntity<ResponseWithMessage> updateDish(@RequestParam("dishId") @Parameter(description = "메뉴ID", required = true) String dishIdString,
+		@RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+		@RequestParam(value = "dishInfo") String json,
 		HttpServletRequest request){
+
+		// 4-0. String으로 받은 인수들 변환하기
+		Integer dishId = Integer.valueOf(dishIdString);
+		DishInfo dishInfo = JsonUtil.read(json, DishInfo.class);
 		//4-1. 유저 확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);

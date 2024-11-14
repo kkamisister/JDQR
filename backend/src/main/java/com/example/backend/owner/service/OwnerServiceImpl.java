@@ -22,6 +22,7 @@ import com.example.backend.owner.dto.OptionVo;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.backend.common.dto.CommonResponse;
@@ -399,12 +400,21 @@ public class OwnerServiceImpl implements OwnerService{
 		Restaurant restaurant = restaurantRepository.findByOwner(owner)
 			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
 
+		List<DishCategory> dishCategories = dishCategoryRepository.findByRestaurant(restaurant);
+
+		List<String> categoryNameList = dishCategories.stream().map(DishCategory::getName).toList();
+
+		for(String categoryName : categoryNameList){
+			if(categoryName.equals(categoryDto.getDishCategoryName())){
+				throw new JDQRException(ErrorCode.DUPLICATED_CATEGORY);
+			}
+		}
+
 		//3. 카테고리를 추가한다
 		DishCategory dishCategory = DishCategory.builder()
 			.name(categoryDto.getDishCategoryName())
 			.restaurant(restaurant)
 			.build();
-
 
 		//4. 카테고리를 저장한다
 		dishCategoryRepository.save(dishCategory);
@@ -417,6 +427,7 @@ public class OwnerServiceImpl implements OwnerService{
 	 */
 	@Override
 	public void removeCategory(Integer dishCategoryId, Integer userId) {
+
 		//1. 점주를 조회한다
 		Owner owner = ownerRepository.findById(userId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
@@ -431,8 +442,15 @@ public class OwnerServiceImpl implements OwnerService{
 		for(DishCategory dishCategory : dishCategories){
 
 			if(Objects.equals(dishCategory.getId(), dishCategoryId)){
-				dishCategoryRepository.delete(dishCategory);
-				return;
+				// 카테고리 삭제 시, 카테고리에 속한 메뉴가 있는 지 확인한다
+				log.warn("dishes : {}",dishCategory.getDishes());
+				if(ObjectUtils.isEmpty(dishCategory.getDishes())){
+					dishCategoryRepository.delete(dishCategory);
+					return;
+				}
+				else{
+					throw new JDQRException(ErrorCode.OCCUPIED_CATEGORY);
+				}
 			}
 		}
 	}

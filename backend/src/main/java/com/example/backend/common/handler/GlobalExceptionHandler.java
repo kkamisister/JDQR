@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
 	 * @return
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	private ResponseEntity<ResponseWithMessage> handleConstraintViolationException(MethodArgumentNotValidException e) {
+	public ResponseEntity<ResponseWithMessage> handleConstraintViolationException(MethodArgumentNotValidException e) {
 		// ConstraintViolation에서 각 메시지 추출
 		// String errorMessage = e.getConstraintViolations().stream()
 		// 	.map(ConstraintViolation::getMessage)  // 메시지만 가져오기 (필드명 제외)

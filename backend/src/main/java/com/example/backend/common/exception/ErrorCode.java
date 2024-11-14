@@ -14,6 +14,10 @@ public enum ErrorCode {
 	// 메뉴 관련 에러
 	DISH_NOT_FOUND(HttpStatus.BAD_REQUEST, "메뉴가 존재하지 않습니다"),
 
+	// 카테고리 관련 에러
+	DUPLICATED_CATEGORY(HttpStatus.OK, "중복된 카테고리 입니다"),
+	OCCUPIED_CATEGORY(HttpStatus.OK, "다른 메뉴에 포함된 카테고리 입니다"),
+
 	// 식당 관련 에러
 	RESTAURANT_NOT_FOUND(HttpStatus.BAD_REQUEST,"사업장이 존재하지 않습니다"),
 

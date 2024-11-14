@@ -35,8 +35,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 		//클라이언트에서 연결할 엔드포인트 설정
 		registry.addEndpoint("/ws")
-			.setAllowedOrigins("http://localhost:3000","https://jdqr608.duckdns.org");
-			// .withSockJS();
+			.setAllowedOrigins("http://localhost:3000","https://jdqr608.duckdns.org")
+			// .setHandshakeHandler(new CustomHandshakeHandler());
+		// .withSockJS();
 	}
 
 	@Override

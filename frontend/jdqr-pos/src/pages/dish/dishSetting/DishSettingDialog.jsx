@@ -4,10 +4,9 @@ import FlatButton from 'components/button/FlatButton';
 import { colors } from 'constants/colors';
 import SubtitleTextField from 'components/input/SubtitleTextField';
 import ImageBox from 'components/common/ImageBox';
-import FileUploadInput from 'components/input/FileUploadInput';
 import EmptyImageBox from 'components/empty/EmptyImageBox';
-import { useQuery } from '@tanstack/react-query';
-import { fetchDishCategoryList } from 'utils/apis/dish';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { addDish, editDish, fetchDishCategoryList } from 'utils/apis/dish';
 import SubtitleSelector from 'components/input/SubtitleSelector';
 
 const DishSettingDialog = ({
@@ -18,13 +17,14 @@ const DishSettingDialog = ({
 		dishName: '새로운 상품명',
 		dishCategoryId: null,
 		dishCategoryName: '카테고리명',
-		optionsIds: [],
+		optionIds: [],
 		price: 0,
 		description: '상품 설명',
 		image: null,
 		tags: [],
 	},
 }) => {
+	const queryClient = useQueryClient();
 	const [name, setName] = useState(dishInfo.dishName);
 	const [description, setDescription] = useState(dishInfo.description);
 	const [price, setPrice] = useState(dishInfo.price);
@@ -39,6 +39,28 @@ const DishSettingDialog = ({
 	});
 
 	const [imageSrc, setImageSrc] = useState(null);
+
+	const saveCurrentDish = async () => {
+		if (isEdit) {
+			await editDish({});
+			queryClient.invalidateQueries('dishList');
+		} else {
+			await addDish(
+				{
+					dishName: name,
+					dishCategoryId: categoryId,
+					dishCategoryName: categoryName,
+					optionIds: [],
+					price: price,
+					description: description,
+					image: '',
+					tagIds: tagList,
+				},
+				imageSrc
+			);
+			queryClient.invalidateQueries('dishList');
+		}
+	};
 
 	// 이미지 파일을 읽고 미리보기 설정
 	const handleImageUpload = event => {
@@ -104,7 +126,13 @@ const DishSettingDialog = ({
 							onChange={handleImageUpload}
 						/>
 						<Stack direction="row">
-							<FlatButton text="상품 저장" color={colors.point.blue} />
+							<FlatButton
+								text="상품 저장"
+								color={colors.point.blue}
+								onClick={() => {
+									saveCurrentDish();
+								}}
+							/>
 							{isEdit && (
 								<FlatButton text="상품 삭제" color={colors.point.red} />
 							)}

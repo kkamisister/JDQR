@@ -35,17 +35,8 @@ export const fetchDishDetailByDishId = async dishId => {
  * @param {{dishName, dishCategoryId, dishCategoryName, optionIds, price, description, image, tagIds}}
  * @returns {Object} - Response 내 data 객체, API 문서 참조
  */
-export const addDish = async ({
-	dishName,
-	dishCategoryId,
-	dishCategoryName,
-	optionIds,
-	price,
-	description,
-	image,
-	tagIds,
-}) => {
-	const response = await axiosInstance.post(`/owner/dish`, {
+export const addDish = async (
+	{
 		dishName,
 		dishCategoryId,
 		dishCategoryName,
@@ -54,6 +45,29 @@ export const addDish = async ({
 		description,
 		image,
 		tagIds,
+	},
+	imageFile
+) => {
+	const formData = new FormData();
+	formData.append('imageFile', imageFile);
+	formData.append(
+		'dishInfo',
+		JSON.stringify({
+			dishName,
+			dishCategoryId,
+			dishCategoryName,
+			optionIds,
+			price,
+			description,
+			image: `dishName.png`,
+			tagIds,
+		})
+	);
+
+	const response = await axiosInstance.post(`/owner/dish`, formData, {
+		headers: {
+			'Content-Type': 'multipart/form-data',
+		},
 	});
 	return response.data;
 };
@@ -117,12 +131,12 @@ export const fetchDishCategoryList = async () => {
 
 /**
  * 메뉴 카테고리 삭제
- * @param {Number} - dishId
+ * @param {Number} - dishCategoryId
  * @returns {Object} - Response 내 data 객체, API 문서 참조
  */
 export const deleteDishCategory = async ({ dishCategoryId }) => {
 	const response = await axiosInstance.delete(
-		`/owner/dish?dishCategoryId=${dishCategoryId}`
+		`/owner/dish/category?dishCategoryId=${dishCategoryId}`
 	);
 	return response.data;
 };
@@ -134,7 +148,7 @@ export const deleteDishCategory = async ({ dishCategoryId }) => {
  * @returns {Object} - Response 내 data 객체, API 문서 참조
  */
 export const addDishCategory = async ({ dishCategoryName }) => {
-	const response = await axiosInstance.put(`/owner/dish/category`, {
+	const response = await axiosInstance.post(`/owner/dish/category`, {
 		dishCategoryName,
 	});
 	return response.data;

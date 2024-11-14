@@ -85,21 +85,16 @@ export default function DishDetailPage() {
 
   const handleAddToCart = () => {
     if (client && client.connected) {
-      const orderedAt = new Date().getTime();
-
-      console.log("주문시각은요.", orderedAt);
-
+      const orderedAt = new Date().toISOString();
       const postData = {
         userId: sessionStorage.getItem("userId"),
         dishId: parsedDishId,
+        orderedAt,
         choiceIds: Object.values(selectedOptions),
         price: data.price,
         quantity,
-        orderedAt,
       };
-      console.log(postData);
       client.send("/pub/cart/add", {}, JSON.stringify(postData));
-      console.log(`${data.dishName} 장바구니에 담기 요청 전송`);
       navigate("/cart");
     } else {
       console.error("STOMP 클라이언트가 연결되지 않았습니다.");

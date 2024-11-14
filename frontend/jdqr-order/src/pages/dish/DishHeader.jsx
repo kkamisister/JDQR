@@ -37,11 +37,11 @@ export default function DishHeader() {
       tableId = sessionStorage.getItem("tableId");
     }
     if (client && client.connected) {
-      console.log("일단 웹소켓 연결은 됨;;");
+      // console.log("일단 웹소켓 연결은 됨;;");
       const subscription = client.subscribe(
         "/sub/cart/" + tableId,
         (message) => {
-          console.log("이것이 멧쉐지", message.body);
+          // console.log("이것이 멧쉐지", message.body);
           const response = JSON.parse(message.body);
           setCartList(response.cartList);
           setPeopleCnt(response.peopleCnt);

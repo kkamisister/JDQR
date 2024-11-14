@@ -1,5 +1,7 @@
 package com.example.backend.common.event;
 
+import static com.example.backend.order.dto.CartResponse.*;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,8 @@ public class JDQREventListener {
 		// 3-2. 현재 테이블과 연결된 사람수를 받아온다
 		Integer subscriberSize = redisHashRepository.getCurrentUserCnt(tableId);
 
+		log.warn("현재 연결된 사람 수 :{}",subscriberSize);
+
 		// 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
 		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
@@ -60,7 +64,7 @@ public class JDQREventListener {
 			totalQuantity += cartData.getQuantity();
 		}
 
-		CartResponse.CartInfo sendData = CartResponse.CartInfo.of(cartList,table.getName(),subscriberSize,totalPrice,totalQuantity);
+		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize,totalPrice,totalQuantity,null);
 
 		// notificationService.sentToClient(tableId,sendData);
 		log.warn("sendData : {}",sendData);

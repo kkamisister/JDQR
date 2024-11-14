@@ -3,6 +3,8 @@ package com.example.backend.order.dto;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -12,12 +14,14 @@ public record CartResponse() {
 	public record CartInfo(
 		List<CartDto> cartList,
 		String tableName,
-		int peopleCnt,
+		Integer peopleCnt,
 		int totalPrice,
-		int totalQuantity
+		int totalQuantity,
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		UserCartItemDto newItem
 	) {
-		public static CartInfo of(List<CartDto> cartList, String tableName, int peopleCnt,int totalPrice,int totalQuantity) {
-			return new CartInfo(cartList,tableName,peopleCnt,totalPrice,totalQuantity);
+		public static CartInfo of(List<CartDto> cartList, String tableName, Integer peopleCnt,int totalPrice,int totalQuantity,UserCartItemDto newItem) {
+			return new CartInfo(cartList,tableName,peopleCnt,totalPrice,totalQuantity,newItem);
 		}
 	}
 

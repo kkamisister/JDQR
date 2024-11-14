@@ -29,8 +29,8 @@
 // 	}
 //
 // 	// GlobalExceptionHandler에서 처리하는 모든 타입의 예외를 그대로 메시지 예외 핸들러에서도 처리해야하기에 래퍼 구조를 사용
-// 	@MessageExceptionHandler(MethodArgumentNotValidException.class)
-// 	public void handleMethodArgumentNotValidException(Principal principal, @Payload SocketRequest request, MethodArgumentNotValidException e) {
+// 	@MessageExceptionHandler(Exception.class)
+// 	public void handleMethodArgumentNotValidException(Principal principal, @Payload(required = false) SocketRequest request, MethodArgumentNotValidException e) {
 // 		log.warn("여기옴????");
 // 		template.convertAndSendToUser(principal.getName(), request.getResponseChannel(), methodProvider.handleMethodArgumentNotValidException(e).getBody());
 // 	}

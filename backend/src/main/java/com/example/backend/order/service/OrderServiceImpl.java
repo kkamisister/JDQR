@@ -114,6 +114,9 @@ public class OrderServiceImpl implements OrderService {
 		// log.warn("key : {}",key);
 		// log.warn("userID : {}",productInfo.getUserId());
 		Map<Integer,CartDto> cachedCartData = redisHashRepository.getCartDatas(key,productInfo.getUserId());
+
+		UserCartItemDto userCartItemDto = new UserCartItemDto();
+
 		// log.warn("cachedCartData : {}",cachedCartData);
 		if(!ObjectUtils.isEmpty(cachedCartData) && cachedCartData.containsKey(productInfo.hashCode())){ // 1. 기존에 동일한 물품이 있어서 거기에 더해지는 경우 -> 지금 담는 hashCode와 비교하여 동일한 것을 찾아서 추가
 
@@ -135,6 +138,12 @@ public class OrderServiceImpl implements OrderService {
 
 			// 여기서 저장한 품목에 대한 가격을 받아서 채워넣어야 함
 			setDishInfo(productInfo);
+
+			// 새롭게 추가된 품목을 표시
+			userCartItemDto.setItem(productInfo);
+			userCartItemDto.setUserId(productInfo.getUserId());
+
+			log.warn("userCartItemDto : {}",userCartItemDto);
 
 			cachedCartData.put(productInfo.hashCode(), productInfo);
 			redisHashRepository.saveHashData(key, productInfo.getUserId(), cachedCartData,20L);
@@ -166,7 +175,7 @@ public class OrderServiceImpl implements OrderService {
 			totalQuantity += cartData.getQuantity();
 		}
 
-		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize,totalPrice,totalQuantity);
+		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize,totalPrice,totalQuantity,userCartItemDto);
 
 		// notificationService.sentToClient(tableId,sendData);
 		log.warn("sendData : {}",sendData);
@@ -225,6 +234,7 @@ public class OrderServiceImpl implements OrderService {
 			cachedCartData.remove(productInfo.hashCode());
 			// log.warn("cachedCardData After : {}",cachedCartData);
 			redisHashRepository.saveHashData(key,productInfo.getUserId(),cachedCartData,20L);
+
 		}
 		else{
 			throw new JDQRException(ErrorCode.FUCKED_UP_QR);
@@ -254,7 +264,7 @@ public class OrderServiceImpl implements OrderService {
 			totalQuantity += cartData.getQuantity();
 		}
 
-		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize,totalPrice,totalQuantity);
+		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize,totalPrice,totalQuantity,null);
 
 		// notificationService.sentToClient(tableId,sendData);
 		messagingTemplate.convertAndSend("/sub/cart/"+tableId,sendData);

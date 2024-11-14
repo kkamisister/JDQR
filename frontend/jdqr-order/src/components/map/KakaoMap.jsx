@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Stack, Typography, Box } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import {
   Map,
   MapMarker,
@@ -15,6 +15,8 @@ const KakaoMap = ({
   initialLocation,
   initialBounds,
   restaurants,
+  selectedMapmarker,
+  setSelectedMapmarker,
 }) => {
   const [isActive, setIsActive] = useState(false)
   const [location, setLocation] = useState({
@@ -22,7 +24,6 @@ const KakaoMap = ({
     lng: 127.03956684373539,
   })
   const [bounds, setBounds] = useState(initialBounds || null)
-  const [selectedMapmarker, setSelectedMapmarker] = useState(null)
 
   const isLoaded = useKakaoLoader()
 
@@ -48,6 +49,10 @@ const KakaoMap = ({
     })
   }
 
+  const handleMapClick = () => {
+    setSelectedMapmarker(null)
+  }
+
   return (
     <Stack sx={{ width: "100%", height: "100%" }}>
       <Map
@@ -61,6 +66,7 @@ const KakaoMap = ({
         level={3}
         draggable
         scrollwheel
+        onClick={handleMapClick}
         onDragEnd={(map) => handleBoundsChanged(map)}
         onZoomChanged={(map) => handleBoundsChanged(map)}
         bounds={bounds}
@@ -104,8 +110,20 @@ const KakaoMap = ({
                 lng: restaurant.lng,
               }}
               yAnchor={1}
+              zIndex={selectedMapmarker === restaurant.id ? 1000 : 1}
             >
-              <Stack alignItems="center" spacing={0.5}>
+              <Stack
+                alignItems="center"
+                spacing={0.5}
+                onClick={() => setSelectedMapmarker(restaurant.id)}
+                sx={{
+                  transform:
+                    selectedMapmarker === restaurant.id
+                      ? "scale(1.1)"
+                      : "scale(1)",
+                  transition: "transform 0.1s ease",
+                }}
+              >
                 <Stack
                   sx={{
                     padding: "5px",

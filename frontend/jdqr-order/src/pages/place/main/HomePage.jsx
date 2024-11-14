@@ -19,6 +19,7 @@ const HomePage = () => {
   })
   const [keyword, setKeyword] = useState("")
   const [selectedCategory, setCategory] = useState("")
+  const [selectedMapmarker, setSelectedMapmarker] = useState(null)
 
   useEffect(() => {
     // 사용자 현위치
@@ -98,6 +99,14 @@ const HomePage = () => {
       )
     : restaurantsData?.restaurants || []
 
+  const visibleRestaurants = filteredRestaurants.some(
+    (restaurant) => restaurant.id === selectedMapmarker
+  )
+    ? filteredRestaurants.filter(
+        (restaurant) => restaurant.id === selectedMapmarker
+      )
+    : filteredRestaurants
+
   return (
     <Stack>
       <Stack
@@ -131,6 +140,8 @@ const HomePage = () => {
           initialLocation={location} // 초기 위치 전달
           initialBounds={bounds} // 초기 bounds 전달
           restaurants={filteredRestaurants || []}
+          selectedMapmarker={selectedMapmarker}
+          setSelectedMapmarker={setSelectedMapmarker}
         />
       </Stack>
 
@@ -146,7 +157,7 @@ const HomePage = () => {
         }}
       >
         <RestaurantListBox
-          restaurants={filteredRestaurants || []}
+          restaurants={visibleRestaurants}
           people={people}
           setPeople={setPeople}
           together={together}

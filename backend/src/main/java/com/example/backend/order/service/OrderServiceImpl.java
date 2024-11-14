@@ -867,6 +867,7 @@ public class OrderServiceImpl implements OrderService {
 			.dish(dish)
 			.userId(userId)
 			.quantity(productInfo.getQuantity())
+			.paidQuantity(0)
 			.orderPrice(orderPrice)
 			.orderStatus(OrderStatus.PENDING)
 			.orderedAt(productInfo.getOrderedAt())

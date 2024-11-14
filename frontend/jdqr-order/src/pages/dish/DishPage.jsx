@@ -24,7 +24,7 @@ const DishPage = () => {
         scrollbarWidth: "none",
       }}
     >
-      <Header title={isLoading ? "" : data.tableName} />
+      <Header title={isLoading ? "" : data.restaurantName} />
       <DishHeader />
       {isLoading && <LoadingSpinner message={"로딩 중입니다"} />}
       {!isLoading && !isError && (

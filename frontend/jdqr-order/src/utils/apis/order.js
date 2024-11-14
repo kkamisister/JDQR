@@ -21,6 +21,7 @@ export const fetchOrderList = async () => {
 export const placeOrder = async () => {
   try {
     const response = await axiosInstance.post("order");
+    // console.log(response);
     return response;
   } catch (error) {
     throw new Error("이거 주문이 안되는데용???ㅠ,ㅠ");

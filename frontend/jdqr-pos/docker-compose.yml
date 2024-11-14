@@ -1,15 +1,13 @@
 #docker-compose.yml
 
-version: "3.8" # Docker Compose 파일 버전
-
 services:
-  react-app:
-    container_name: react_owner
-    image: reactimage:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    # network_mode: "host"
-    # stdin_open: true 
+   react-app:
+      container_name: react_owner
+      image: reactimage:latest
+      build:
+         context: .
+         dockerfile: Dockerfile
+      ports:
+         - '3000:3000'
+      # network_mode: "host"
+      # stdin_open: true

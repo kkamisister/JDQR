@@ -6,10 +6,10 @@ public record DishRequest() {
 
 	public record DishInfo(
 		String dishName,
-		int dishCategoryId,
+		Integer dishCategoryId,
 		String dishCategoryName,
 		List<Integer> optionIds,
-		int price,
+		Integer price,
 		String description,
 		String image,
 		List<Integer> tagIds

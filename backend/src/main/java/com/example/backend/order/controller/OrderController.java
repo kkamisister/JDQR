@@ -96,6 +96,17 @@ public class OrderController {
 	}
 
 	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")
+	@GetMapping("/payment")
+	public ResponseEntity<ResponseWithData<TotalPaymentInfoResponseDto>> getPaymentInfo(HttpServletRequest request) {
+		String tableId = (String)request.getAttribute("tableId");
+
+		ResponseWithData<InitialPaymentResponseDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(), "부분결제 요청에 성공하였습니다", );
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
+	}
+
+	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")
 	@PostMapping("/payment")
 	public ResponseEntity<ResponseWithData<InitialPaymentResponseDto>> payForOrder(HttpServletRequest request, PaymentRequestDto paymentRequestDto) {
 		String tableId = (String)request.getAttribute("tableId");

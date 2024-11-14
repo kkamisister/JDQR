@@ -2,7 +2,7 @@ package com.example.backend.order.repository;
 
 import com.example.backend.common.repository.Querydsl4RepositorySupport;
 import com.example.backend.order.dto.OrderResponseVo;
-import com.example.backend.order.entity.Order;
+import com.example.backend.order.entity.ParentOrder;
 import com.example.backend.order.entity.Payment;
 import com.example.backend.order.enums.OrderStatus;
 import com.querydsl.core.types.Projections;
@@ -21,7 +21,7 @@ import static com.example.backend.dish.entity.QDishCategory.dishCategory;
 
 public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implements OrderRepositoryCustom {
     @Override
-    public List<Order> findUnpaidOrders(String tableId) {
+    public List<ParentOrder> findUnpaidOrders(String tableId) {
         return selectFrom(order)
             .where(order.tableId.eq(tableId)
                 .and(order.orderStatus.eq(OrderStatus.PENDING)))
@@ -54,7 +54,7 @@ public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implem
     }
 
     @Override
-    public List<Order> findOrdersByPayment(Payment curPayment) {
+    public List<ParentOrder> findOrdersByPayment(Payment curPayment) {
 
         return select(order)
             .from(order)

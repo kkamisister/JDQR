@@ -173,8 +173,8 @@ VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
        (9, 9, 2, NOW(), NOW(), 'ACTIVE'), -- Onion Rings: No Salt
        (10, 10, 2, NOW(), NOW(), 'ACTIVE'); -- Pizza Combo: Extra Ice
 
--- 10. orders 테이블
-INSERT INTO `orders` (`id`, `menu_cnt`, `created_at`, `updated_at`, `table_id`, `order_status`, `payment_method`,
+-- 10. parentOrders 테이블
+INSERT INTO `parentOrders` (`id`, `menu_cnt`, `created_at`, `updated_at`, `table_id`, `order_status`, `payment_method`,
                       `status`)
 VALUES (1, 3, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PENDING', 'MENU_DIVIDE', 'ACTIVE'),
        (2, 2, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),

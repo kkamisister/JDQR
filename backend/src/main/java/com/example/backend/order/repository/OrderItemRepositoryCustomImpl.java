@@ -2,7 +2,7 @@ package com.example.backend.order.repository;
 
 
 import com.example.backend.common.repository.Querydsl4RepositorySupport;
-import com.example.backend.order.entity.Order;
+import com.example.backend.order.entity.ParentOrder;
 import com.example.backend.order.entity.OrderItem;
 
 import java.util.List;
@@ -13,9 +13,9 @@ public class OrderItemRepositoryCustomImpl extends Querydsl4RepositorySupport im
 
     // Order에 해당하는 OrderItem 목록을 반환
     @Override
-    public List<OrderItem> findOrderItemByOrder(List<Order> orders) {
+    public List<OrderItem> findOrderItemByOrder(List<ParentOrder> parentOrders) {
         return selectFrom(orderItem)
-            .where(orderItem.order.in(orders))
+            .where(orderItem.order.in(parentOrders))
             .fetch();
     }
 }

@@ -1,11 +1,10 @@
 package com.example.backend.dish.repository;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
+import com.example.backend.order.entity.ParentOrder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
 import com.example.backend.TestDataGenerator;
 import com.example.backend.common.config.QuerydslConfig;
@@ -24,10 +22,7 @@ import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.DishCategory;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.repository.RestaurantRepository;
-import com.example.backend.order.entity.Order;
 import com.example.backend.order.entity.OrderItem;
-import com.example.backend.order.enums.OrderStatus;
-import com.example.backend.order.enums.PaymentMethod;
 import com.example.backend.order.repository.OrderItemRepository;
 import com.example.backend.order.repository.OrderRepository;
 import com.example.backend.owner.entity.Owner;
@@ -137,19 +132,19 @@ class DishRepositoryCustomTest extends ContainerSupport {
 		}
 		dishRepository.saveAll(dishes1);
 
-		List<Order> orders = generator.generateTestOrderList(false);
-		orderRepository.saveAll(orders);
+		List<ParentOrder> parentOrders = generator.generateTestOrderList(false);
+		orderRepository.saveAll(parentOrders);
 
 		List<OrderItem> orderItems = generator.generateTestOrderItemList(false);
 		for(int i=0;i<6;i++){
 			OrderItem orderItem = orderItems.get(i);
 			orderItem.setDish(dishes1.get(i));
-			orderItem.setOrder(orders.get(i%4));
+			orderItem.setParentOrder(parentOrders.get(i%4));
 		}
 		orderItemRepository.saveAll(orderItems);
 
 		//when
-		List<Dish> dishes = dishRepository.findAllByOrder(orders.get(0));
+		List<Dish> dishes = dishRepository.findAllByOrder(parentOrders.get(0));
 
 		//then
 		assertThat(dishes.size()).isEqualTo(2);

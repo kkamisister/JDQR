@@ -4,13 +4,11 @@ import static com.example.backend.table.dto.TableRequest.*;
 import static com.example.backend.table.dto.TableResponse.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.example.backend.common.enums.EntityStatus;
-import com.example.backend.dish.dto.DishResponse;
 import com.example.backend.dish.dto.DishResponse.DishDetailInfo;
 import com.example.backend.dish.dto.OptionDto;
 import com.example.backend.dish.entity.Dish;
@@ -19,23 +17,20 @@ import com.example.backend.dish.entity.Option;
 import com.example.backend.dish.repository.DishOptionRepository;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.etc.entity.Restaurant;
-import com.example.backend.order.entity.Order;
+import com.example.backend.order.entity.ParentOrder;
 import com.example.backend.order.enums.OrderStatus;
 import com.example.backend.order.repository.OrderItemRepository;
 import com.example.backend.order.repository.OrderRepository;
 import com.example.backend.owner.entity.Owner;
 import com.example.backend.owner.repository.OwnerRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.backend.common.dto.CommonResponse.ResponseWithData;
 import com.example.backend.common.enums.UseStatus;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
 import com.example.backend.common.util.GenerateLink;
 import com.example.backend.etc.repository.RestaurantRepository;
-import com.example.backend.table.dto.TableResponse;
 import com.example.backend.table.entity.Table;
 import com.example.backend.table.repository.TableRepository;
 
@@ -180,16 +175,16 @@ public class TableServiceImpl implements TableService{
 		List<TableDetailInfo> tableDetailInfos = new ArrayList<>();
 		int leftSeatNum = 0;
 		for(Table table : tables){
-			List<Order> orderList = orderRepository.findByTableId(table.getId());
+			List<ParentOrder> parentOrderList = orderRepository.findByTableId(table.getId());
 			Map<DishDetailInfo, Integer> dishCountMap = new LinkedHashMap<>();
 			if(table.getUseStatus().equals(UseStatus.AVAILABLE)){ // 남은 좌석의 수를 카운팅
 				leftSeatNum += table.getPeople();
 			}
-			for(Order order : orderList){
+			for(ParentOrder parentOrder : parentOrderList){
 				// 아직 결제되지 않은 항목만 가지고온다
-				if(order.getOrderStatus().equals(OrderStatus.PENDING)){
+				if(parentOrder.getOrderStatus().equals(OrderStatus.PENDING)){
 					// 해당 주문에 있는 모든 Dish를 가지고온다
-					List<Dish> dishes = dishRepository.findAllByOrder(order);
+					List<Dish> dishes = dishRepository.findAllByOrder(parentOrder);
 					for(Dish dish : dishes){
 						List<DishOption> dishOptions = dishOptionRepository.findByDish(dish);
 						List<Option> options = dishOptions.stream().map(DishOption::getOption).toList();
@@ -235,15 +230,15 @@ public class TableServiceImpl implements TableService{
 			.orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
 		//3. 테이블의 상세정보를 조회한다
-		List<Order> orderList = orderRepository.findByTableId(table.getId());
+		List<ParentOrder> parentOrderList = orderRepository.findByTableId(table.getId());
 		Map<DishDetailInfo, Integer> dishCountMap = new LinkedHashMap<>();
 
 		int totalPrice = 0;
-		for(Order order : orderList){
+		for(ParentOrder parentOrder : parentOrderList){
 			// 아직 결제되지 않은 항목만 가지고온다
-			if(order.getOrderStatus().equals(OrderStatus.PENDING)){
+			if(parentOrder.getOrderStatus().equals(OrderStatus.PENDING)){
 				// 해당 주문에 있는 모든 Dish를 가지고온다
-				List<Dish> dishes = dishRepository.findAllByOrder(order);
+				List<Dish> dishes = dishRepository.findAllByOrder(parentOrder);
 				for(Dish dish : dishes){
 					List<DishOption> dishOptions = dishOptionRepository.findByDish(dish);
 					List<Option> options = dishOptions.stream().map(DishOption::getOption).toList();

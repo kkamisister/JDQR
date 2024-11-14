@@ -1,33 +1,25 @@
 package com.example.backend.order.repository;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
+import com.example.backend.order.entity.ParentOrder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
 import com.example.backend.TestDataGenerator;
 import com.example.backend.common.config.QuerydslConfig;
 import com.example.backend.config.ContainerSupport;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.repository.RestaurantRepository;
-import com.example.backend.order.entity.Order;
-import com.example.backend.order.enums.OrderStatus;
-import com.example.backend.order.enums.PaymentMethod;
 import com.example.backend.owner.entity.Owner;
 import com.example.backend.owner.repository.OwnerRepository;
-import com.example.backend.table.entity.Table;
-import com.example.backend.table.repository.TableRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Import({QuerydslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Slf4j
-class OrderRepositoryTest extends ContainerSupport {
+class ParentOrderRepositoryTest extends ContainerSupport {
 
 	@Autowired
 	private OwnerRepository ownerRepository;
@@ -69,17 +61,17 @@ class OrderRepositoryTest extends ContainerSupport {
 		restaurantRepository.saveAll(restaurants);
 
 		// order 생성
-		List<Order> orders = generator.generateTestOrderList(false);
-		orderRepository.saveAll(orders);
+		List<ParentOrder> parentOrders = generator.generateTestOrderList(false);
+		orderRepository.saveAll(parentOrders);
 
 
 		//when
-		List<Order> orderList = orderRepository.findByTableId("11111");
+		List<ParentOrder> parentOrderList = orderRepository.findByTableId("11111");
 
 		//then
-		assertThat(orderList.size()).isEqualTo(2);
+		assertThat(parentOrderList.size()).isEqualTo(2);
 
-		assertThat(orderList).extracting(Order::getMenuCnt)
+		assertThat(parentOrderList).extracting(ParentOrder::getMenuCnt)
 			.containsExactly(5,9);
 
 	}

@@ -19,6 +19,18 @@ public record OrderResponse() {
 
     }
 
+    public record TotalPaymentInfoResponseDto(
+        String tableName,
+        Integer dishCnt,
+        Integer restDishCnt,
+        Integer price,
+        Integer restPrice,
+        List<OrderInfoResponseDto> orders
+
+    ) {
+
+    }
+
     @Schema(name = "주문 내역 조회 결과 반환 dto", description = "각 주문별 주문 내역 조회 정보를 담는다")
     @Builder
     public record OrderInfoResponseDto(

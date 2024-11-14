@@ -10,13 +10,11 @@ const useWebSocketStore = create((set) => ({
     }
     const client = Stomp.client("wss://jdqr608.duckdns.org/ws");
     const token = sessionStorage.getItem("tableToken");
-    console.log("이게토큰", token);
     client.connect(
       {
         Authorization: `Bearer ${token}`,
       },
       () => {
-        console.log("STOMP 연결 성공");
         set({ client });
       }
     );
@@ -24,9 +22,7 @@ const useWebSocketStore = create((set) => ({
   disconnect: () => {
     set((state) => {
       if (state.client && state.client.connected) {
-        state.client.disconnect(() => {
-          console.log("STOMP 연결 종료");
-        });
+        state.client.disconnect(() => {});
       }
       return { client: null };
     });

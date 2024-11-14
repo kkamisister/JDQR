@@ -18,10 +18,7 @@ const getCookieValue = (name) => {
 // tableToken을 확인하고 없으면 extractTableInfo 호출
 const initializeToken = async () => {
   const token = sessionStorage.getItem("tableToken");
-  if (token) {
-    console.log("셋션 스토리지에서 토큰을 가져왔습니다.");
-  } else {
-    console.log("토큰이 없어 extractTableInfo를 호출합니다.");
+  if (!token) {
     await extractTableInfo();
   }
 };
@@ -69,8 +66,6 @@ const setUserCookie = async () => {
 
       userId = getCookieValue("JDQR-order-user-id");
       sessionStorage.setItem("userId", userId);
-    } else {
-      console.log("userId:", userId);
     }
   } catch (error) {
     console.error("쿠키 발급 오류:", error);

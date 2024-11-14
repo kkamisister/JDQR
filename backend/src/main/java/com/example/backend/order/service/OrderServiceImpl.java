@@ -868,6 +868,7 @@ public class OrderServiceImpl implements OrderService {
 			.userId(userId)
 			.quantity(productInfo.getQuantity())
 			.orderPrice(orderPrice)
+			.orderStatus(OrderStatus.PENDING)
 			.orderedAt(productInfo.getOrderedAt())
 			.build();
 	}
@@ -895,6 +896,7 @@ public class OrderServiceImpl implements OrderService {
 		Order order = Order.builder()
 			.tableId(tableId)
 			.orderStatus(OrderStatus.PENDING)
+			.paymentMethod(PaymentMethod.UNDEFINED)
 			.menuCnt(cartDatas.size())
 			.build();
 

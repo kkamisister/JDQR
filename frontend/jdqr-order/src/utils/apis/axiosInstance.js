@@ -29,12 +29,22 @@ const extractTableInfo = async () => {
     const params = new URLSearchParams(window.location.search);
     const tableId = params.get("tableId");
     const token = params.get("token");
+
+    const userId = getCookieValue("JDQR-order-user-id");
+
     if (tableId && token) {
       sessionStorage.setItem("tableId", tableId);
       sessionStorage.setItem("tableToken", token);
+
       console.log("tableId와 token이 성공적으로 저장되었습니다.");
 
-      await setUserCookie();
+      if (!userId) {
+        console.log("쿠키에 userId가 없습니다. 쿠키 발급 요청을 시작합니다.");
+        await setUserCookie();
+      } else {
+        console.log("쿠키에서 userId를 가져왔습니다:", userId);
+        sessionStorage.setItem("userId", userId);
+      }
     } else {
       sessionStorage.setItem("tableId", "6721aa9b0d22a923091eef73");
       sessionStorage.setItem("tableToken", "dummyTableToken");

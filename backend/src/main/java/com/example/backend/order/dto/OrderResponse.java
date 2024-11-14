@@ -23,6 +23,8 @@ public record OrderResponse() {
     @Builder
     public record OrderInfoResponseDto(
         Integer orderId,
+        Integer price,
+        Integer dishCnt,
         List<DishInfoResponseDto> dishes
     ) {
 
@@ -37,6 +39,7 @@ public record OrderResponse() {
         Integer dishCategoryId,
         String dishCategoryName,
         Integer price,
+        Integer totalPrice,
         List<OptionDetailDto> options,
         Integer quantity
     ) {

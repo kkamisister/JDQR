@@ -75,7 +75,7 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 					// 세션 속성에 사용자 ID 저장
 					accessor.getSessionAttributes().put("tableId", tableId);
 					// 인원 수 증가
-					incrementOnlineUserCount("6721aa9b0d22a923091eef73");
+					incrementOnlineUserCount(tableId);
 				} else {
 					throw new JDQRException(ErrorCode.TOKEN_IS_NOT_VALID);
 				}
@@ -94,7 +94,6 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 
 		// DISCONNECT 프레임에 대해서만 처리
 		if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
-			decrementOnlineUserCount("6721aa9b0d22a923091eef73");  // 인원수 감소
 
 			// 목적지를 찾는다
 			String dest = (String)accessor.getSessionAttributes().get("destination");
@@ -104,6 +103,7 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 			// /sub/cart의 경우에만 이벤트를 호출한다
 			if(dest.equals("/sub/cart")){
 				String tableId = (String)accessor.getSessionAttributes().get("tableId");
+				decrementOnlineUserCount(tableId);  // 인원수 감소
 
 				// log.warn("tableId :  {}",tableId);
 

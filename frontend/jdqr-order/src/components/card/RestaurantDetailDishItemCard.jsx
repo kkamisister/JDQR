@@ -93,7 +93,7 @@ const RestaurantDetailDishItemCard = ({
           <Box
             component="img"
             alt={dish.dishName}
-            src="https://cdn.dominos.co.kr/admin/upload/goods/20230619_F33836Pn.jpg"
+            src={dish.image}
             sx={{
               width: 120,
               height: 120,

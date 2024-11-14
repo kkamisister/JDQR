@@ -5,7 +5,6 @@ import Tab from '@mui/material/Tab';
 import { Box, Stack } from '@mui/material';
 import { colors } from 'constants/colors';
 import DishList from './DishList';
-import { dishData } from 'sampleData/apiMock';
 import FlatButton from 'components/button/FlatButton';
 import DishSettingDialog from './dishSetting/DishSettingDialog';
 import DishCategorySettingDialog from './dishCategorySetting/DishCategorySettingDialog';
@@ -13,7 +12,6 @@ import DishOptionSettingDialog from './dishOptionSetting/DishOptionSettingDialog
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { fetchDishList } from 'utils/apis/dish';
 import PageTitleBox from 'components/title/PageTitleBox';
-const dishes = dishData.data.dishes;
 
 function CustomTabPanel(props) {
 	const { children, value, index, ...other } = props;

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Stack, Typography, Box, Switch, Container } from '@mui/material';
 import PageTitleBox from 'components/title/PageTitleBox';
 import OrderBox from './order/OrderBox';
-import { tableData } from 'sampleData/apiMock';
 import OrderDetailBox from './order/OrderDetailBox';
 import FlatButton from 'components/button/FlatButton';
 import { colors } from 'constants/colors';
@@ -17,7 +16,6 @@ import {
 	addTable,
 	editTable,
 } from 'utils/apis/table';
-const SampleTableRequestData = tableData;
 
 const TablePage = () => {
 	const queryClient = useQueryClient();

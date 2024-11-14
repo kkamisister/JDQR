@@ -19,6 +19,7 @@ const HomePage = () => {
   })
   const [keyword, setKeyword] = useState("")
   const [selectedCategory, setCategory] = useState("")
+  const [selectedMapmarker, setSelectedMapmarker] = useState(null)
 
   useEffect(() => {
     // 사용자 현위치
@@ -59,19 +60,19 @@ const HomePage = () => {
     queryFn: async () => {
       // keyword 여부에 따라 다른 api 호출
       if (keyword) {
-        console.log("파라미터는....이렇게 생겼다지...", {
-          bounds,
-          people,
-          together,
-          keyword,
-        })
+        // console.log("파라미터는....이렇게 생겼다지...", {
+        //   bounds,
+        //   people,
+        //   together,
+        //   keyword,
+        // })
         const response = await fetchRestaurantSearch({
           ...bounds,
           people,
           together,
           keyword,
         })
-        console.log("api 응답은....이렇게 생겼다지....:", response)
+        // console.log("api 응답은....이렇게 생겼다지....:", response)
         return response
       } else {
         const response = await fetchRestaurants({
@@ -84,7 +85,7 @@ const HomePage = () => {
     },
     enabled: !!bounds,
   })
-  console.log("당신은...데이터를...불러왔지..:", restaurantsData)
+  // console.log("당신은...데이터를...불러왔지..:", restaurantsData)
 
   const handleBoundsChange = (newBounds) => {
     setBounds(newBounds)
@@ -97,6 +98,14 @@ const HomePage = () => {
         )
       )
     : restaurantsData?.restaurants || []
+
+  const visibleRestaurants = filteredRestaurants.some(
+    (restaurant) => restaurant.id === selectedMapmarker
+  )
+    ? filteredRestaurants.filter(
+        (restaurant) => restaurant.id === selectedMapmarker
+      )
+    : filteredRestaurants
 
   return (
     <Stack>
@@ -131,6 +140,8 @@ const HomePage = () => {
           initialLocation={location} // 초기 위치 전달
           initialBounds={bounds} // 초기 bounds 전달
           restaurants={filteredRestaurants || []}
+          selectedMapmarker={selectedMapmarker}
+          setSelectedMapmarker={setSelectedMapmarker}
         />
       </Stack>
 
@@ -146,7 +157,7 @@ const HomePage = () => {
         }}
       >
         <RestaurantListBox
-          restaurants={filteredRestaurants || []}
+          restaurants={visibleRestaurants}
           people={people}
           setPeople={setPeople}
           together={together}

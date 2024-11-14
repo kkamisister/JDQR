@@ -60,19 +60,19 @@ const HomePage = () => {
     queryFn: async () => {
       // keyword 여부에 따라 다른 api 호출
       if (keyword) {
-        // console.log("파라미터는....이렇게 생겼다지...", {
-        //   bounds,
-        //   people,
-        //   together,
-        //   keyword,
-        // })
+        console.log("파라미터는....이렇게 생겼다지...", {
+          bounds,
+          people,
+          together,
+          keyword,
+        })
         const response = await fetchRestaurantSearch({
           ...bounds,
           people,
           together,
           keyword,
         })
-        // console.log("api 응답은....이렇게 생겼다지....:", response)
+        console.log("api 응답은....이렇게 생겼다지....:", response)
         return response
       } else {
         const response = await fetchRestaurants({
@@ -85,27 +85,33 @@ const HomePage = () => {
     },
     enabled: !!bounds,
   })
-  // console.log("당신은...데이터를...불러왔지..:", restaurantsData)
+  console.log("당신은...데이터를...불러왔지..:", restaurantsData)
 
   const handleBoundsChange = (newBounds) => {
     setBounds(newBounds)
   }
-
   const filteredRestaurants = selectedCategory
-    ? restaurantsData?.restaurants?.filter((restaurant) =>
-        restaurant.restaurantCategories.major.some(
-          (category) => category.restaurantCategoryName === selectedCategory
-        )
+    ? restaurantsData?.restaurants?.filter(
+        (restaurant) =>
+          restaurant.restaurantCategories?.major[0]?.restaurantCategoryName ===
+          selectedCategory
       )
     : restaurantsData?.restaurants || []
 
-  const visibleRestaurants = filteredRestaurants.some(
-    (restaurant) => restaurant.id === selectedMapmarker
-  )
-    ? filteredRestaurants.filter(
+  const visibleRestaurants = selectedMapmarker
+    ? (filteredRestaurants || []).filter(
         (restaurant) => restaurant.id === selectedMapmarker
       )
-    : filteredRestaurants
+    : filteredRestaurants || []
+
+  // console.log("selectedMapmarker:", selectedMapmarker)
+  // console.log("selectedCategory: ", selectedCategory)
+  // console.log("restaurantsData: ", [restaurantsData])
+  // console.log("KakaoMap에 전달되는 restaurants 리스트:", filteredRestaurants)
+  // console.log(
+  //   "RestaurantListBox에 전달되는 restaurants 리스트:",
+  //   visibleRestaurants
+  // )
 
   return (
     <Stack>

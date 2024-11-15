@@ -18,7 +18,6 @@ const KakaoMap = ({
   selectedMapmarker,
   setSelectedMapmarker,
 }) => {
-  const [isActive, setIsActive] = useState(false)
   const [location, setLocation] = useState({
     lat: 37.50125774784631,
     lng: 127.03956684373539,
@@ -26,6 +25,12 @@ const KakaoMap = ({
   const [bounds, setBounds] = useState(initialBounds || null)
 
   const isLoaded = useKakaoLoader()
+
+  // 대한민국 범위 설정
+  const koreaBounds = {
+    sw: { lat: 33.0, lng: 124.0 },
+    ne: { lat: 43.0, lng: 132.0 },
+  }
 
   useEffect(() => {
     if (isLoaded && initialLocation) {
@@ -47,6 +52,18 @@ const KakaoMap = ({
       minLng: sw.getLng(),
       maxLng: ne.getLng(),
     })
+
+    const center = map.getCenter()
+    const lat = center.getLat()
+    const lng = center.getLng()
+
+    if (
+      lat < koreaBounds.sw.lat ||
+      lat > koreaBounds.ne.lat ||
+      lng < koreaBounds.sw.lng ||
+      lng > koreaBounds.ne.lng
+    )
+      window.location.reload()
   }
 
   const handleMapClick = () => {
@@ -64,6 +81,7 @@ const KakaoMap = ({
           height: "100%",
         }}
         level={3}
+        minLevel={7}
         draggable
         scrollwheel
         onClick={handleMapClick}
@@ -101,7 +119,7 @@ const KakaoMap = ({
             return size < 10 ? 10 : size < 30 ? 20 : 30
           }}
         >
-          {/* 식당 마커 추가 */}
+          {/* 식당 마커 */}
           {restaurants?.map((restaurant) => (
             <CustomOverlayMap
               key={restaurant.id}

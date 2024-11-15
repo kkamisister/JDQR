@@ -134,7 +134,6 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 	/**
 	 * 사업장 정보를 조회하는 메서드
-	 * @param restaurantId
 	 * @param userId
 	 * @return
 	 */
@@ -290,6 +289,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 			.image(restaurant.getImage())
 			.lat(restaurant.getLatitude())
 			.lng(restaurant.getLongitude())
+			.phoneNumber(restaurant.getPhoneNumber())
 			.open(restaurant.getOpen())
 			.build();
 		return restaurantDto;

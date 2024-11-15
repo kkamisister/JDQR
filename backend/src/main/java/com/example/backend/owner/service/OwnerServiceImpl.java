@@ -14,6 +14,7 @@ import java.util.Objects;
 import com.example.backend.common.service.ImageS3Service;
 import com.example.backend.common.util.TagParser;
 import com.example.backend.dish.dto.ChoiceDto;
+import com.example.backend.dish.dto.OptionDto;
 import com.example.backend.dish.entity.Choice;
 import com.example.backend.dish.repository.ChoiceRepository;
 import com.example.backend.etc.entity.Restaurant;
@@ -521,7 +522,17 @@ public class OwnerServiceImpl implements OwnerService{
 		// 우선, 메뉴의 태그를 가져와야한다
 		List<String> tags = TagParser.parseTags(dish.getTags());
 
-		DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags);
+		// Dish의 옵션을 가지고온다
+		List<DishOption> dishOptions = dishOptionRepository.findByDishId(dish.getId());
+
+		List<OptionDto> options = new ArrayList<>();
+		for(DishOption dishOption : dishOptions){
+			Option option = dishOption.getOption();
+			OptionDto optionDto = OptionDto.of(option);
+			options.add(optionDto);
+		}
+
+		DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags,options);
 		return dishSimpleInfo;
 	}
 

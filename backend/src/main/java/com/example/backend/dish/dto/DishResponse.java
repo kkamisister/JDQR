@@ -55,10 +55,12 @@ public record DishResponse() {
 		int price,
 		String description,
 		String image,
-		List<String> tags
+		List<String> tags,
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		List<OptionDto> options
 	){
 
-		public static DishSimpleInfo of(Dish dish,List<String> tags){
+		public static DishSimpleInfo of(Dish dish,List<String> tags,List<OptionDto> options){
 			return DishSimpleInfo.builder()
 				.dishId(dish.getId())
 				.dishName(dish.getName())
@@ -66,6 +68,7 @@ public record DishResponse() {
 				.description(dish.getDescription())
 				.image(dish.getImage())
 				.tags(tags)
+				.options(options)
 				.build();
 		}
 	}

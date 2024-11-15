@@ -298,7 +298,7 @@ public class OrderServiceImpl implements OrderService {
 
         // 0. parentOrders를 가져온다. 없을 경우, 새로 만든다.
         ParentOrder parentOrder;
-        Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdDesc(tableId);
+        Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId);
         if (optionalParentOrder.isPresent() && optionalParentOrder.get().getOrderStatus().equals(OrderStatus.PENDING)) {
             parentOrder = optionalParentOrder.get();
         } else {
@@ -403,7 +403,7 @@ public class OrderServiceImpl implements OrderService {
         Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
         //
-        Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdDesc(tableId);
+        Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId);
         if (optionalParentOrder.isEmpty() || !optionalParentOrder.get().getOrderStatus().equals(OrderStatus.PENDING)) {
             return getBaseOrderInfo(table);
         }
@@ -516,7 +516,7 @@ public class OrderServiceImpl implements OrderService {
         Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
         // 주문이 비어 있거나, 이미 결제된 주문일 경우 error throw
-        Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdDesc(tableId);
+        Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId);
         if (optionalParentOrder.isEmpty() || !optionalParentOrder.get().getOrderStatus().equals(OrderStatus.PENDING)) {
             throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
         }

@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface ParentOrderRepository extends JpaRepository<ParentOrder, Integer> {
-    Optional<ParentOrder> findFirstByTableIdDesc(String tableId);
+    Optional<ParentOrder> findFirstByTableIdOrderByIdDesc(String tableId);
 }

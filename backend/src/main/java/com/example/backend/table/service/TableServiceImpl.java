@@ -14,7 +14,6 @@ import com.example.backend.dish.entity.Option;
 import com.example.backend.dish.repository.DishOptionRepository;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.etc.entity.Restaurant;
-import com.example.backend.order.dto.OrderResponseVo;
 import com.example.backend.order.entity.ParentOrder;
 import com.example.backend.order.enums.OrderStatus;
 import com.example.backend.order.repository.OrderItemRepository;
@@ -176,7 +175,7 @@ public class TableServiceImpl implements TableService{
 		List<TableDetailInfo> tableDetailInfos = new ArrayList<>();
 		int leftSeatNum = 0;
 		for(Table table : tables){
-			Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdDesc(table.getId());
+			Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(table.getId());
 
 			// 테이블에 한 번도 주문이 들어가지 않은 상태일 경우
 			if (optionalParentOrder.isEmpty()) {
@@ -255,7 +254,7 @@ public class TableServiceImpl implements TableService{
 			.orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
 		//3. 테이블의 상세정보를 조회한다
-		Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdDesc(table.getId());
+		Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(table.getId());
 		if (optionalParentOrder.isEmpty()) {
 			return getBaseTableInfo(table);
 		}

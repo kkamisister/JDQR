@@ -48,10 +48,10 @@ public class RestaurantController {
 	@GetMapping("/restaurant/keyword")
 	public ResponseEntity<ResponseWithData<RestaurantInfo>> restaurantSearchByKeyword(
 		@RequestParam("keyword") String keyword,
-		@RequestParam(value = "minLat",defaultValue = "30") @Min(value = 33, message = "대한민국을 벗어날 수 없습니다") double minLat,
-		@RequestParam(value = "maxLat",defaultValue = "50") @Max(value = 43, message = "대한민국을 벗어날 수 없습니다") double maxLat,
-		@RequestParam(value = "minLng",defaultValue = "100") @Min(value = 124, message = "대한민국을 벗어날 수 없습니다") double minLng,
-		@RequestParam(value = "maxLng",defaultValue = "150") @Max(value = 132, message = "대한민국을 벗어날 수 없습니다") double maxLng,
+		@RequestParam(value = "minLat",defaultValue = "33") @Min(value = 33, message = "대한민국을 벗어날 수 없습니다") double minLat,
+		@RequestParam(value = "maxLat",defaultValue = "43") @Max(value = 43, message = "대한민국을 벗어날 수 없습니다") double maxLat,
+		@RequestParam(value = "minLng",defaultValue = "124") @Min(value = 124, message = "대한민국을 벗어날 수 없습니다") double minLng,
+		@RequestParam(value = "maxLng",defaultValue = "132") @Max(value = 132, message = "대한민국을 벗어날 수 없습니다") double maxLng,
 		@RequestParam(value = "people",required = false, defaultValue = "0") int people,
 		@RequestParam(value = "together",required = false, defaultValue = "false") boolean together){
 

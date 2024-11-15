@@ -13,6 +13,8 @@ public enum SimpleResponseMessage {
 
     ORDER_SUCCESS("주문에 성공하였습니다."),
 
+    ORDER_STATUS_CHANGED("주문의 상태를 '결제 대기 중'으로 성공적으로 변경하였습니다."),
+
     // 토스 결제 api 콜백 처리 관련 응답
     PAYMENT_CANCELLED_EXCEED_PURCHASE_AMOUNT("주문한 금액보다 더 많은 양의 결제를 하려고 시도하여 결제가 취소되었습니다."),
     PAYMENT_CANCELLED_EXCEED_MENU_AMOUNT("주문한 메뉴보다 더 많은 양의 메뉴를 결제하려고 시도하여 결제가 취소되었습니다."),

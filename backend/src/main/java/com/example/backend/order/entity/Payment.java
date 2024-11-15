@@ -19,6 +19,10 @@ public class Payment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_order_id")
+    private ParentOrder parentOrder;
+
     // 결제 금액
     private Integer amount;
 

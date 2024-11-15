@@ -95,12 +95,14 @@ public class OrderController {
 		messagingTemplate.convertAndSend("/sub/cart/"+tableId, simpleResponseMessage);
 	}
 
-	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")
+	@Operation(summary = "주문 정보 + 결제된 정보", description = "주문한 음식들의 내역과, 결제 현황을 보여 주는 api")
 	@GetMapping("/payment")
-	public ResponseEntity<ResponseWithData<TotalPaymentInfoResponseDto>> getPaymentInfo(HttpServletRequest request) {
+	public ResponseEntity<ResponseWithData<TotalOrderInfoResponseDto>> getPaymentInfo(HttpServletRequest request) {
 		String tableId = (String)request.getAttribute("tableId");
 
-		ResponseWithData<InitialPaymentResponseDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(), "부분결제 요청에 성공하였습니다", );
+		TotalOrderInfoResponseDto data = orderService.getTotalPaymentInfo(tableId);
+
+		ResponseWithData<TotalOrderInfoResponseDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(), "부분결제 요청에 성공하였습니다", data);
 
 		return ResponseEntity.status(responseWithData.status())
 			.body(responseWithData);

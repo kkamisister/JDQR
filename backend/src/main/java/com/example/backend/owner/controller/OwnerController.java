@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,7 @@ import com.example.backend.owner.service.OwnerService;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/owner")
 @Tag(name = "점주 설정 관련 API", description = "점주의 설정 관련 Controller입니다")
+@Slf4j
 public class OwnerController {
 
 	private final OwnerService ownerService;
@@ -95,7 +97,6 @@ public class OwnerController {
 		HttpServletRequest request){
 
 		DishInfo dishInfo = JsonUtil.read(json, DishInfo.class);
-
 		//2-1. 유저 확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);

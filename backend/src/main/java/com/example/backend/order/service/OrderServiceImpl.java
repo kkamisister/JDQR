@@ -63,6 +63,7 @@ public class OrderServiceImpl implements OrderService {
 	private final SimpMessagingTemplate messagingTemplate;
 	private final TossWebClient tossWebClient;
     private final OrderPaymentRepository orderPaymentRepository;
+	private final ParentOrderRepository parentOrderRepository;
 
 	/**
 	 * tableName으로 qrCode를 찾아서, 해당 코드에 token을 더한 주소를 반환
@@ -293,11 +294,27 @@ public class OrderServiceImpl implements OrderService {
 			return SimpleResponseMessage.ORDER_ITEM_EMPTY;
 		}
 
+		// 0. parentOrders를 가져온다. 없을 경우, 새로 만든다.
+		ParentOrder parentOrder;
+		Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByIdDesc();
+		if (optionalParentOrder.isPresent() && optionalParentOrder.get().getOrderStatus().equals(OrderStatus.PENDING)) {
+			parentOrder = optionalParentOrder.get();
+		}
+		else {
+			parentOrder = ParentOrder.builder()
+				.tableId(tableId)
+				.orderStatus(OrderStatus.PENDING)
+				.paymentMethod(PaymentMethod.UNDEFINED)
+				.build();
+
+			parentOrder = parentOrderRepository.save(parentOrder);
+		}
+
 		// 1. orders table에 데이터를 추가한다
-		ParentOrder parentOrder = saveOrder(cartDatas, tableId);
+		Order order = saveOrder(cartDatas, tableId, parentOrder);
 
 		// 2. order_items에 데이터를 추가한다
-		List<OrderItem> orderItems = saveOrderItems(parentOrder, cartDatas);
+		List<OrderItem> orderItems = saveOrderItems(order, cartDatas);
 
 		// 3. order_item_options에 데이터를 추가한다
 		saveOrderItemOptions(orderItems, cartDatas);
@@ -874,20 +891,26 @@ public class OrderServiceImpl implements OrderService {
 	/**
 	 * 유저들이 담은 메뉴들의 정보를 바탕으로, order_items table에 데이터를 저장한다
 	 *
-	 * @param parentOrder : orders table에 저장된 주문 정보
+	 * @param order : orders table에 저장된 주문 정보
 	 * @param cartDatas : 유저들이 담은 메뉴들의 정보
 	 * @return : 저장된 entity list
 	 */
-	private List<OrderItem> saveOrderItems(ParentOrder parentOrder, List<CartDto> cartDatas) {
+	private List<OrderItem> saveOrderItems(Order order, List<CartDto> cartDatas) {
 
 		List<OrderItem> orderItems = cartDatas.stream()
-			.map(cartData -> productInfoToOrderItem(parentOrder, cartData))
+			.map(cartData -> productInfoToOrderItem(order, cartData))
 			.toList();
 
 		return orderItemRepository.saveAll(orderItems);
 	}
 
-	private OrderItem productInfoToOrderItem(ParentOrder parentOrder, CartDto productInfo) {
+	/**
+	 * orderItem에 데이터를 추가하는 메서드
+	 * @param order : orderItem이 속해 있는 order
+	 * @param productInfo : orderItem의 정보를 담고 있는 CartDto
+	 * @return : 저장된 orderItem entity
+	 */
+	private OrderItem productInfoToOrderItem(Order order, CartDto productInfo) {
 		Integer dishId = productInfo.getDishId();
 		Dish dish = dishRepository.findById(dishId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
@@ -898,7 +921,7 @@ public class OrderServiceImpl implements OrderService {
 		Integer orderPrice = getPriceOfDishAndOptions(dish, choices);
 
 		return OrderItem.builder()
-			.parentOrder(parentOrder)
+			.order(order)
 			.dish(dish)
 			.userId(userId)
 			.quantity(productInfo.getQuantity())
@@ -928,14 +951,12 @@ public class OrderServiceImpl implements OrderService {
 	 * @param tableId
 	 * @return : 저장된 entity
 	 */
-	private ParentOrder saveOrder(List<CartDto> cartDatas, String tableId) {
-		ParentOrder parentOrder = ParentOrder.builder()
-			.tableId(tableId)
-			.orderStatus(OrderStatus.PENDING)
-			.paymentMethod(PaymentMethod.UNDEFINED)
+	private Order saveOrder(List<CartDto> cartDatas, String tableId, ParentOrder parentOrder) {
+		Order order = Order.builder()
+			.parentOrder(parentOrder)
 			.build();
 
-		return orderRepository.save(parentOrder);
+		return orderRepository.save(order);
 	}
 
 }

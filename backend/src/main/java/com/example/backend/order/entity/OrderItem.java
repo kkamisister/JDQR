@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -47,4 +49,23 @@ public class OrderItem extends BaseEntity {
 
     @Column(name = "order_status")
     private OrderStatus orderStatus;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "orderItem")
+    private List<OrderItemChoice> orderItemChoices = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+            "id=" + id +
+            ", order=" + order +
+            ", userId='" + userId + '\'' +
+            ", dish=" + dish +
+            ", quantity=" + quantity +
+            ", paidQuantity=" + paidQuantity +
+            ", orderPrice=" + orderPrice +
+            ", orderedAt=" + orderedAt +
+            ", orderStatus=" + orderStatus +
+            '}';
+    }
 }

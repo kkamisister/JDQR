@@ -81,6 +81,7 @@ public record DishResponse() {
 		int price,
 		String description,
 		String image,
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 		List<OptionDto> options,
 		@JsonInclude(JsonInclude.Include.NON_EMPTY)
 		List<String> tags,

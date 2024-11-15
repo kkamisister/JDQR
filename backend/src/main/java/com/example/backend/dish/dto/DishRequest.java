@@ -12,7 +12,7 @@ public record DishRequest() {
 		Integer price,
 		String description,
 		String image,
-		List<Integer> tagIds
+		List<String> tags
 	){
 
 	}

@@ -1,9 +1,15 @@
 package com.example.backend.order.controller;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import com.example.backend.common.exception.ErrorCode;
+import com.example.backend.common.exception.JDQRException;
+import com.example.backend.common.exception.ValidationException;
 import com.example.backend.order.dto.CartRequest.*;
 import com.example.backend.order.dto.CartResponse.*;
 import com.example.backend.order.dto.DummyOrderDto;
@@ -15,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +40,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,6 +54,7 @@ public class OrderController {
 
 	private final OrderService orderService;
 	private final SimpMessagingTemplate messagingTemplate;
+	private final Validator validator;
 
 	@Operation(summary = "인증 토큰 발급", description = "토큰을 발급한 url을 반환하는 api")
 	@ApiResponses(value = {
@@ -112,9 +122,20 @@ public class OrderController {
 	@MessageMapping("/cart/add")
 	public void addItemToCart(@Payload CartDto productInfo, @Header("simpSessionAttributes") Map<String,Object> attributes){
 
+		// 수동 검증 수행
+		Set<ConstraintViolation<CartDto>> violations = validator.validate(productInfo);
+		if (!violations.isEmpty()) {
+			// 유효성 검증 실패 예외 발생
+			List<String> errorMessages = violations.stream()
+				.map(violation -> violation.getPropertyPath() + " " + violation.getMessage())
+				.collect(Collectors.toList());
+
+			throw new ValidationException(errorMessages); // 유효성 검증 실패 예외 발생
+		}
+
 		String tableId = (String)attributes.get("tableId");
 		log.warn("테이블 id : {}",tableId);
-		orderService.addItem(tableId,productInfo);
+		orderService.addItem(tableId, productInfo);
 	}
 
 	// todo: order data 삽입용 api. 데이터 삽입 이후 삭제

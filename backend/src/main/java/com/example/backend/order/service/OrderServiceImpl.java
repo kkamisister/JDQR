@@ -763,6 +763,22 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Transactional
+    @Override
+    public SimpleResponseMessage initPayment(String tableId) {
+        ParentOrder parentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId)
+            .orElseThrow(() -> new JDQRException(ErrorCode.PARENT_ORDER_NOT_FOUND));
+
+        if (parentOrder.getOrderStatus() != OrderStatus.PENDING && parentOrder.getOrderStatus() != OrderStatus.PAY_WAITING) {
+            throw new JDQRException(ErrorCode.VALIDATION_ERROR_INTERNAL);
+        }
+
+        parentOrder.setOrderStatus(OrderStatus.PAY_WAITING);
+        parentOrderRepository.save(parentOrder);
+
+        return SimpleResponseMessage.ORDER_STATUS_CHANGED;
+    }
+
     /**
      * 테이블에 들어간 주문이 없을 때, 기본 OrderInfoResponseDto를 반환
      *

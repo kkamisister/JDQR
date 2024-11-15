@@ -39,7 +39,7 @@ VALUES (1, 37.7749, -122.4194, b'1', 1, NOW(), NOW(), '123 Main St, San Francisc
 --     농민백암순대 본점
        (15, 37.5037329376349, 127.052982069884, b'1', 15, NOW(), NOW(), '서울특별시 강남구 선릉로86길 40-4',
         'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_15.jpg', 'Food', '농민백암순대 본점',
-        '02-555-9603', '254-12-01439', 'ACTIVE'),
+        '02-555-9603', '254-12-01439', 'ACTIVE')
 ;
 
 -- 3. restaurant_categories 테이블
@@ -342,7 +342,7 @@ INSERT INTO `dish_options` (`id`, `dish_id`, `option_id`, `created_at`, `updated
 VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
        (2, 2, 2, NOW(), NOW(), 'ACTIVE'), -- Nachos: Extra Cheese
        (3, 3, 1, NOW(), NOW(), 'ACTIVE'), -- Chicken Sandwich: Double Meat
-       (3, 4, 2, NOW(), NOW(), 'ACTIVE'), -- Veggie Burger: No Onion
+       (4, 4, 2, NOW(), NOW(), 'ACTIVE'), -- Veggie Burger: No Onion
        (5, 5, 2, NOW(), NOW(), 'ACTIVE'), -- Burrito: Extra Sauce
        (6, 6, 2, NOW(), NOW(), 'ACTIVE'), -- Chocolate Cake: Add Spicy
        (7, 7, 2, NOW(), NOW(), 'ACTIVE'), -- Garlic Bread: Whole Wheat Bread
@@ -426,43 +426,61 @@ VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
 --        (79, 44, 4, NOW(), NOW(), 'ACTIVE'),
 ;
 
--- -- 10. orders 테이블
--- INSERT INTO `orders` (`id`, `menu_cnt`, `created_at`, `updated_at`, `table_id`, `order_status`, `payment_method`,
---                       `status`)
--- VALUES (1, 3, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PENDING', 'MENU_DIVIDE', 'ACTIVE'),
---        (2, 2, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
---        (3, 4, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
---        (4, 1, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PENDING', 'MENU_DIVIDE', 'ACTIVE'),
---        (5, 2, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
---        (6, 3, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
---        (7, 2, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PENDING', 'MENU_DIVIDE', 'ACTIVE'),
---        (8, 5, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
---        (9, 3, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
---        (10, 4, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MENU_DIVIDE', 'ACTIVE');
+-- parent_orders 테이블
+INSERT INTO `parent_orders` (id, created_at, updated_at, table_id, order_status, payment_method, status)
+values (1, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PAID', 'MENU_DIVIDE', 'ACTIVE'),
+       (2, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
+       (3, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
+       (4, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MENU_DIVIDE', 'ACTIVE'),
+       (5, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
+       (6, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
+       (7, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PAID', 'MENU_DIVIDE', 'ACTIVE'),
+       (8, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
+       (9, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
+       (10, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MENU_DIVIDE', 'ACTIVE');
+
+-- 10. orders 테이블
+INSERT INTO `orders` (id, parent_order_id, created_at, updated_at, status)
+VALUES (1, 1, NOW(), NOW(), 'ACTIVE'),
+       (2, 2, NOW(), NOW(), 'ACTIVE'),
+       (3, 3, NOW(), NOW(), 'ACTIVE'),
+       (4, 4, NOW(), NOW(), 'ACTIVE'),
+       (5, 5, NOW(), NOW(), 'ACTIVE'),
+       (6, 6, NOW(), NOW(), 'ACTIVE'),
+       (7, 7, NOW(), NOW(), 'ACTIVE'),
+       (8, 8, NOW(), NOW(), 'ACTIVE'),
+       (9, 9, NOW(), NOW(), 'ACTIVE'),
+       (10, 10, NOW(), NOW(), 'ACTIVE')
+;
+
 --
 -- -- 11. order_items 테이블
--- INSERT INTO `order_items` (`dish_id`, `id`, `order_id`, `order_price`, `quantity`, `created_at`, `ordered_at`,
---                            `updated_at`, `user_id`, `status`)
--- VALUES (1, 1, 1, 500, 2, NOW(), NOW(), NOW(), 'user_1', 'ACTIVE'),
---        (2, 2, 1, 700, 1, NOW(), NOW(), NOW(), 'user_2', 'ACTIVE'),
---        (3, 3, 2, 1500, 3, NOW(), NOW(), NOW(), 'user_3', 'ACTIVE'),
---        (4, 4, 2, 1300, 1, NOW(), NOW(), NOW(), 'user_4', 'ACTIVE'),
---        (5, 5, 3, 1200, 2, NOW(), NOW(), NOW(), 'user_5', 'ACTIVE'),
---        (6, 6, 3, 800, 1, NOW(), NOW(), NOW(), 'user_6', 'ACTIVE'),
---        (7, 7, 4, 400, 3, NOW(), NOW(), NOW(), 'user_7', 'ACTIVE'),
---        (8, 8, 4, 350, 2, NOW(), NOW(), NOW(), 'user_8', 'ACTIVE'),
---        (9, 9, 5, 600, 1, NOW(), NOW(), NOW(), 'user_9', 'ACTIVE'),
---        (10, 10, 5, 1000, 1, NOW(), NOW(), NOW(), 'user_10', 'ACTIVE');
+INSERT INTO `order_items` (`dish_id`, `id`, `order_id`, `order_price`, `quantity`, `created_at`, `ordered_at`,
+                           `updated_at`, `user_id`, `status`)
+VALUES (1, 1, 1, 500, 2, NOW(), NOW(), NOW(), 'user_1', 'ACTIVE'),
+       (2, 2, 1, 700, 1, NOW(), NOW(), NOW(), 'user_2', 'ACTIVE'),
+       (3, 3, 2, 1500, 3, NOW(), NOW(), NOW(), 'user_3', 'ACTIVE'),
+       (4, 4, 2, 1300, 1, NOW(), NOW(), NOW(), 'user_4', 'ACTIVE'),
+       (5, 5, 3, 1200, 2, NOW(), NOW(), NOW(), 'user_5', 'ACTIVE'),
+       (6, 6, 3, 800, 1, NOW(), NOW(), NOW(), 'user_6', 'ACTIVE'),
+       (7, 7, 4, 400, 3, NOW(), NOW(), NOW(), 'user_7', 'ACTIVE'),
+       (8, 8, 4, 350, 2, NOW(), NOW(), NOW(), 'user_8', 'ACTIVE'),
+       (9, 9, 5, 600, 1, NOW(), NOW(), NOW(), 'user_9', 'ACTIVE'),
+       (10, 10, 5, 1000, 1, NOW(), NOW(), NOW(), 'user_10', 'ACTIVE');
 --
--- -- 12. order_item_options 테이블
--- INSERT INTO `order_item_choices` (`id`, `choice_id`, `order_item_id`, `created_at`, `updated_at`, `status`)
--- VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- Order Item 1: Small Size
---        (2, 2, 2, NOW(), NOW(), 'ACTIVE'), -- Order Item 2: Large Size
---        (3, 3, 3, NOW(), NOW(), 'ACTIVE'), -- Order Item 3: Extra Cheese
---        (4, 4, 4, NOW(), NOW(), 'ACTIVE'), -- Order Item 4: Extra Sauce
---        (5, 5, 5, NOW(), NOW(), 'ACTIVE'), -- Order Item 5: No Salt
---        (6, 6, 6, NOW(), NOW(), 'ACTIVE'), -- Order Item 6: Add Spicy
---        (7, 7, 7, NOW(), NOW(), 'ACTIVE'), -- Order Item 7: Double Meat
---        (8, 8, 8, NOW(), NOW(), 'ACTIVE'), -- Order Item 8: No Onion
---        (9, 9, 9, NOW(), NOW(), 'ACTIVE'), -- Order Item 9: Whole Wheat Bread
---        (10, 10, 10, NOW(), NOW(), 'ACTIVE');
+-- 12. order_item_options 테이블
+INSERT INTO `order_item_choices` (`id`, `choice_id`, `order_item_id`, `created_at`, `updated_at`, `status`)
+VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- Order Item 1: Small Size
+       (2, 2, 2, NOW(), NOW(), 'ACTIVE'), -- Order Item 2: Large Size
+       (3, 3, 3, NOW(), NOW(), 'ACTIVE'), -- Order Item 3: Extra Cheese
+       (4, 4, 4, NOW(), NOW(), 'ACTIVE'), -- Order Item 4: Extra Sauce
+       (5, 5, 5, NOW(), NOW(), 'ACTIVE'), -- Order Item 5: No Salt
+       (6, 6, 6, NOW(), NOW(), 'ACTIVE'), -- Order Item 6: Add Spicy
+       (7, 7, 7, NOW(), NOW(), 'ACTIVE'), -- Order Item 7: Double Meat
+       (8, 8, 8, NOW(), NOW(), 'ACTIVE'), -- Order Item 8: No Onion
+       (9, 9, 9, NOW(), NOW(), 'ACTIVE'), -- Order Item 9: Whole Wheat Bread
+       (10, 10, 10, NOW(), NOW(), 'ACTIVE');
+
+update dish
+set tags = '[]'
+where tags = '';

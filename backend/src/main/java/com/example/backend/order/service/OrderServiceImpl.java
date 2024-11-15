@@ -1061,7 +1061,6 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = orderRepository.findAllByParentOrder(parentOrder);
 
         List<OrderItem> orderItems = orderItemRepository.findOrderItemByOrder(orders).stream()
-            .filter(orderItem -> orderItem.getOrderStatus().equals(OrderStatus.PENDING))
             .toList();
 
         return orderItems.stream()
@@ -1187,7 +1186,6 @@ public class OrderServiceImpl implements OrderService {
             .quantity(productInfo.getQuantity())
             .paidQuantity(0)
             .orderPrice(orderPrice)
-            .orderStatus(OrderStatus.PENDING)
             .orderedAt(productInfo.getOrderedAt())
             .build();
     }

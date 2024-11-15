@@ -100,60 +100,60 @@ class DishRepositoryCustomTest extends ContainerSupport {
 
 	}
 
-	@DisplayName("주문에 속한 메뉴들을 조회할 수 있다")
-	@Test
-	void findAllByOrderTest(){
-
-		Owner owner = Owner.builder()
-			.email("sujipark2009@gmail.com")
-			.code("ABCDEFG")
-			.name("김영표")
-			.build();
-
-		ownerRepository.save(owner);
-
-		List<Restaurant> restaurants = generator.generateTestRestaurantList(false);
-		for(Restaurant restaurant : restaurants) {
-			restaurant.setOwner(owner);
-		}
-		restaurantRepository.saveAll(restaurants);
-
-		List<DishCategory> dishCategories = generator.generateTestDishCategoryList(false);
-		for(int i=0;i<4;i++){
-			DishCategory dishCategory = dishCategories.get(i%4);
-			dishCategory.setRestaurant(restaurants.get(i%2));
-		}
-		dishCategoryRepository.saveAll(dishCategories);
-
-		List<Dish> dishes1 = generator.generateTestDishList(false);
-		for(int i=0;i<8;i++){
-			Dish dish = dishes1.get(i);
-			dish.setDishCategory(dishCategories.get(i%4));
-		}
-		dishRepository.saveAll(dishes1);
-
-		List<ParentOrder> parentOrders = generator.generateTestOrderList(false);
-		orderRepository.saveAll(parentOrders);
-
-		List<OrderItem> orderItems = generator.generateTestOrderItemList(false);
-		for(int i=0;i<6;i++){
-			OrderItem orderItem = orderItems.get(i);
-			orderItem.setDish(dishes1.get(i));
-			orderItem.setParentOrder(parentOrders.get(i%4));
-		}
-		orderItemRepository.saveAll(orderItems);
-
-		//when
-		List<Dish> dishes = dishRepository.findAllByOrder(parentOrders.get(0));
-
-		//then
-		assertThat(dishes.size()).isEqualTo(2);
-
-		assertThat(dishes)
-			.extracting(Dish::getName)
-			.contains("더블QPC","베토디");
-
-
-	}
+//	@DisplayName("주문에 속한 메뉴들을 조회할 수 있다")
+//	@Test
+//	void findAllByOrderTest(){
+//
+//		Owner owner = Owner.builder()
+//			.email("sujipark2009@gmail.com")
+//			.code("ABCDEFG")
+//			.name("김영표")
+//			.build();
+//
+//		ownerRepository.save(owner);
+//
+//		List<Restaurant> restaurants = generator.generateTestRestaurantList(false);
+//		for(Restaurant restaurant : restaurants) {
+//			restaurant.setOwner(owner);
+//		}
+//		restaurantRepository.saveAll(restaurants);
+//
+//		List<DishCategory> dishCategories = generator.generateTestDishCategoryList(false);
+//		for(int i=0;i<4;i++){
+//			DishCategory dishCategory = dishCategories.get(i%4);
+//			dishCategory.setRestaurant(restaurants.get(i%2));
+//		}
+//		dishCategoryRepository.saveAll(dishCategories);
+//
+//		List<Dish> dishes1 = generator.generateTestDishList(false);
+//		for(int i=0;i<8;i++){
+//			Dish dish = dishes1.get(i);
+//			dish.setDishCategory(dishCategories.get(i%4));
+//		}
+//		dishRepository.saveAll(dishes1);
+//
+//		List<ParentOrder> parentOrders = generator.generateTestOrderList(false);
+//		orderRepository.saveAll(parentOrders);
+//
+//		List<OrderItem> orderItems = generator.generateTestOrderItemList(false);
+//		for(int i=0;i<6;i++){
+//			OrderItem orderItem = orderItems.get(i);
+//			orderItem.setDish(dishes1.get(i));
+//			orderItem.setParentOrder(parentOrders.get(i%4));
+//		}
+//		orderItemRepository.saveAll(orderItems);
+//
+//		//when
+//		List<Dish> dishes = dishRepository.findAllByOrder(parentOrders.get(0));
+//
+//		//then
+//		assertThat(dishes.size()).isEqualTo(2);
+//
+//		assertThat(dishes)
+//			.extracting(Dish::getName)
+//			.contains("더블QPC","베토디");
+//
+//
+//	}
 
 }

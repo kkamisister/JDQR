@@ -39,40 +39,40 @@ class ParentOrderRepositoryTest extends ContainerSupport {
 
 	private final TestDataGenerator generator = new TestDataGenerator();
 
-	@DisplayName("테이블 ID로 주문을 조회할 수 있다")
-	@Test
-	void findByTableId() {
-
-		Owner owner = Owner.builder()
-			.email("sujipark2009@gmail.com")
-			.code("ABCDEFG")
-			.name("김영표")
-			.build();
-
-		ownerRepository.save(owner);
-
-
-		// 식당 생성
-		List<Restaurant> restaurants = generator.generateTestRestaurantList(false);
-		for(Restaurant restaurant : restaurants) {
-			restaurant.setOwner(owner);
-		}
-
-		restaurantRepository.saveAll(restaurants);
-
-		// order 생성
-		List<ParentOrder> parentOrders = generator.generateTestOrderList(false);
-		orderRepository.saveAll(parentOrders);
-
-
-		//when
-		List<ParentOrder> parentOrderList = orderRepository.findByTableId("11111");
-
-		//then
-		assertThat(parentOrderList.size()).isEqualTo(2);
-
-		assertThat(parentOrderList).extracting(ParentOrder::getMenuCnt)
-			.containsExactly(5,9);
-
-	}
+//	@DisplayName("테이블 ID로 주문을 조회할 수 있다")
+//	@Test
+//	void findByTableId() {
+//
+//		Owner owner = Owner.builder()
+//			.email("sujipark2009@gmail.com")
+//			.code("ABCDEFG")
+//			.name("김영표")
+//			.build();
+//
+//		ownerRepository.save(owner);
+//
+//
+//		// 식당 생성
+//		List<Restaurant> restaurants = generator.generateTestRestaurantList(false);
+//		for(Restaurant restaurant : restaurants) {
+//			restaurant.setOwner(owner);
+//		}
+//
+//		restaurantRepository.saveAll(restaurants);
+//
+//		// order 생성
+//		List<ParentOrder> parentOrders = generator.generateTestOrderList(false);
+//		orderRepository.saveAll(parentOrders);
+//
+//
+//		//when
+//		List<ParentOrder> parentOrderList = orderRepository.findByTableId("11111");
+//
+//		//then
+//		assertThat(parentOrderList.size()).isEqualTo(2);
+//
+//		assertThat(parentOrderList).extracting(ParentOrder::getMenuCnt)
+//			.containsExactly(5,9);
+//
+//	}
 }

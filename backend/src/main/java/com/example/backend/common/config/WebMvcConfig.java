@@ -11,7 +11,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry
 			.addMapping("/**")
 			.allowedOrigins(
-				"http://localhost:3000","https://jdqr608.duckdns.org"
+				"http://localhost:3000","https://jdqr608.duckdns.org","https://jdqr608.duckdns.org:8081"
 			)
 			.allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
 			.allowedHeaders("*")

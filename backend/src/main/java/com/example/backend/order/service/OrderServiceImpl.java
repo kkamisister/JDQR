@@ -296,7 +296,7 @@ public class OrderServiceImpl implements OrderService {
 
 		// 0. parentOrders를 가져온다. 없을 경우, 새로 만든다.
 		ParentOrder parentOrder;
-		Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByIdDesc();
+		Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdDesc(tableId);
 		if (optionalParentOrder.isPresent() && optionalParentOrder.get().getOrderStatus().equals(OrderStatus.PENDING)) {
 			parentOrder = optionalParentOrder.get();
 		}
@@ -412,8 +412,16 @@ public class OrderServiceImpl implements OrderService {
 		// 1. 현재 조회하기를 원하는 테이블의 정보 받아오기
 		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
+		//
+		Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdDesc(tableId);
+		if (!optionalParentOrder.isPresent() || !optionalParentOrder.get().getOrderStatus().equals(OrderStatus.PENDING)) {
+			return getBaseOrderInfo(table);
+		}
+
+		ParentOrder parentOrder = optionalParentOrder.get();
+
 		// 2. 테이블을 join한 결과 받아오기
-		List<OrderResponseVo> orderResponseVos = orderRepository.findWholeOrderInfos(tableId);
+		List<OrderResponseVo> orderResponseVos = orderRepository.findWholeOrderInfos(parentOrder);
 
 //		for (OrderResponseVo orderResponseVo : orderResponseVos) {
 //			System.out.println("orderResponseVo = " + orderResponseVo);
@@ -508,6 +516,20 @@ public class OrderServiceImpl implements OrderService {
 			.dishCnt(totalDishCount)
 			.price(totalPrice)
 			.orders(orderInfoResponseDtos)
+			.build();
+	}
+
+	/**
+	 * 테이블에 들어간 주문이 없을 때, 기본 OrderInfoResponseDto를 반환
+	 * @param table : 주문 중인 테이블
+	 * @return : TotalOrderInfoResponseDto
+	 */
+	private TotalOrderInfoResponseDto getBaseOrderInfo(Table table) {
+		return TotalOrderInfoResponseDto.builder()
+			.tableName(table.getName())
+			.dishCnt(0)
+			.price(0)
+			.orders(new ArrayList<>())
 			.build();
 	}
 

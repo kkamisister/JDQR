@@ -12,7 +12,7 @@ public interface OrderRepositoryCustom {
      */
     List<ParentOrder> findUnpaidOrders(String tableId);
 
-    List<OrderResponseVo> findWholeOrderInfos(String tableId);
+    List<OrderResponseVo> findWholeOrderInfos(ParentOrder parentOrder);
 
     List<ParentOrder> findOrdersByPayment(Payment payment);
 }

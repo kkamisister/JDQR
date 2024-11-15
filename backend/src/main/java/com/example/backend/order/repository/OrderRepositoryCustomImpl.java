@@ -29,7 +29,7 @@ public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implem
     }
 
     @Override
-    public List<OrderResponseVo> findWholeOrderInfos(String tableId) {
+    public List<OrderResponseVo> findWholeOrderInfos(ParentOrder parentOrder) {
         return select(Projections.constructor(OrderResponseVo.class, order.id, dish.id, orderItem.userId,
             dish.name, dish.price, dishCategory.id, dishCategory.name, orderItem.quantity, option.id,
             option.name, choice.id, choice.name, choice.price
@@ -47,8 +47,7 @@ public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implem
             .on(orderItem.dish.eq(dish))
             .join(dishCategory)
             .on(dish.dishCategory.eq(dishCategory))
-            .where(order.tableId.eq(tableId)
-                .and(order.orderStatus.eq(OrderStatus.PENDING)))
+            .where(order.parentOrder.eq(parentOrder))
             .fetch()
             ;
     }

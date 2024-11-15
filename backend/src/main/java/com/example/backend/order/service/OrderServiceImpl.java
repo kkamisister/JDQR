@@ -12,6 +12,7 @@ import com.example.backend.common.client.toss.dto.TossPaymentRequestDto;
 import com.example.backend.common.client.toss.dto.TossPaymentResponseDto;
 import com.example.backend.common.enums.SimpleResponseMessage;
 import com.example.backend.common.enums.UseStatus;
+import com.example.backend.common.exception.ValidationException;
 import com.example.backend.common.util.RandomUtil;
 import com.example.backend.common.util.TimeUtil;
 import com.example.backend.dish.entity.Dish;
@@ -105,8 +106,10 @@ public class OrderServiceImpl implements OrderService {
 
 		log.warn("productInfo : {}",productInfo);
 		// 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
+		// dishRepository.findById(productInfo.getDishId())
+		// 	.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
 		dishRepository.findById(productInfo.getDishId())
-			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+			.orElseThrow(() -> new ValidationException(List.of("해당 메뉴가 존재하지 않습니다.")));
 
 		// 2. 테이블 장바구니에 물품을 담는다
 		//<tableId,<userId,<hashCode,항목>>>
@@ -158,7 +161,8 @@ public class OrderServiceImpl implements OrderService {
 		Integer subscriberSize = redisHashRepository.getCurrentUserCnt(tableId);
 
 		// 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
-		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
+		Table table = tableRepository.findById(tableId)
+			.orElseThrow(() -> new ValidationException(List.of("해당 테이블이 존재하지 않습니다.")));
 
 		log.warn("table : {}",table);
 

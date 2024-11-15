@@ -12,6 +12,7 @@ import com.example.backend.common.client.toss.dto.TossPaymentRequestDto;
 import com.example.backend.common.client.toss.dto.TossPaymentResponseDto;
 import com.example.backend.common.enums.SimpleResponseMessage;
 import com.example.backend.common.enums.UseStatus;
+import com.example.backend.common.exception.ValidationException;
 import com.example.backend.common.util.RandomUtil;
 import com.example.backend.common.util.TimeUtil;
 import com.example.backend.dish.entity.Dish;
@@ -158,8 +159,9 @@ public class OrderServiceImpl implements OrderService {
         // 3-2. 현재 테이블과 연결된 사람수를 받아온다
         Integer subscriberSize = redisHashRepository.getCurrentUserCnt(tableId);
 
-        // 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
-        Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
+		// 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
+		Table table = tableRepository.findById(tableId)
+			.orElseThrow(() -> new ValidationException(List.of("해당 테이블이 존재하지 않습니다.")));
 
         log.warn("table : {}", table);
 
@@ -312,18 +314,18 @@ public class OrderServiceImpl implements OrderService {
         // 1. orders table에 데이터를 추가한다
         Order order = saveOrder(cartDatas, tableId, parentOrder);
 
-        // 2. order_items에 데이터를 추가한다
-        List<OrderItem> orderItems = saveOrderItems(order, cartDatas);
+		// 2. order_items에 데이터를 추가한다
+		List<OrderItem> orderItems = saveOrderItems(order, cartDatas);
 
-        // 3. order_item_options에 데이터를 추가한다
-        saveOrderItemOptions(orderItems, cartDatas);
+		// 3. order_item_options에 데이터를 추가한다
+		saveOrderItemOptions(orderItems, cartDatas);
 
-        // 4. redis에서 정보를 제거한다
-        String key = "table::" + tableId;
-        redisHashRepository.removeKey(key);
+		// 4. redis에서 정보를 제거한다
+		String key = "table::" + tableId;
+		redisHashRepository.removeKey(key);
 
-        return SimpleResponseMessage.ORDER_SUCCESS;
-    }
+		return SimpleResponseMessage.ORDER_SUCCESS;
+	}
 
     /**
      * 결제 방식에 따라 결제를 수행한 후, 성공 여부를 반환하는 api
@@ -444,7 +446,7 @@ public class OrderServiceImpl implements OrderService {
                                 .optionName(option.getOptionName())
                                 .choiceId(option.getChoiceId())
                                 .choiceName(option.getChoiceName())
-                                .price(option.getDishPrice())
+                                .price(option.getChoicePrice())
                                 .build()
                             )
                             .toList();
@@ -462,7 +464,7 @@ public class OrderServiceImpl implements OrderService {
                             .dishCategoryId(baseOrder.getDishCategoryId())
                             .dishCategoryName(baseOrder.getDishCategoryName())
                             .price(baseOrder.getDishPrice())
-                            .totalPrice(baseOrder.getDishPrice() + optionPrice)
+							.totalPrice(baseOrder.getDishPrice() + optionPrice)
                             .options(options)
                             .quantity(baseOrder.getQuantity())
                             .build();

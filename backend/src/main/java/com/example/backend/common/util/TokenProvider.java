@@ -111,6 +111,20 @@ public class TokenProvider {
             .parseSignedClaims(accessToken)
             .getPayload();
     }
+
+    public AuthToken generate(Integer userId){
+
+        Long now = (new Date()).getTime();
+        Date accessTokenExpiredDate = new Date(now + ACCESS_TOKEN_VALIDITY_SECONDS);
+        Date refreshTokenExpiredDate = new Date(now + REFRESH_TOKEN_VALIDITY_SECONDS);
+
+        String subject = userId.toString();
+        String accessToken = generateAccessToken(subject, accessTokenExpiredDate);
+        generateRefreshToken(subject,refreshTokenExpiredDate,accessToken);
+
+        return AuthToken.of(accessToken);
+    }
+
     public AuthToken generate(Integer userId,String accessToken){
 
         Long now = (new Date()).getTime();

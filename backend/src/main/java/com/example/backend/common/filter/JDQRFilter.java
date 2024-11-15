@@ -116,7 +116,7 @@ public class JDQRFilter extends OncePerRequestFilter {
 
         // jwt 토큰 확인 로직에서 제외시킬 api path 설정
         // /api/v1/admin/login/{anything} 경로와 /swagger 경로, test용 api 필터링 제외
-        return pathMatcher.match("/api/v1/admin/login/**", path)
+        return pathMatcher.match("/api/v1/owner/login/**", path)
             || pathMatcher.match("/api/v1/swagger-ui/**", path)		// swagger ui 실행시 동작하는 api
             || pathMatcher.match("/v3/api-docs/**", path)			// swagger ui 실행시 동작하는 api
             || pathMatcher.match("/api/v1/test/**", path)

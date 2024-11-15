@@ -32,6 +32,7 @@ public class RestaurantDto {
 	private String image;
 	private double lat;
 	private double lng;
+	private String phoneNumber;
 	private boolean open;
 
 	public static RestaurantDto from(Restaurant restaurant) {

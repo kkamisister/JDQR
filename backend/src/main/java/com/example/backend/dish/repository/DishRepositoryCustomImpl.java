@@ -10,14 +10,9 @@ import java.util.Optional;
 
 import com.example.backend.common.repository.Querydsl4RepositorySupport;
 import com.example.backend.dish.entity.Dish;
-import com.example.backend.dish.entity.DishCategory;
-import com.example.backend.dish.entity.QDish;
-import com.example.backend.dish.entity.QDishCategory;
 import com.example.backend.etc.entity.Restaurant;
-import com.example.backend.order.entity.Order;
+import com.example.backend.order.entity.ParentOrder;
 import com.example.backend.order.entity.OrderItem;
-import com.example.backend.order.entity.QOrder;
-import com.example.backend.order.entity.QOrderItem;
 
 public class DishRepositoryCustomImpl extends Querydsl4RepositorySupport implements DishRepositoryCustom {
 	@Override
@@ -36,11 +31,11 @@ public class DishRepositoryCustomImpl extends Querydsl4RepositorySupport impleme
 	}
 
 	@Override
-	public List<Dish> findAllByOrder(Order order1) {
+	public List<Dish> findAllByOrder(ParentOrder parentOrder) {
 		List<OrderItem> orderItems = selectFrom(orderItem)
 			.join(orderItem.dish, dish)
 			.join(orderItem.order, order).fetchJoin()
-			.where(order.eq(order1))
+			.where(order.parentOrder.eq(parentOrder))
 			.orderBy(dish.id.asc())
 			.fetch();
 

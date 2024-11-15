@@ -8,6 +8,7 @@ import static java.lang.Boolean.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.backend.order.entity.ParentOrder;
 import org.springframework.stereotype.Component;
 
 import com.example.backend.common.enums.CategoryType;
@@ -19,7 +20,6 @@ import com.example.backend.dish.entity.Option;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.entity.RestaurantCategory;
 import com.example.backend.etc.entity.RestaurantCategoryMap;
-import com.example.backend.order.entity.Order;
 import com.example.backend.order.entity.OrderItem;
 import com.example.backend.order.enums.OrderStatus;
 import com.example.backend.order.enums.PaymentMethod;
@@ -237,21 +237,20 @@ public final class TestDataGenerator {
 	}
 
 	// 4개
-	public List<Order> generateTestOrderList(boolean isIdNeed){
+	public List<ParentOrder> generateTestOrderList(boolean isIdNeed){
 
 		int numOfElement = 4;
 
-		List<Order> orderList = new ArrayList<>();
+		List<ParentOrder> parentOrderList = new ArrayList<>();
 		for(int i=0;i<numOfElement;i++){
-			orderList.add(generateOrder(tableIdList.get(i%2),menuCntList.get(i),orderStatusList.get(i),paymentMethodList.get(i),isIdNeed ? i+1 : null));
+			parentOrderList.add(generateOrder(tableIdList.get(i%2),menuCntList.get(i),orderStatusList.get(i),paymentMethodList.get(i),isIdNeed ? i+1 : null));
 		}
-		return orderList;
+		return parentOrderList;
 	}
 
-	private Order generateOrder(String tableId,int cnt,OrderStatus orderStatus,PaymentMethod paymentMethod,Integer id){
-		return Order.builder()
+	private ParentOrder generateOrder(String tableId, int cnt, OrderStatus orderStatus, PaymentMethod paymentMethod, Integer id){
+		return ParentOrder.builder()
 			.tableId(tableId)
-			.menuCnt(cnt)
 			.orderStatus(orderStatus)
 			.paymentMethod(paymentMethod)
 			.build();

@@ -10,6 +10,7 @@ import lombok.*;
 @ToString
 public class OrderResponseVo {
     private Integer orderId;
+    private Integer orderItemId;
     private Integer dishId;
     private String userId;
     private String dishName;

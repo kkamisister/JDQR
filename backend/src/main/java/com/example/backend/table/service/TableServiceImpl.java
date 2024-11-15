@@ -3,14 +3,9 @@ package com.example.backend.table.service;
 import static com.example.backend.table.dto.TableRequest.*;
 import static com.example.backend.table.dto.TableResponse.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.example.backend.common.enums.EntityStatus;
-import com.example.backend.dish.dto.DishResponse;
 import com.example.backend.dish.dto.DishResponse.DishDetailInfo;
 import com.example.backend.dish.dto.OptionDto;
 import com.example.backend.dish.entity.Dish;
@@ -19,23 +14,22 @@ import com.example.backend.dish.entity.Option;
 import com.example.backend.dish.repository.DishOptionRepository;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.etc.entity.Restaurant;
-import com.example.backend.order.entity.Order;
+import com.example.backend.order.dto.OrderResponseVo;
+import com.example.backend.order.entity.ParentOrder;
 import com.example.backend.order.enums.OrderStatus;
 import com.example.backend.order.repository.OrderItemRepository;
 import com.example.backend.order.repository.OrderRepository;
+import com.example.backend.order.repository.ParentOrderRepository;
 import com.example.backend.owner.entity.Owner;
 import com.example.backend.owner.repository.OwnerRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.backend.common.dto.CommonResponse.ResponseWithData;
 import com.example.backend.common.enums.UseStatus;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
 import com.example.backend.common.util.GenerateLink;
 import com.example.backend.etc.repository.RestaurantRepository;
-import com.example.backend.table.dto.TableResponse;
 import com.example.backend.table.entity.Table;
 import com.example.backend.table.repository.TableRepository;
 
@@ -57,6 +51,8 @@ public class TableServiceImpl implements TableService{
 	private final OrderItemRepository orderItemRepository;
 	private final DishRepository dishRepository;
 	private final DishOptionRepository dishOptionRepository;
+	private final ParentOrderRepository parentOrderRepository;
+
 	/**
 	 * 요청받은 테이블의 정보를, userId를 가진 점주를 찾아 등록한다
 	 * @param tableInfo
@@ -180,29 +176,39 @@ public class TableServiceImpl implements TableService{
 		List<TableDetailInfo> tableDetailInfos = new ArrayList<>();
 		int leftSeatNum = 0;
 		for(Table table : tables){
-			List<Order> orderList = orderRepository.findByTableId(table.getId());
+			Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdDesc(table.getId());
+
+			// 테이블에 한 번도 주문이 들어가지 않은 상태일 경우
+			if (optionalParentOrder.isEmpty()) {
+				tableDetailInfos.add(getBaseTableInfo(table));
+				continue;
+			}
+
+			ParentOrder parentOrder = optionalParentOrder.get();
+
 			Map<DishDetailInfo, Integer> dishCountMap = new LinkedHashMap<>();
 			if(table.getUseStatus().equals(UseStatus.AVAILABLE)){ // 남은 좌석의 수를 카운팅
 				leftSeatNum += table.getPeople();
 			}
-			for(Order order : orderList){
-				// 아직 결제되지 않은 항목만 가지고온다
-				if(order.getOrderStatus().equals(OrderStatus.PENDING)){
-					// 해당 주문에 있는 모든 Dish를 가지고온다
-					List<Dish> dishes = dishRepository.findAllByOrder(order);
-					for(Dish dish : dishes){
-						List<DishOption> dishOptions = dishOptionRepository.findByDish(dish);
-						List<Option> options = dishOptions.stream().map(DishOption::getOption).toList();
-						List<OptionDto> optionDtos = options.stream().map(OptionDto::of).toList();
-						// log.warn("optionDtos : {}",optionDtos);
-						DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish,optionDtos);
 
-						// log.warn("dishDetailInfo : {}",dishDetailInfo);
-						dishCountMap.put(dishDetailInfo, dishCountMap.getOrDefault(dishDetailInfo, 0) + 1);
-						// log.warn("개수 : {}",dishCountMap.get(dishDetailInfo));
-					}
+			// 아직 결제되지 않은 항목만 가지고온다
+			if(parentOrder.getOrderStatus().equals(OrderStatus.PENDING) || parentOrder.getOrderStatus().equals(OrderStatus.PAY_WAITING)){
+				// 해당 주문에 있는 모든 Dish를 가지고온다
+
+				List<Dish> dishes = dishRepository.findAllByOrder(parentOrder);
+				for(Dish dish : dishes){
+					List<DishOption> dishOptions = dishOptionRepository.findByDish(dish);
+					List<Option> options = dishOptions.stream().map(DishOption::getOption).toList();
+					List<OptionDto> optionDtos = options.stream().map(OptionDto::of).toList();
+					// log.warn("optionDtos : {}",optionDtos);
+					DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish,optionDtos);
+
+					// log.warn("dishDetailInfo : {}",dishDetailInfo);
+					dishCountMap.put(dishDetailInfo, dishCountMap.getOrDefault(dishDetailInfo, 0) + 1);
+					// log.warn("개수 : {}",dishCountMap.get(dishDetailInfo));
 				}
 			}
+
 			// 수량이 누적된 dishCountMap에서 최종 DishDetailInfo 생성
 			List<DishDetailInfo> result = dishCountMap.entrySet().stream()
 				.map(entry -> entry.getKey().withQuantity(entry.getValue()))
@@ -216,6 +222,20 @@ public class TableServiceImpl implements TableService{
 		TableResultDto tableResultDto = new TableResultDto(tableDetailInfos,leftSeatNum);
 
 		return tableResultDto;
+	}
+
+	/**
+	 * 테이블에 아직 한 번도 주문한 적이 없는 경우, 해당 테이블의 정보만을 반환
+	 */
+	private TableDetailInfo getBaseTableInfo(Table table) {
+		return TableDetailInfo.builder()
+			.tableId(table.getId())
+			.name(table.getName())
+			.color(table.getColor())
+			.qrLink(table.getQrCode())
+			.people(0)
+			.dishes(new ArrayList<>())
+			.build();
 	}
 
 	/**
@@ -235,27 +255,32 @@ public class TableServiceImpl implements TableService{
 			.orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
 		//3. 테이블의 상세정보를 조회한다
-		List<Order> orderList = orderRepository.findByTableId(table.getId());
+		Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdDesc(table.getId());
+		if (optionalParentOrder.isEmpty()) {
+			return getBaseTableInfo(table);
+		}
+
+		ParentOrder parentOrder = optionalParentOrder.get();
+
 		Map<DishDetailInfo, Integer> dishCountMap = new LinkedHashMap<>();
 
 		int totalPrice = 0;
-		for(Order order : orderList){
-			// 아직 결제되지 않은 항목만 가지고온다
-			if(order.getOrderStatus().equals(OrderStatus.PENDING)){
-				// 해당 주문에 있는 모든 Dish를 가지고온다
-				List<Dish> dishes = dishRepository.findAllByOrder(order);
-				for(Dish dish : dishes){
-					List<DishOption> dishOptions = dishOptionRepository.findByDish(dish);
-					List<Option> options = dishOptions.stream().map(DishOption::getOption).toList();
-					List<OptionDto> optionDtos = options.stream().map(OptionDto::of).toList();
-					DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish,optionDtos);
+		// 아직 결제되지 않은 항목만 가지고온다
+		if(parentOrder.getOrderStatus().equals(OrderStatus.PENDING)){
+			// 해당 주문에 있는 모든 Dish를 가지고온다
+			List<Dish> dishes = dishRepository.findAllByOrder(parentOrder);
+			for(Dish dish : dishes){
+				List<DishOption> dishOptions = dishOptionRepository.findByDish(dish);
+				List<Option> options = dishOptions.stream().map(DishOption::getOption).toList();
+				List<OptionDto> optionDtos = options.stream().map(OptionDto::of).toList();
+				DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish,optionDtos);
 
-					dishCountMap.put(dishDetailInfo, dishCountMap.getOrDefault(dishDetailInfo, 0) + 1);
+				dishCountMap.put(dishDetailInfo, dishCountMap.getOrDefault(dishDetailInfo, 0) + 1);
 
-					totalPrice += dish.getPrice();
-				}
+				totalPrice += dish.getPrice();
 			}
 		}
+
 		// 수량이 누적된 dishCountMap에서 최종 DishDetailInfo 생성
 		List<DishDetailInfo> result = dishCountMap.entrySet().stream()
 			.map(entry -> entry.getKey().withQuantity(entry.getValue()))

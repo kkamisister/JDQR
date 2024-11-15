@@ -105,6 +105,19 @@ public class OrderController {
 		messagingTemplate.convertAndSend("/sub/cart/"+tableId, simpleResponseMessage);
 	}
 
+	@Operation(summary = "주문 정보 + 결제된 정보", description = "주문한 음식들의 내역과, 결제 현황을 보여 주는 api")
+	@GetMapping("/payment")
+	public ResponseEntity<ResponseWithData<TotalOrderInfoResponseDto>> getPaymentInfo(HttpServletRequest request) {
+		String tableId = (String)request.getAttribute("tableId");
+
+		TotalOrderInfoResponseDto data = orderService.getTotalPaymentInfo(tableId);
+
+		ResponseWithData<TotalOrderInfoResponseDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(), "부분결제 요청에 성공하였습니다", data);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
+	}
+
 	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")
 	@PostMapping("/payment")
 	public ResponseEntity<ResponseWithData<InitialPaymentResponseDto>> payForOrder(HttpServletRequest request, PaymentRequestDto paymentRequestDto) {
@@ -138,11 +151,11 @@ public class OrderController {
 		orderService.addItem(tableId, productInfo);
 	}
 
-	// todo: order data 삽입용 api. 데이터 삽입 이후 삭제
-	@PostMapping("/dummy")
-	public void addDummyOrderData(@RequestBody DummyOrderDto productInfo){
-		orderService.addDummyOrderData(productInfo);
-	}
+//	// todo: order data 삽입용 api. 데이터 삽입 이후 삭제
+//	@PostMapping("/dummy")
+//	public void addDummyOrderData(@RequestBody DummyOrderDto productInfo){
+//		orderService.addDummyOrderData(productInfo);
+//	}
 
 
 	@Operation(summary = "장바구니 항목 제거", description = "장바구니 항목을 제거하는 api")

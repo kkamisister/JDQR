@@ -31,11 +31,11 @@ public class DishRepositoryCustomImpl extends Querydsl4RepositorySupport impleme
 	}
 
 	@Override
-	public List<Dish> findAllByOrder(ParentOrder parentOrder1) {
+	public List<Dish> findAllByOrder(ParentOrder parentOrder) {
 		List<OrderItem> orderItems = selectFrom(orderItem)
 			.join(orderItem.dish, dish)
 			.join(orderItem.order, order).fetchJoin()
-			.where(order.eq(parentOrder1))
+			.where(order.parentOrder.eq(parentOrder))
 			.orderBy(dish.id.asc())
 			.fetch();
 

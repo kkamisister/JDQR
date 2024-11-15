@@ -33,7 +33,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -130,11 +129,11 @@ public class OrderController {
 		orderService.addItem(tableId,productInfo);
 	}
 
-	// todo: order data 삽입용 api. 데이터 삽입 이후 삭제
-	@PostMapping("/dummy")
-	public void addDummyOrderData(@RequestBody DummyOrderDto productInfo){
-		orderService.addDummyOrderData(productInfo);
-	}
+//	// todo: order data 삽입용 api. 데이터 삽입 이후 삭제
+//	@PostMapping("/dummy")
+//	public void addDummyOrderData(@RequestBody DummyOrderDto productInfo){
+//		orderService.addDummyOrderData(productInfo);
+//	}
 
 
 	@Operation(summary = "장바구니 항목 제거", description = "장바구니 항목을 제거하는 api")

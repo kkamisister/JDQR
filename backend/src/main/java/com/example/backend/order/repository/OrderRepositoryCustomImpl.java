@@ -24,11 +24,11 @@ import static com.example.backend.dish.entity.QDishCategory.dishCategory;
 
 public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implements OrderRepositoryCustom {
     @Override
-    public List<ParentOrder> findUnpaidOrders(String tableId) {
-        return selectFrom(order)
-            .where(order.tableId.eq(tableId)
-                .and(order.orderStatus.eq(OrderStatus.PENDING)))
-            .fetch();
+    public ParentOrder findUnpaidOrders(String tableId) {
+        return selectFrom(parentOrder)
+            .where(parentOrder.tableId.eq(tableId))
+            .orderBy(parentOrder.id.desc())
+            .fetchOne();
     }
 
     @Override
@@ -53,17 +53,6 @@ public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implem
             .where(order.parentOrder.eq(parentOrder))
             .fetch()
             ;
-    }
-
-    @Override
-    public List<ParentOrder> findOrdersByPayment(Payment curPayment) {
-
-        return select(order)
-            .from(order)
-            .join(orderPayment.order, order)
-            .join(orderPayment.payment, payment)
-            .where(payment.eq(curPayment))
-            .fetch();
     }
 
     @Override

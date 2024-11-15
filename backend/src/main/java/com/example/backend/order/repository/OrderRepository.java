@@ -9,5 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer>, OrderRepositoryCustom {
-	List<ParentOrder> findByTableId(String tableId);
+
+	List<Order> findAllByParentOrder(ParentOrder parentOrder);
 }

@@ -23,7 +23,7 @@ public interface OrderService {
     TotalOrderInfoResponseDto getOrderInfo(String tableId);
 
 	// todo: 데이터 삽입 이후 삭제 필요
-	void addDummyOrderData(DummyOrderDto productInfo);
+//	void addDummyOrderData(DummyOrderDto productInfo);
 
 	TotalOrderInfoResponseDto getTotalPaymentInfo(String tableId);
 }

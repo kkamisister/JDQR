@@ -62,7 +62,6 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentDetailRepository paymentDetailRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final TossWebClient tossWebClient;
-    private final OrderPaymentRepository orderPaymentRepository;
     private final ParentOrderRepository parentOrderRepository;
 
     /**
@@ -339,30 +338,20 @@ public class OrderServiceImpl implements OrderService {
         // 1. 결제 방식을 확인한다
         PaymentMethod paymentMethod = paymentRequestDto.type();
 
-        // 2. 해당 테이블의 가장 최근 order를 확인하고, 결제 방식을 업데이트시킨다
-        List<ParentOrder> parentOrders = updatePaymentMethodOfOrder(tableId, paymentMethod);
+        // 2. 해당 테이블의 가장 최근 parentOrder를 확인하고, 결제 방식을 업데이트시킨다
+        ParentOrder parentOrder = updatePaymentMethodOfOrder(tableId, paymentMethod);
 
         // 3. paymentMethod 에 따라 다르게 재고 관리를 시행
         Payment payment;
         // 3-1. paymentMethod 가 MONEY_DIVIDE 일 경우
         if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
-            Integer totalPurchaseAmount = getTotalPurchaseAmount(parentOrders);
-            payment = createBasePaymentForMoneyDivide(parentOrders, totalPurchaseAmount, paymentRequestDto);
+            Integer totalPurchaseAmount = getTotalPurchaseAmount(parentOrder);
+            payment = createBasePaymentForMoneyDivide(parentOrder, totalPurchaseAmount, paymentRequestDto);
         }
         // 3-2. paymentMethod 가 MENU_DIVIDE 일 경우
         else {
             payment = createBasePaymentForMenuDivide(paymentRequestDto);
         }
-
-        // 4. OrderPayment에 데이터 삽입
-        List<ParentOrderPayment> parentOrderPayments = parentOrders.stream()
-            .map(order -> ParentOrderPayment.builder()
-                .parentOrder(order)
-                .payment(payment)
-                .build())
-            .toList();
-
-        orderPaymentRepository.saveAll(parentOrderPayments);
 
         return InitialPaymentResponseDto.builder()
             .tossOrderId(payment.getTossOrderId())
@@ -787,63 +776,63 @@ public class OrderServiceImpl implements OrderService {
             .build();
     }
 
-    @Transactional
-    @Override
-    public void addDummyOrderData(DummyOrderDto dummyOrderDto) {
-        String tableId = dummyOrderDto.getTableId();
-
-        // 1. Orders table에 저장
-        ParentOrder parentOrder = ParentOrder.builder()
-            .tableId(tableId)
-            .orderStatus(OrderStatus.PAID)
-            .paymentMethod(dummyOrderDto.getPaymentMethod())
-            .build();
-
-        ParentOrder savedParentOrder = orderRepository.save(parentOrder);
-        String userId = UUID.randomUUID().toString();
-
-        // 2. order_items table에 저장
-        List<DummyDishDto> dummyDishDtos = dummyOrderDto.getDummyDishDtos();
-        for (DummyDishDto dummyDishDto : dummyDishDtos) {
-            Dish dish = dishRepository.findById(dummyDishDto.getDishId())
-                .orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
-
-            OrderItem orderItem = OrderItem.builder()
-                .parentOrder(savedParentOrder)
-                .dish(dish)
-                .userId(userId)
-                .quantity(dummyDishDto.getQuantity())
-                .paidQuantity(dummyDishDto.getQuantity())
-                .orderPrice(dummyDishDto.getPrice())
-                .orderStatus(OrderStatus.PAID)
-                .build();
-
-            List<Integer> choiceIds = dummyDishDto.getChoiceIds();
-            OrderItem savedOrderItem = orderItemRepository.save(orderItem);
-
-            List<Choice> choices = choiceRepository.findAllById(choiceIds);
-            Map<Integer, Choice> choiceIdMap = new HashMap<>(choices.size());
-            for (Choice choice : choices) {
-                choiceIdMap.put(choice.getId(), choice);
-            }
-
-            // orderItemChoices 저장
-            List<OrderItemChoice> orderItemChoices = choiceIds.stream()
-                .map(choiceId -> {
-                    Choice choice = choiceIdMap.get(choiceId);
-                    return OrderItemChoice.builder()
-                        .orderItem(orderItem)
-                        .choice(choice)
-                        .build();
-                })
-                .toList();
-
-            orderItemChoiceRepository.saveAll(orderItemChoices);
-
-        }
-
-
-    }
+//    @Transactional
+//    @Override
+//    public void addDummyOrderData(DummyOrderDto dummyOrderDto) {
+//        String tableId = dummyOrderDto.getTableId();
+//
+//        // 1. Orders table에 저장
+//        ParentOrder parentOrder = ParentOrder.builder()
+//            .tableId(tableId)
+//            .orderStatus(OrderStatus.PAID)
+//            .paymentMethod(dummyOrderDto.getPaymentMethod())
+//            .build();
+//
+//        ParentOrder savedParentOrder = orderRepository.save(parentOrder);
+//        String userId = UUID.randomUUID().toString();
+//
+//        // 2. order_items table에 저장
+//        List<DummyDishDto> dummyDishDtos = dummyOrderDto.getDummyDishDtos();
+//        for (DummyDishDto dummyDishDto : dummyDishDtos) {
+//            Dish dish = dishRepository.findById(dummyDishDto.getDishId())
+//                .orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+//
+//            OrderItem orderItem = OrderItem.builder()
+//                .parentOrder(savedParentOrder)
+//                .dish(dish)
+//                .userId(userId)
+//                .quantity(dummyDishDto.getQuantity())
+//                .paidQuantity(dummyDishDto.getQuantity())
+//                .orderPrice(dummyDishDto.getPrice())
+//                .orderStatus(OrderStatus.PAID)
+//                .build();
+//
+//            List<Integer> choiceIds = dummyDishDto.getChoiceIds();
+//            OrderItem savedOrderItem = orderItemRepository.save(orderItem);
+//
+//            List<Choice> choices = choiceRepository.findAllById(choiceIds);
+//            Map<Integer, Choice> choiceIdMap = new HashMap<>(choices.size());
+//            for (Choice choice : choices) {
+//                choiceIdMap.put(choice.getId(), choice);
+//            }
+//
+//            // orderItemChoices 저장
+//            List<OrderItemChoice> orderItemChoices = choiceIds.stream()
+//                .map(choiceId -> {
+//                    Choice choice = choiceIdMap.get(choiceId);
+//                    return OrderItemChoice.builder()
+//                        .orderItem(orderItem)
+//                        .choice(choice)
+//                        .build();
+//                })
+//                .toList();
+//
+//            orderItemChoiceRepository.saveAll(orderItemChoices);
+//
+//        }
+//
+//
+//    }
 
     /**
      * {tossOrderId}에 해당하는 주문의 결제가 모두 끝났는지를 판단한다.
@@ -859,17 +848,15 @@ public class OrderServiceImpl implements OrderService {
         payment.setPaymentStatus(PaymentStatus.PAID);
         paymentRepository.save(payment);
 
-        List<ParentOrder> ordersByPayment = orderRepository.findOrdersByPayment(payment);
+        ParentOrder parentOrder = payment.getParentOrder();
 
         // 결제가 다 끝났는지를 확인
-        boolean flag = getTotalPurchaseAmount(ordersByPayment).equals(getCurPaidAmount(ordersByPayment));
+        boolean flag = getTotalPurchaseAmount(parentOrder).equals(getCurPaidAmount(parentOrder));
 
         // 결제가 끝났을 경우 : order과 table의 상태 변경
         if (flag) {
-            for (ParentOrder parentOrder : ordersByPayment) {
-                parentOrder.setOrderStatus(OrderStatus.PAID);
-            }
-            orderRepository.saveAll(ordersByPayment);
+            parentOrder.setOrderStatus(OrderStatus.PAID);
+            parentOrderRepository.save(parentOrder);
 
             Table table = tableRepository.findById(tableId)
                 .orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
@@ -901,13 +888,13 @@ public class OrderServiceImpl implements OrderService {
 
         // 1. 우리 DB의 상태 업데이트
         // 현재 결제의 결제 방식 확인
-        List<ParentOrder> parentOrders = orderRepository.findOrdersByPayment(payment);
-        PaymentMethod paymentMethod = parentOrders.get(0).getPaymentMethod();
+        ParentOrder parentOrder = payment.getParentOrder();
+        PaymentMethod paymentMethod = parentOrder.getPaymentMethod();
 
         // 1-1. 결제 방식이 MONEY_DIVIDE 방식일 경우
         if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
-            Integer totalPurchaseAmount = getTotalPurchaseAmount(parentOrders);
-            Integer curPaidAmount = getCurPaidAmount(parentOrders);
+            Integer totalPurchaseAmount = getTotalPurchaseAmount(parentOrder);
+            Integer curPaidAmount = getCurPaidAmount(parentOrder);
 
             // 주문한 금액보다 더 많은 양의 금액을 결제하려고 시도하는 경우
             if (curPaidAmount + payment.getAmount() > totalPurchaseAmount) {
@@ -1015,14 +1002,13 @@ public class OrderServiceImpl implements OrderService {
      * N빵 결제를 할 경우에 해당 결제 정보가 담긴 payment Entity를 추가한다.
      * 동시성 처리를 위해 Lock 적용
      *
-     * @param parentOrders        : 결제를 하기를 원하는 order entity list
      * @param totalPurchaseAmount : 총 주문 금액
      * @param paymentRequestDto   : 결제 정보가 담긴 record
      */
     @Transactional
-    protected Payment createBasePaymentForMoneyDivide(List<ParentOrder> parentOrders, Integer totalPurchaseAmount, PaymentRequestDto paymentRequestDto) {
+    protected Payment createBasePaymentForMoneyDivide(ParentOrder parentOrder, Integer totalPurchaseAmount, PaymentRequestDto paymentRequestDto) {
         // 1. 현재 결제가 된 총 금액을 구한다.
-        Integer curPaidAmount = getCurPaidAmount(parentOrders);
+        Integer curPaidAmount = getCurPaidAmount(parentOrder);
 
         // 결제할 금액 구하기
         int paymentAmount = totalPurchaseAmount * paymentRequestDto.serveNum() / paymentRequestDto.peopleNum();
@@ -1058,26 +1044,21 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 주문 기준으로, 현재 결제가 완료된 금액을 구해서 반환한다.
      *
-     * @param parentOrders : 조회하기를 원하는 order entity list
      * @return : 총 결제 금액
      */
-    private Integer getCurPaidAmount(List<ParentOrder> parentOrders) {
-        return paymentRepository.findPaymentsByOrders(parentOrders).stream()
+    private Integer getCurPaidAmount(ParentOrder parentOrder) {
+        return paymentRepository.findPaymentsByOrders(parentOrder).stream()
             .map(Payment::getAmount)
             .reduce(0, Integer::sum);
     }
 
     /**
-     * @param parentOrders : 현재 집계하기를 원하는 order들의 list
      * @return : 해당 테이블에서 구메한 메뉴들의 가격의 총합
      */
-    private Integer getTotalPurchaseAmount(List<ParentOrder> parentOrders) {
-        for (ParentOrder parentOrder : parentOrders) {
-            if (!parentOrder.getOrderStatus().equals(OrderStatus.PENDING))
-                throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
-        }
+    private Integer getTotalPurchaseAmount(ParentOrder parentOrder) {
+        List<Order> orders = orderRepository.findAllByParentOrder(parentOrder);
 
-        List<OrderItem> orderItems = orderItemRepository.findOrderItemByOrder(parentOrders).stream()
+        List<OrderItem> orderItems = orderItemRepository.findOrderItemByOrder(orders).stream()
             .filter(orderItem -> orderItem.getOrderStatus().equals(OrderStatus.PENDING))
             .toList();
 
@@ -1095,34 +1076,31 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional
     @RedLock(key = "'order_status'")
-    protected List<ParentOrder> updatePaymentMethodOfOrder(String tableId, PaymentMethod paymentMethod) {
+    protected ParentOrder updatePaymentMethodOfOrder(String tableId, PaymentMethod paymentMethod) {
         // 1. 테이블의 가장 최근 order 가져오기
-        List<ParentOrder> parentOrders = orderRepository.findUnpaidOrders(tableId);
+        ParentOrder parentOrder = orderRepository.findUnpaidOrders(tableId);
 
-        for (ParentOrder parentOrder : parentOrders) {
-            if (!parentOrder.getOrderStatus().equals(OrderStatus.PENDING))
-                throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
+        if (!parentOrder.getOrderStatus().equals(OrderStatus.PAY_WAITING))
+            throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
 
-            // 2. 테이블을 확인 후 결제 방식(payment_method column)을 업데이트하기
-            PaymentMethod oldPaymentMethod = parentOrder.getPaymentMethod();
+        // 2. 테이블을 확인 후 결제 방식(payment_method column)을 업데이트하기
+        PaymentMethod oldPaymentMethod = parentOrder.getPaymentMethod();
 
-            // 2-1. 결제 방식이 아직 정해지지 않았을 경우
-            if (oldPaymentMethod.equals(PaymentMethod.UNDEFINED)) {
-                parentOrder.setPaymentMethod(paymentMethod);
-            }
-            // 2-2. 결제 방식이 정해진 경우
-            // oldPaymentMethod는 항상 paymentMethod와 동일해야 한다
-            // 다를 경우 에러를 반환
-            else {
-                if (!oldPaymentMethod.equals(paymentMethod)) {
-                    throw new JDQRException(ErrorCode.PAYMENT_METHOD_NOT_VALID);
-                }
+        // 2-1. 결제 방식이 아직 정해지지 않았을 경우
+        if (oldPaymentMethod.equals(PaymentMethod.UNDEFINED)) {
+            parentOrder.setPaymentMethod(paymentMethod);
+        }
+        // 2-2. 결제 방식이 정해진 경우
+        // oldPaymentMethod는 항상 paymentMethod와 동일해야 한다
+        // 다를 경우 에러를 반환
+        else {
+            if (!oldPaymentMethod.equals(paymentMethod)) {
+                throw new JDQRException(ErrorCode.PAYMENT_METHOD_NOT_VALID);
             }
         }
 
         // 3. 바뀐 결제 방식 저장
-        orderRepository.saveAll(parentOrders);
-        return parentOrders;
+        return parentOrderRepository.save(parentOrder);
     }
 
     /**

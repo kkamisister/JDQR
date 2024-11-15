@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface PaymentRepositoryCustom {
 
-    List<Payment> findPaymentsByOrders(List<ParentOrder> parentOrders);
+    List<Payment> findPaymentsByOrders(ParentOrder parentOrder);
 }

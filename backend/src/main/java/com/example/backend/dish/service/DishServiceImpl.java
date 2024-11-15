@@ -84,7 +84,7 @@ public class DishServiceImpl implements DishService {
 			// 우선, 메뉴의 태그를 가져와야한다
 			List<String> tags = TagParser.parseTags(dish.getTags());
 
-			DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags);
+			DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags,null);
 
 			// 카테고리 별 SimpleInfo정보를 추가한다
 			if(!idToSimpleInfoMap.containsKey(dishCategoryId)){
@@ -184,7 +184,7 @@ public class DishServiceImpl implements DishService {
 
 			List<String> tags = TagParser.parseTags(dish.getTags());
 
-			DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags);
+			DishSimpleInfo dishSimpleInfo = DishSimpleInfo.of(dish,tags,null);
 			dishSimpleInfos.add(dishSimpleInfo);
 		}
 

@@ -658,15 +658,15 @@ public class OrderServiceImpl implements OrderService {
         else {
             List<PaymentResponseVo> paymentResponseVos = orderRepository.findWholePaymentInfos(parentOrder);
 
-            HashMap<Integer, Integer> orderItemToQuantityMap = new HashMap<>();
+            HashMap<Integer, Integer> orderItemToPaidQuantityMap = new HashMap<>();
             for (PaymentResponseVo paymentResponseVo : paymentResponseVos) {
 
                 Integer key = paymentResponseVo.getOrderItemId();
-                orderItemToQuantityMap.put(key, orderItemToQuantityMap.getOrDefault(key, 0) + paymentResponseVo.getQuantity());
+                orderItemToPaidQuantityMap.put(key, orderItemToPaidQuantityMap.getOrDefault(key, 0) + paymentResponseVo.getQuantity());
             }
 
             // 3. stream의 groupingBy 옵션을 이용하여 join된 결과물을 종류별로 분리
-            // orderId -> dishId -> List<OrderResponseVo> 구조
+            // orderId -> orderItemId -> List<OrderResponseVo> 구조
             Map<Integer, Map<Integer, List<OrderResponseVo>>> orderGroup = orderResponseVos.stream()
                 .collect(Collectors.groupingBy(OrderResponseVo::getOrderId,
                     Collectors.groupingBy(OrderResponseVo::getOrderItemId)));
@@ -703,7 +703,8 @@ public class OrderServiceImpl implements OrderService {
                                 .mapToInt(OptionDetailDto::getPrice)
                                 .sum();
 
-                            Integer paidQuantity = orderItemToQuantityMap.get(orderItemId);
+                            Integer paidQuantity = orderItemToPaidQuantityMap.getOrDefault(orderItemId, 0);
+
 
                             // baseOrder와 options를 결합하여 DishInfoResponseDto 만들기
                             return DishInfoResponseDto.builder()

@@ -930,7 +930,7 @@ public class OrderServiceImpl implements OrderService {
         if (!payment.getAmount().equals(tossPaymentSimpleResponseDto.amount())) {
             payment.setPaymentStatus(PaymentStatus.CANCELLED);
             paymentRepository.save(payment);
-            return SimpleResponseMessage.PAYMENT_CANCELLED_EXCEED_PURCHASE_AMOUNT;
+            return SimpleResponseMessage.PAYMENT_EXCEED_PURCHASE_AMOUNT;
         }
 
         // 이미 처리된 결제인 경우
@@ -952,7 +952,7 @@ public class OrderServiceImpl implements OrderService {
                 // 현재 결제 상태를 취소 상태로 바꾼다
                 payment.setPaymentStatus(PaymentStatus.CANCELLED);
                 paymentRepository.save(payment);
-                return SimpleResponseMessage.PAYMENT_CANCELLED_EXCEED_PURCHASE_AMOUNT;
+                return SimpleResponseMessage.PAYMENT_EXCEED_PURCHASE_AMOUNT;
             }
         }
         // 1-2. 결제 방식이 MENU_DIVIDE 방식일 경우
@@ -967,7 +967,7 @@ public class OrderServiceImpl implements OrderService {
                 if (orderItem.getPaidQuantity() + paymentDetail.getQuantity() > orderItem.getQuantity()) {
                     payment.setPaymentStatus(PaymentStatus.CANCELLED);
                     paymentRepository.save(payment);
-                    return SimpleResponseMessage.PAYMENT_CANCELLED_EXCEED_MENU_AMOUNT;
+                    return SimpleResponseMessage.PAYMENT_EXCEED_MENU_AMOUNT;
                 }
 
                 orderItems.add(orderItem);

@@ -4,20 +4,12 @@ import Box from "@mui/material/Box";
 import { useState } from "react";
 import { colors } from "../../constants/colors";
 
-export default function PaymentTab({ orderList, onTabClick }) {
-  const tabs = ["함께 결제", "각자 결제"];
-  const [value, setValue] = useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-    onTabClick(orderList[newValue]);
-  };
-
+export default function PaymentTab({ orderList, onTabClick, activeTab }) {
   return (
-    <Box sx={{ bgcolor: colors.background.white }}>
+    <Box>
       <Tabs
-        value={value}
-        onChange={handleChange}
+        value={activeTab}
+        onChange={(e, newVal) => onTabClick(newVal)}
         textColor="inherit"
         TabIndicatorProps={{
           style: {
@@ -25,7 +17,7 @@ export default function PaymentTab({ orderList, onTabClick }) {
           },
         }}
       >
-        {tabs.map((tab, index) => (
+        {orderList.map((tab, index) => (
           <Tab
             key={index}
             label={tab}

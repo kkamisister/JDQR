@@ -36,7 +36,7 @@ export const placeOrder = async () => {
 export const ChangeOrderStatus = async () => {
   try {
     const response = await axiosInstance.post("order/status");
-    return response;
+    return response.data;
   } catch (error) {
     throw new Error("야;; 주문 상태 변경이 안된다..");
   }
@@ -50,8 +50,22 @@ export const ChangeOrderStatus = async () => {
 export const checkOrderStatus = async () => {
   try {
     const response = await axiosInstance.get("order/status");
-    return response;
+    return response.data;
   } catch (error) {
     throw new Error("흠냐 주문 상태 조회가 안되는데;;");
+  }
+};
+
+/**
+ * 결제 내역 조회
+ * @returns {Object}
+ */
+
+export const fetchPaymentList = async () => {
+  try {
+    const response = await axiosInstance.get("order/payment");
+    return response.data.data;
+  } catch (error) {
+    throw new Error("헉스바리 결제 진행 내역 조회가 안 돼요");
   }
 };

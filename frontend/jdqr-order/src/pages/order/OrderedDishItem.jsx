@@ -23,6 +23,10 @@ export default function OrderedDishItem({ dish }) {
         <span>수량</span>
         <span>{`x${dish.quantity}개`}</span>
       </DishItemText>
+      <DishItemText sx={{ color: colors.text.main }}>
+        <span>합계</span>
+        <span>{(dish.totalPrice * dish.quantity).toLocaleString()}원</span>
+      </DishItemText>
     </Stack>
   );
 }

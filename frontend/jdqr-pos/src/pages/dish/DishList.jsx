@@ -1,7 +1,28 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import DishListItem from './DishListItem';
 import { Box } from '@mui/material';
-const DishList = ({ dishItems }) => {
+import DishEditDialog from './dishSetting/DishEditDialog';
+const DishList = ({ dishItems, categoryId }) => {
+	/**
+	 * 메뉴 설정 Dialog 관련 상태 처리
+	 */
+	const [dishDialogOpen, setDishDialogOpen] = useState(false);
+	const handleDishDialogOpen = dish => {
+		if (dish == null) {
+			return;
+		}
+		console.log(dish);
+		setSelectedDish(() => dish);
+		setDishDialogOpen(() => true);
+	};
+
+	const handleDishDialogClose = () => {
+		setDishDialogOpen(() => false);
+	};
+	const [selectedDish, setSelectedDish] = useState(null);
+	useEffect(() => {
+		console.log(categoryId);
+	}, [categoryId]);
 	return (
 		<Box
 			direction="row"
@@ -20,8 +41,16 @@ const DishList = ({ dishItems }) => {
 					name={dish.dishName}
 					price={dish.price}
 					tags={dish.tags}
+					onClick={() => {
+						handleDishDialogOpen(dish);
+					}}
 				/>
 			))}
+			<DishEditDialog
+				dishInfo={{ ...selectedDish, dishCategoryId: categoryId }}
+				open={dishDialogOpen}
+				onClose={handleDishDialogClose}
+			/>
 		</Box>
 	);
 };

@@ -1,8 +1,10 @@
-import React from 'react';
+import { useState } from 'react';
 import { Typography, Stack } from '@mui/material';
 import { colors } from 'constants/colors';
 import { darken } from '@mui/system';
-const DishListItem = ({ name, price, tags }) => {
+import DishAddDialog from './dishSetting/DishAddDialog';
+
+const DishListItem = ({ name, price, tags, onClick }) => {
 	return (
 		<Stack
 			spacing={0.75}
@@ -19,7 +21,8 @@ const DishListItem = ({ name, price, tags }) => {
 				},
 				transition: 'all 0.3s',
 				cursor: 'pointer',
-			}}>
+			}}
+			onClick={onClick}>
 			<Stack>
 				<Typography sx={{ fontSize: '22px', fontWeight: '600' }}>
 					{name}

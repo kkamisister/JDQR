@@ -7,7 +7,8 @@ import { colors } from 'constants/colors';
 import DishList from './DishList';
 import { dishData } from 'sampleData/apiMock';
 import FlatButton from 'components/button/FlatButton';
-import DishSettingDialog from './dishSetting/DishSettingDialog';
+import DishAddDialog from './dishSetting/DishAddDialog';
+import DishEditDialog from './dishSetting/DishEditDialog';
 import DishCategorySettingDialog from './dishCategorySetting/DishCategorySettingDialog';
 import DishOptionSettingDialog from './dishOptionSetting/DishOptionSettingDialog';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
@@ -151,6 +152,7 @@ const DishPage = () => {
 										categoryTabValue === index ? 'bold' : 'normal',
 									fontSize: '30px',
 								}}
+								key={`category-tab-${index}`}
 								label={category.dishCategoryName}
 								{...a11yProps(index)}
 							/>
@@ -164,15 +166,14 @@ const DishPage = () => {
 							index={index}>
 							<DishList
 								key={`tab-DishList-${index}`}
+								categoryId={category.dishCategoryId}
 								dishItems={category.items}
+								setDishDialogOpen={setDishDialogOpen}
 							/>
 						</CustomTabPanel>
 					))}
 			</Stack>
-			<DishSettingDialog
-				open={dishDialogOpen}
-				onClose={handleDishDialogClose}
-			/>
+			<DishAddDialog open={dishDialogOpen} onClose={handleDishDialogClose} />
 			<DishCategorySettingDialog
 				open={dishCategoryDialogOpen}
 				onClose={handleDishCategoryDialogClose}

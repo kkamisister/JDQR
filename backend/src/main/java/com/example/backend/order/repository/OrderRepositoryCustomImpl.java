@@ -38,18 +38,12 @@ public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implem
             option.name, choice.id, choice.name, choice.price
         ))
             .from(order)
-            .join(orderItem)
-            .on(order.eq(orderItem.order))
-            .join(orderItemChoice)
-            .on(orderItem.eq(orderItemChoice.orderItem))
-            .join(choice)
-            .on(orderItemChoice.choice.eq(choice))
-            .join(option)
-            .on(choice.option.eq(option))
-            .join(dish)
-            .on(orderItem.dish.eq(dish))
-            .join(dishCategory)
-            .on(dish.dishCategory.eq(dishCategory))
+            .leftJoin(orderItem).on(order.eq(orderItem.order))
+            .leftJoin(orderItemChoice).on(orderItem.eq(orderItemChoice.orderItem))
+            .leftJoin(choice).on(orderItemChoice.choice.eq(choice))
+            .leftJoin(option).on(choice.option.eq(option))
+            .join(dish).on(orderItem.dish.eq(dish))
+            .join(dishCategory).on(dish.dishCategory.eq(dishCategory))
             .where(order.parentOrder.eq(parentOrder))
             .fetch()
             ;
@@ -59,10 +53,8 @@ public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implem
     public List<PaymentResponseVo> findWholePaymentInfos(ParentOrder parentOrder) {
         return select(Projections.constructor(PaymentResponseVo.class, QParentOrder.parentOrder.id, payment.id, paymentDetail.id, paymentDetail.orderItem.id, paymentDetail.quantity))
             .from(QParentOrder.parentOrder)
-            .join(payment)
-            .on(payment.parentOrder.eq(QParentOrder.parentOrder))
-            .join(paymentDetail)
-            .on(paymentDetail.payment.eq(payment))
+            .join(payment).on(payment.parentOrder.eq(QParentOrder.parentOrder))
+            .join(paymentDetail).on(paymentDetail.payment.eq(payment))
             .fetch()
             ;
     }

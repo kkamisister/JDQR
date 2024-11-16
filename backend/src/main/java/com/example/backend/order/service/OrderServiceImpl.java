@@ -25,6 +25,7 @@ import com.example.backend.order.dto.OrderRequest.*;
 import com.example.backend.order.dto.OrderResponse.*;
 import com.example.backend.order.entity.*;
 import com.example.backend.order.enums.OrderStatus;
+import com.example.backend.order.enums.OrderStatusGroup;
 import com.example.backend.order.enums.PaymentMethod;
 import com.example.backend.order.enums.PaymentStatus;
 import com.example.backend.order.repository.*;
@@ -420,7 +421,7 @@ public class OrderServiceImpl implements OrderService {
 
         //
         Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId);
-        if (optionalParentOrder.isEmpty() || !optionalParentOrder.get().getOrderStatus().equals(OrderStatus.PENDING)) {
+        if (optionalParentOrder.isEmpty() || optionalParentOrder.get().getOrderStatus().getGroup().equals(OrderStatusGroup.FINISHED)) {
             return getBaseOrderInfo(table);
         }
 
@@ -429,9 +430,6 @@ public class OrderServiceImpl implements OrderService {
         // 2. 테이블을 join한 결과 받아오기
         List<OrderResponseVo> orderResponseVos = orderRepository.findWholeOrderInfos(parentOrder);
 
-//		for (OrderResponseVo orderResponseVo : orderResponseVos) {
-//			System.out.println("orderResponseVo = " + orderResponseVo);
-//		}
 
         // 3. stream의 groupingBy 옵션을 이용하여 join된 결과물을 종류별로 분리
         // orderId -> orderItemId List<OrderResponseVo> 구조
@@ -456,16 +454,21 @@ public class OrderServiceImpl implements OrderService {
                         OrderResponseVo baseOrder = values.get(0);
 
                         // 옵션들에 대한 정보를 담는 list 구하기
-                        List<OptionDetailDto> options = values.stream()
-                            .map(option -> OptionDetailDto.builder()
-                                .optionId(option.getOptionId())
-                                .optionName(option.getOptionName())
-                                .choiceId(option.getChoiceId())
-                                .choiceName(option.getChoiceName())
-                                .price(option.getChoicePrice())
-                                .build()
-                            )
-                            .toList();
+                        List<OptionDetailDto> options = new ArrayList<>();
+
+                        for (OrderResponseVo option : values) {
+                            if (option.getOptionId() != null) {
+                                options.add(OptionDetailDto.builder()
+                                    .optionId(option.getOptionId())
+                                    .optionName(option.getOptionName())
+                                    .choiceId(option.getChoiceId())
+                                    .choiceName(option.getChoiceName())
+                                    .price(option.getDishPrice())
+                                    .build()
+                                );
+                            }
+                        }
+
 
                         int optionPrice = options.stream()
                             .mapToInt(OptionDetailDto::getPrice)
@@ -533,7 +536,7 @@ public class OrderServiceImpl implements OrderService {
 
         // 주문이 비어 있거나, 이미 결제된 주문일 경우 error throw
         Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId);
-        if (optionalParentOrder.isEmpty() || !optionalParentOrder.get().getOrderStatus().equals(OrderStatus.PENDING)) {
+        if (optionalParentOrder.isEmpty() || optionalParentOrder.get().getOrderStatus().getGroup().equals(OrderStatusGroup.FINISHED)) {
             throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
         }
 
@@ -553,8 +556,6 @@ public class OrderServiceImpl implements OrderService {
 
         // 2-1. N빵 결제 방식일 경우
         if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
-
-
             List<Payment> payments = paymentRepository.findAllByParentOrder(parentOrder);
             int paidAmount = payments.stream()
                 .mapToInt(Payment::getAmount)
@@ -583,16 +584,20 @@ public class OrderServiceImpl implements OrderService {
                             OrderResponseVo baseOrder = values.get(0);
 
                             // 옵션들에 대한 정보를 담는 list 구하기
-                            List<OptionDetailDto> options = values.stream()
-                                .map(option -> OptionDetailDto.builder()
-                                    .optionId(option.getOptionId())
-                                    .optionName(option.getOptionName())
-                                    .choiceId(option.getChoiceId())
-                                    .choiceName(option.getChoiceName())
-                                    .price(option.getDishPrice())
-                                    .build()
-                                )
-                                .toList();
+                            List<OptionDetailDto> options = new ArrayList<>();
+
+                            for (OrderResponseVo option : values) {
+                                if (option.getOptionId() != null) {
+                                    options.add(OptionDetailDto.builder()
+                                        .optionId(option.getOptionId())
+                                        .optionName(option.getOptionName())
+                                        .choiceId(option.getChoiceId())
+                                        .choiceName(option.getChoiceName())
+                                        .price(option.getDishPrice())
+                                        .build()
+                                    );
+                                }
+                            }
 
                             int optionPrice = options.stream()
                                 .mapToInt(OptionDetailDto::getPrice)

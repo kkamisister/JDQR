@@ -17,7 +17,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "dish")
+@Table(name = "dishes")
 public class Dish extends BaseEntity {
 
     @Id

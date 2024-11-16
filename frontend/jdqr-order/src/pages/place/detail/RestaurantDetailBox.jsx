@@ -1,6 +1,5 @@
 import React from "react"
 import { scroller } from "react-scroll"
-import RestaurantInfo from "./RestaurantInfo"
 import DishTab from "../../../components/tab/DishTab"
 import RestaurantDetailDishItemCard from "../../../components/card/RestaurantDetailDishItemCard"
 import { Box, Stack } from "@mui/material"
@@ -17,7 +16,6 @@ const RestaurantDetailBox = ({ categories, dishes, restaurant }) => {
   }
   return (
     <Stack padding="10px" height="100%">
-      <RestaurantInfo restaurant={restaurant} />
       <DishTab dishCategories={categories} onTabClick={handleCategoryClick} />
       <Box
         id="scrollable-dish-list"

@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import RestaurantDetailBox from "./RestaurantDetailBox"
 import MapBackButtonHeader from "../../../components/header/MapBackButtonHeader"
+import RestaurantInfo from "./RestaurantInfo"
 import { fetchRestaurantDetail } from "../../../utils/apis/place"
 import { useQuery } from "@tanstack/react-query"
 import { useParams } from "react-router-dom"
@@ -39,10 +40,19 @@ const RestaurantDetailPage = () => {
       >
         <MapBackButtonHeader />
       </Stack>
-
       <Stack
         style={{
           marginTop: "60px",
+          overflowY: "auto",
+        }}
+        padding="10px"
+        height="100%"
+      >
+        <RestaurantInfo restaurant={restaurantData.restaurant} />
+      </Stack>
+
+      <Stack
+        style={{
           overflowY: "auto",
         }}
       >

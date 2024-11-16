@@ -47,9 +47,6 @@ public class OrderItem extends BaseEntity {
     @Column(name = "ordered_at")
     private LocalDateTime orderedAt;
 
-    @Column(name = "order_status")
-    private OrderStatus orderStatus;
-
     @Builder.Default
     @OneToMany(mappedBy = "orderItem")
     private List<OrderItemChoice> orderItemChoices = new ArrayList<>();

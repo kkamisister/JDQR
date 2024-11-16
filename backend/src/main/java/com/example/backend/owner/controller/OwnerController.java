@@ -272,6 +272,48 @@ public class OwnerController {
 			.body(responseWithMessage);
 	}
 
+	@Operation(summary = "옵션 삭제", description = "옵션을 삭제하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "옵션 삭제 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@DeleteMapping("/option")
+	public ResponseEntity<ResponseWithMessage> deleteOption(@RequestParam("optionId") Integer optionId,HttpServletRequest request){
+
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		ownerService.deleteOption(userId,optionId);
+
+		ResponseWithMessage responseWithMessage = new ResponseWithMessage(
+			HttpStatus.OK.value(),"옵션 삭제에 성공하였습니다"
+		);
+
+		return ResponseEntity.status(responseWithMessage.status())
+			.body(responseWithMessage);
+	}
+
+	//4. 메뉴 수정
+	@Operation(summary = "옵션 수정", description = "옵션을 수정하는 api")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "옵션 수정 성공"),
+		@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	@PutMapping("/option")
+	public ResponseEntity<ResponseWithMessage> updateOption(@RequestParam("optionId") @Parameter(description = "옵션ID", required = true) Integer optionId,
+		@RequestBody OptionRequestDto optionDto, HttpServletRequest request){
+
+		String id = (String)request.getAttribute("userId");
+		Integer userId = Integer.valueOf(id);
+
+		//4-2. db에 변경사항 저장
+		ownerService.updateOption(userId, optionId, optionDto);
+
+		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(),"옵션 수정에 성공하였습니다");
+
+		return ResponseEntity.status(responseWithMessage.status())
+			.body(responseWithMessage);
+	}
 
 	@Operation(summary = "사업장 조회", description = "사업장을 조회하는 api")
 	@ApiResponses(value = {

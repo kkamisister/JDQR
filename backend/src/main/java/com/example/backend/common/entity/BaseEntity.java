@@ -31,9 +31,12 @@ public abstract class BaseEntity {
     @Column(nullable = false, name = "updated_at")
     private LocalDateTime updatedAt;
 
-
     @PrePersist
     public void prePersist() {
         this.status = EntityStatus.ACTIVE;
+    }
+
+    public void changeStatus(EntityStatus status) {
+        this.status = status;
     }
 }

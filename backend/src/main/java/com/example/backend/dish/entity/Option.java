@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.backend.common.entity.BaseEntity;
+import com.example.backend.common.enums.EntityStatus;
 import com.example.backend.dish.dto.OptionDto;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.owner.dto.OwnerRequest;
@@ -47,6 +48,11 @@ public class Option extends BaseEntity {
     public void setChoices(List<Choice> choices) {
         this.choices = choices;
     }
+
+    public void changeOptionName(OptionRequestDto optionDto){
+        this.name = optionDto.optionName();
+    }
+
 
     public static Option of(Restaurant restaurant,OptionRequestDto optionDto){
         return Option.builder()

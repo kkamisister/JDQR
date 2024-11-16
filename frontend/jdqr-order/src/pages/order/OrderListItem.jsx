@@ -4,7 +4,7 @@ import OrderedDishItem from "./OrderedDishItem";
 
 export default function OrderListItem({ order, index }) {
   return (
-    <Stack bgcolor={colors.background.white} p={2}>
+    <Stack p={2} mb={5}>
       <Stack
         direction="row"
         sx={{

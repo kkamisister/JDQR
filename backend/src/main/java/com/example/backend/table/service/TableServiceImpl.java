@@ -231,10 +231,26 @@ public class TableServiceImpl implements TableService{
 				.map(entry -> entry.getKey().withQuantity(entry.getValue()))
 				.toList();
 
+			// 각 메뉴의 세부옵션을 다 더한 가격을 산출하여 총 가격을 구하는데 사용한다
+			int totalPrice = 0;
+			for(DishDetailInfo dishDetailInfo : result) {
+				List<OptionDto> options = dishDetailInfo.options();
+				int choicePrice = 0;
+				for(OptionDto optionDto : options) {
+					choicePrice += optionDto.getChoices().stream()
+						.mapToInt(ChoiceDto::getPrice)
+						.sum();
+				}
+				// 현재 음식의 진짜 가격(본 가격 + 옵션반영가격)에 수량을 곱한다
+				totalPrice += (dishDetailInfo.price() + choicePrice) * dishDetailInfo.quantity();
+			}
 
-			TableDetailInfo tableDetailInfo = TableDetailInfo.of(table,result);
+
+			TableDetailInfo tableDetailInfo = TableDetailInfo.of(table,result,totalPrice);
 			tableDetailInfos.add(tableDetailInfo);
 		}
+
+
 
 		TableResultDto tableResultDto = new TableResultDto(tableDetailInfos,leftSeatNum);
 

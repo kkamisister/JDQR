@@ -1,31 +1,36 @@
 import React, { useEffect, useState } from "react"
-import { Stack } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import {
   Map,
   MapMarker,
   useKakaoLoader,
-  customOverlay,
+  MarkerClusterer,
+  CustomOverlayMap,
 } from "react-kakao-maps-sdk"
-import activeMapmarker from "../../assets/images/mapmarker1.png"
-import inactiveMapmarker from "../../assets/images/mapmarker2.png"
-
-const { kakao } = window
+import currLocatMapmarker from "../../assets/images/currLocatMapmarker.png"
+import { colors } from "../../constants/colors"
 
 const KakaoMap = ({
   onBoundsChange,
   initialLocation,
   initialBounds,
   restaurants,
+  selectedMapmarker,
+  setSelectedMapmarker,
 }) => {
-  const [isActive, setIsActive] = useState(false)
   const [location, setLocation] = useState({
     lat: 37.50125774784631,
     lng: 127.03956684373539,
   })
   const [bounds, setBounds] = useState(initialBounds || null)
-  const [selectedMapmarker, setSelectedMapmarker] = useState(null)
 
   const isLoaded = useKakaoLoader()
+
+  // 대한민국 범위 설정
+  const koreaBounds = {
+    sw: { lat: 33.0, lng: 124.0 },
+    ne: { lat: 43.0, lng: 132.0 },
+  }
 
   useEffect(() => {
     if (isLoaded && initialLocation) {
@@ -47,6 +52,22 @@ const KakaoMap = ({
       minLng: sw.getLng(),
       maxLng: ne.getLng(),
     })
+
+    const center = map.getCenter()
+    const lat = center.getLat()
+    const lng = center.getLng()
+
+    if (
+      lat < koreaBounds.sw.lat ||
+      lat > koreaBounds.ne.lat ||
+      lng < koreaBounds.sw.lng ||
+      lng > koreaBounds.ne.lng
+    )
+      window.location.reload()
+  }
+
+  const handleMapClick = () => {
+    setSelectedMapmarker(null)
   }
 
   return (
@@ -60,79 +81,109 @@ const KakaoMap = ({
           height: "100%",
         }}
         level={3}
+        minLevel={7}
         draggable
         scrollwheel
+        onClick={handleMapClick}
         onDragEnd={(map) => handleBoundsChanged(map)}
         onZoomChanged={(map) => handleBoundsChanged(map)}
         bounds={bounds}
-        onCreate={(map) => {
-          // 클러스터러 생성
-          const clusterer = new kakao.maps.MarkerClusterer({
-            map: map,
-            averageCenter: true,
-            minLevel: 4,
-          })
-
-          if (restaurants) {
-            const overlays = restaurants.map((restaurant) => {
-              const overlayContent = `
-              <div class="custom-overlay" style="box-shadow: none;">
-                <img src=${
-                  restaurant.open && restaurant.restTableNum > 0
-                    ? activeMapmarker
-                    : inactiveMapmarker
-                } style="width: 80px; height: 60px;" />
-                <p>${restaurant.restaurantName}</p>
-              </div>`
-
-              const overlay = new kakao.maps.CustomOverlay({
-                position: new kakao.maps.LatLng(restaurant.lat, restaurant.lng),
-                content: overlayContent,
-                clickable: true,
-              })
-
-              return overlay
-            })
-
-            clusterer.addMarkers(overlays)
-          }
-        }}
       >
-        {/* 기본 위치 마커 (현재 위치)
+        {/* 현재 위치 마커 */}
         <MapMarker
           position={location}
           image={{
-            src: "https://cdn-icons-png.flaticon.com/128/2098/2098567.png",
-            size: {
-              width: 35,
-              height: 35,
-            },
+            src: currLocatMapmarker,
+            size: { width: 35, height: 35 },
           }}
         />
-
-        {/* restaurants가 존재할 때 각 식당들의 위치에 마커 추가 */}
-        {/* {restaurants &&
-          restaurants.map((restaurant) => (
-            <MapMarker
+        <MarkerClusterer
+          averageCenter={true}
+          minLevel={3}
+          styles={[
+            {
+              width: "50px",
+              height: "50px",
+              background: "rgba(255, 0, 0, 0.6)",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "14px",
+              fontWeight: "bold",
+              textAlign: "center",
+            },
+          ]}
+          calculator={(size) => {
+            return size < 10 ? 10 : size < 30 ? 20 : 30
+          }}
+        >
+          {/* 식당 마커 */}
+          {restaurants?.map((restaurant) => (
+            <CustomOverlayMap
               key={restaurant.id}
               position={{
                 lat: restaurant.lat,
                 lng: restaurant.lng,
               }}
-              image={{
-                src:
-                  restaurant.open && restaurant.restTableNum > 0
-                    ? activeMapmarker
-                    : inactiveMapmarker,
-                size: { width: 80, height: 60 },
-              }}
-              onClick={() => {
-                console.log(
-                  `Clicked on restaurant: ${restaurant.restaurantName}`
-                )
-              }}
-            />
-          ))} */}
+              yAnchor={1}
+              zIndex={selectedMapmarker === restaurant.id ? 1000 : 1}
+            >
+              <Stack
+                alignItems="center"
+                spacing={0.5}
+                onClick={() => setSelectedMapmarker(restaurant.id)}
+                sx={{
+                  transform:
+                    selectedMapmarker === restaurant.id
+                      ? "scale(1.1)"
+                      : "scale(1)",
+                  transition: "transform 0.1s ease",
+                }}
+              >
+                <Stack
+                  sx={{
+                    padding: "5px",
+                    fontSize: "13px",
+                    backgroundColor:
+                      restaurant.open && restaurant.restTableNum > 0
+                        ? colors.main.primary500
+                        : colors.text.sub2,
+                    color: colors.text.white,
+                    borderRadius: "8px",
+                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                    width: "75px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {restaurant.open ? (
+                    restaurant.restTableNum > 0 ? (
+                      <Stack>
+                        {restaurant.restSeatNum}석 / {restaurant.restTableNum}T
+                      </Stack>
+                    ) : (
+                      <Stack>{restaurant.restTableNum} Table</Stack>
+                    )
+                  ) : (
+                    <Typography>영업 종료</Typography>
+                  )}
+                </Stack>
+                <Typography
+                  fontSize={16}
+                  fontWeight={700}
+                  borderRadius={20}
+                  bgcolor="rgba(255, 255, 255, 0.642)"
+                >
+                  {restaurant.restaurantName}
+                </Typography>
+              </Stack>
+            </CustomOverlayMap>
+          ))}
+        </MarkerClusterer>
       </Map>
     </Stack>
   )

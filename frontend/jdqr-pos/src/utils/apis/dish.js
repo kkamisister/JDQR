@@ -145,12 +145,12 @@ export const fetchDishCategoryList = async () => {
 
 /**
  * 메뉴 카테고리 삭제
- * @param {Number} - dishId
+ * @param {Number} - dishCategoryId
  * @returns {Object} - Response 내 data 객체, API 문서 참조
  */
 export const deleteDishCategory = async ({ dishCategoryId }) => {
 	const response = await axiosInstance.delete(
-		`/owner/dish?dishCategoryId=${dishCategoryId}`
+		`/owner/dish/category?dishCategoryId=${dishCategoryId}`
 	);
 	return response.data;
 };
@@ -162,7 +162,7 @@ export const deleteDishCategory = async ({ dishCategoryId }) => {
  * @returns {Object} - Response 내 data 객체, API 문서 참조
  */
 export const addDishCategory = async ({ dishCategoryName }) => {
-	const response = await axiosInstance.put(`/owner/dish/category`, {
+	const response = await axiosInstance.post(`/owner/dish/category`, {
 		dishCategoryName,
 	});
 	return response.data;

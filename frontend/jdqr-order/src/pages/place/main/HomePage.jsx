@@ -4,7 +4,10 @@ import { Stack } from "@mui/material"
 import KakaoMap from "../../../components/map/KakaoMap"
 import RestaurantListBox from "./RestaurantListBox"
 import MapDefaultHeader from "../../../components/header/MapDefaultHeader"
-import { fetchRestaurants } from "../../../utils/apis/place"
+import {
+  fetchRestaurants,
+  fetchRestaurantSearch,
+} from "../../../utils/apis/place"
 
 const HomePage = () => {
   const [bounds, setBounds] = useState(null)
@@ -14,8 +17,12 @@ const HomePage = () => {
     lat: 37.50125774784631,
     lng: 127.03956684373539,
   })
+  const [keyword, setKeyword] = useState("")
+  const [selectedCategory, setCategory] = useState("")
+  const [selectedMapmarker, setSelectedMapmarker] = useState(null)
 
   useEffect(() => {
+    // 사용자 현위치
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -42,28 +49,69 @@ const HomePage = () => {
   }, [])
 
   const { data: restaurantsData } = useQuery({
-    queryKey: ["restaurants", bounds, people, together],
+    queryKey: [
+      "restaurants",
+      bounds,
+      people,
+      together,
+      keyword,
+      selectedCategory,
+    ],
     queryFn: async () => {
-      // console.log("파라미터는....이렇게 생겼다지...", {
-      //   bounds,
-      //   people,
-      //   together,
-      // })
-      const response = await fetchRestaurants({
-        ...bounds,
-        people,
-        together,
-      })
-      // console.log("api 응답은....이렇게 생겼다지....:", response)
-      return response
+      // keyword 여부에 따라 다른 api 호출
+      if (keyword) {
+        console.log("파라미터는....이렇게 생겼다지...", {
+          bounds,
+          people,
+          together,
+          keyword,
+        })
+        const response = await fetchRestaurantSearch({
+          ...bounds,
+          people,
+          together,
+          keyword,
+        })
+        console.log("api 응답은....이렇게 생겼다지....:", response)
+        return response
+      } else {
+        const response = await fetchRestaurants({
+          ...bounds,
+          people,
+          together,
+        })
+        return response
+      }
     },
-    enabled: !!bounds, // bounds가 설정되었을 때만 쿼리 활성화
+    enabled: !!bounds,
   })
-  // console.log("당신은...데이터를...불러왔지..:", restaurantsData)
+  console.log("당신은...데이터를...불러왔지..:", restaurantsData)
 
   const handleBoundsChange = (newBounds) => {
     setBounds(newBounds)
   }
+  const filteredRestaurants = selectedCategory
+    ? restaurantsData?.restaurants?.filter(
+        (restaurant) =>
+          restaurant.restaurantCategories?.major[0]?.restaurantCategoryName ===
+          selectedCategory
+      )
+    : restaurantsData?.restaurants || []
+
+  const visibleRestaurants = selectedMapmarker
+    ? (filteredRestaurants || []).filter(
+        (restaurant) => restaurant.id === selectedMapmarker
+      )
+    : filteredRestaurants || []
+
+  // console.log("selectedMapmarker:", selectedMapmarker)
+  // console.log("selectedCategory: ", selectedCategory)
+  // console.log("restaurantsData: ", [restaurantsData])
+  // console.log("KakaoMap에 전달되는 restaurants 리스트:", filteredRestaurants)
+  // console.log(
+  //   "RestaurantListBox에 전달되는 restaurants 리스트:",
+  //   visibleRestaurants
+  // )
 
   return (
     <Stack>
@@ -78,6 +126,8 @@ const HomePage = () => {
       >
         <MapDefaultHeader
           majorCategories={restaurantsData?.majorCategories || []}
+          setKeyword={setKeyword}
+          setCategory={setCategory}
         />
       </Stack>
 
@@ -95,7 +145,9 @@ const HomePage = () => {
           onBoundsChange={handleBoundsChange}
           initialLocation={location} // 초기 위치 전달
           initialBounds={bounds} // 초기 bounds 전달
-          restaurants={restaurantsData?.restaurants || []}
+          restaurants={filteredRestaurants || []}
+          selectedMapmarker={selectedMapmarker}
+          setSelectedMapmarker={setSelectedMapmarker}
         />
       </Stack>
 
@@ -111,7 +163,7 @@ const HomePage = () => {
         }}
       >
         <RestaurantListBox
-          restaurants={restaurantsData?.restaurants || []}
+          restaurants={visibleRestaurants}
           people={people}
           setPeople={setPeople}
           together={together}

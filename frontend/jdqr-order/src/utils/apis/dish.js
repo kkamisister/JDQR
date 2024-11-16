@@ -7,7 +7,6 @@ import axiosInstance from "./axiosInstance";
 export const fetchDishMenu = async () => {
   try {
     const response = await axiosInstance.get("dish");
-    // console.log(response.data.data.tableName);
     return response.data.data; // 실제 메뉴판 정보만 반환
   } catch (error) {
     console.error("메뉴판 조회 실패:", error);

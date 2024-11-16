@@ -1,0 +1,13 @@
+#docker-compose.yml
+
+services:
+   react-app:
+      container_name: react_owner
+      image: reactimage:latest
+      build:
+         context: .
+         dockerfile: Dockerfile
+      ports:
+         - '3000:3000'
+      # network_mode: "host"
+      # stdin_open: true

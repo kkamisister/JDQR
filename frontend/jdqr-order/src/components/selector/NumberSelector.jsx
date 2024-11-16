@@ -8,27 +8,33 @@ export default function NumberSelector({
   value = 1,
   maxVal,
   onChange,
+  onIncrease,
+  onDecrease,
   fontSize,
   sx,
 }) {
   const [selectorValue, setValue] = useState(value);
+
   const handleIncrease = () => {
-    const newVal = selectorValue + 1;
-    if (maxVal === undefined || newVal <= maxVal) {
-      setValue(newVal);
-      onChange(newVal);
-    } else {
-      setValue(maxVal);
-      onChange(maxVal);
-    }
+    const newVal =
+      maxVal === undefined || selectorValue + 1 <= maxVal
+        ? selectorValue + 1
+        : maxVal;
+
+    setValue(newVal);
+
+    if (onChange) onChange(newVal); // 기존 onChange 호출
+    if (onIncrease) onIncrease(newVal); // 새 onIncrease 호출
   };
 
   const handleDecrease = () => {
     const newVal = selectorValue > 1 ? selectorValue - 1 : 1;
-    setValue(newVal);
-    onChange(newVal);
-  };
 
+    setValue(newVal);
+
+    if (onChange) onChange(newVal); // 기존 onChange 호출
+    if (onDecrease) onDecrease(newVal); // 새 onDecrease 호출
+  };
   return (
     <Stack
       direction="row"

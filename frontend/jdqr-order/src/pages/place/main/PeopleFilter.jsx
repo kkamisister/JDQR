@@ -9,9 +9,15 @@ const PeopleFilter = ({ people, setPeople, together, setTogether }) => {
   const peopleOptions = ["1인", "2인", "4인", "단체"]
 
   const handleButtonClick = (index) => {
-    const peopleValues = [1, 2, 4, 5]
-    setPeople(peopleValues[index])
-    setActiveIndex(index)
+    if (activeIndex === index) {
+      setActiveIndex(null)
+      setPeople(0)
+      setTogether(false)
+    } else {
+      const peopleValues = [1, 2, 4, 5]
+      setPeople(peopleValues[index])
+      setActiveIndex(index)
+    }
   }
 
   const handleCheckboxChange = (e) => {

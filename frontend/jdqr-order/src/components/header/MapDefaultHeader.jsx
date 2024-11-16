@@ -4,16 +4,20 @@ import SearchIcon from "@mui/icons-material/Search"
 import RestaurantCategoryButton from "../button/RestaurantCategoryButton"
 import { colors } from "../../constants/colors"
 
-const MapDefaultHeader = ({ majorCategories }) => {
+const MapDefaultHeader = ({ majorCategories, setKeyword, setCategory }) => {
   const [activeIndex, setActiveIndex] = useState(null)
-  const [isChecked, setIsChecked] = useState(false)
 
   const handleButtonClick = (index) => {
+    const category = majorCategories[index]
     setActiveIndex((prevIndex) => {
       const newIndex = prevIndex === index ? null : index
-      setIsChecked(newIndex !== null) // 간소화된 isChecked 설정
+      setCategory(newIndex !== null ? category : "")
       return newIndex
     })
+  }
+
+  const handleKeywordChange = (event) => {
+    setKeyword(event.target.value)
   }
 
   return (
@@ -39,6 +43,7 @@ const MapDefaultHeader = ({ majorCategories }) => {
         <TextField
           placeholder="매장 검색"
           fullWidth
+          onChange={handleKeywordChange}
           sx={{
             borderRadius: "10px",
             backgroundColor: colors.background.white,

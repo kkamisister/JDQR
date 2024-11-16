@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { Stack, Typography, Button, Box, Divider } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { colors } from "../../constants/colors";
-import DishItemCard from "../../components/card/DishItemCard";
 import { useNavigate } from "react-router-dom";
-import NumberSelector from "../../components/selector/NumberSelector";
 import { useSnackbar } from "notistack";
 import useWebSocketStore from "../../stores/SocketStore";
 import CartListItem from "./CartListItem";
 import BaseButton from "../../components/button/BaseButton";
 import Footer from "../../components/footer/Footer";
+import { placeOrder } from "../../utils/apis/order";
 
 export default function CartList() {
   const navigate = useNavigate();
@@ -53,8 +52,15 @@ export default function CartList() {
     navigate("/dish");
   };
 
-  const goToPayment = () => {
-    navigate("/payment");
+  const submitOrder = async () => {
+    try {
+      placeOrder();
+      navigate("/order");
+    } catch (error) {
+      throw new Error(
+        "왤케 조금 시키세요;;;;이러면 자영업자들 뭐 목고 살라고;;"
+      );
+    }
   };
 
   return (
@@ -83,8 +89,8 @@ export default function CartList() {
 
       <Box>
         {totalQuantity > 0 && totalPrice && (
-          <BaseButton count={totalQuantity} onClick={goToPayment}>
-            {`${totalPrice.toLocaleString()}원 결제하기`}
+          <BaseButton count={totalQuantity} onClick={submitOrder}>
+            {`${totalPrice.toLocaleString()}원 주문하기`}
           </BaseButton>
         )}
       </Box>

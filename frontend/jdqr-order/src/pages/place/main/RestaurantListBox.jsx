@@ -83,6 +83,7 @@ const RestaurantListBox = ({
               justifyContent: "center",
               alignItems: "center",
               height: "100%",
+              marginBottom: "30px",
             }}
           >
             <Typography color={colors.text.sub1} fontSize={16}>

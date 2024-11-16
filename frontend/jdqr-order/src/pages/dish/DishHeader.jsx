@@ -17,6 +17,9 @@ export default function DishHeader() {
   const [cartList, setCartList] = useState([]);
 
   let tableId = sessionStorage.getItem("tableId");
+  const goToOrder = () => {
+    navigate("/order");
+  };
 
   const goToCart = () => {
     navigate("/cart");
@@ -75,6 +78,7 @@ export default function DishHeader() {
     >
       <Stack direction="row" justifyContent="space-between">
         <Button
+          onClick={goToOrder}
           startIcon={<ReceiptLongIcon />}
           sx={{
             bgcolor: colors.text.sub1,

@@ -18,9 +18,7 @@ export default function PaymentTab({ orderList, onTabClick }) {
       <Tabs
         value={value}
         onChange={handleChange}
-        sx={{
-          color: colors.text.main,
-        }}
+        textColor="inherit"
         TabIndicatorProps={{
           style: {
             backgroundColor: colors.main.primary500,

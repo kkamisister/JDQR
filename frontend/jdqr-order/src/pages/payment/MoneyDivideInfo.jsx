@@ -3,7 +3,7 @@ import { colors } from "../../constants/colors";
 import NumberSelector from "../../components/selector/NumberSelector";
 import { useState, useEffect } from "react";
 
-export default function MoneyDivideInfo({ initTotal = 3, initPortion = 1 }) {
+export default function MoneyDivideInfo({ initTotal, initPortion }) {
   const [total, setTotal] = useState(initTotal);
   const [portion, setPortion] = useState(initPortion);
 

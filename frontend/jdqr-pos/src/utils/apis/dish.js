@@ -184,7 +184,7 @@ export const addDishOption = async ({
 	isMandatory = true,
 	choices,
 }) => {
-	const response = await axiosInstance.put(`/owner/option`, {
+	const response = await axiosInstance.post(`/owner/option`, {
 		optionName,
 		maxChoiceCount,
 		isMandatory,
@@ -209,5 +209,48 @@ export const fetchDishOptionList = async () => {
  */
 export const fetchDishOptionDetail = async ({ optionId }) => {
 	const response = await axiosInstance.get(`/owner/option/${optionId}`);
+	return response.data;
+};
+
+/**
+ * 옵션 수정
+ * @typedef {Number} optionName - 옵션 이름
+ * @typedef {String} maxChoiceCount - 최대 선택 갯수
+ * @typedef {Number} isMandatory - 옵션 필수 여부
+ * @typedef {Array} choices - 옵션 내부 선택 리스트
+ * @typedef {{choiceName:String, price:Number}} choice - 옵션 내부 선택
+ * @param {{optionName, maxChoiceCount, isMandatory, choices}}
+ * @returns {Object} - Response 내 data 객체, API 문서 참조
+ */
+export const editDishOption = async ({
+	optionId,
+	optionName,
+	maxChoiceCount = 1,
+	isMandatory = true,
+	choices,
+}) => {
+	console.log(`/owner/option?optionId=${optionId}`);
+	const response = await axiosInstance.put(
+		`/owner/option?optionId=${optionId}`,
+		{
+			optionName,
+			maxChoiceCount,
+			isMandatory,
+			choices,
+		}
+	);
+	return response.data;
+};
+
+/**
+ * 옵션 삭제
+ * @typedef {Number} optionId - 옵션 ID
+ * @param {{optionId}} - 옵션 ID
+ * @returns {Object} - Response 내 data 객체, API 문서 참조
+ */
+export const deleteDishOption = async ({ optionId }) => {
+	const response = await axiosInstance.delete(
+		`/owner/option?optionId=${optionId}`
+	);
 	return response.data;
 };

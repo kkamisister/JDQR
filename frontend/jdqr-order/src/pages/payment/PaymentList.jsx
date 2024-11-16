@@ -3,7 +3,9 @@ import PaymentTab from "./PaymentTab";
 import { useState } from "react";
 import { colors } from "../../constants/colors";
 import MoneyDivideList from "./MoneyDivideList";
-import MenuDivideList from "./MenuDivideList";
+// import MenuDivideList from "./MenuDivideList";
+
+// 하 대소문자도 구분 못하는 멍청이 git아
 
 export default function PaymentList({ orders }) {
   // console.log(orders);
@@ -20,7 +22,7 @@ export default function PaymentList({ orders }) {
         activeTab={activeTab}
       />
       {activeTab === 0 && <MoneyDivideList orders={orders} />}
-      {activeTab === 1 && <MenuDivideList />}
+      {/* {activeTab === 1 && <MenuDivideList />} */}
     </Stack>
   );
 }

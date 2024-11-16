@@ -31,29 +31,41 @@ export const fetchDishDetailByDishId = async dishId => {
  * @typedef {Number} price - 가격(원)
  * @typedef {Number} description - 상품 설명
  * @typedef {String} image - 이미지
- * @typedef {Array} tagIds - 테그ID 배열 (시그니쳐, 인기메뉴 등)
- * @param {{dishName, dishCategoryId, dishCategoryName, optionIds, price, description, image, tagIds}}
+ * @typedef {Array} tags - 테그ID 배열 (시그니쳐, 인기메뉴 등)
+ * @param {{dishName, dishCategoryId, dishCategoryName, optionIds, price, description, image, tags}}
  * @returns {Object} - Response 내 data 객체, API 문서 참조
  */
-export const addDish = async ({
-	dishName,
-	dishCategoryId,
-	dishCategoryName,
-	optionIds,
-	price,
-	description,
-	image,
-	tagIds,
-}) => {
-	const response = await axiosInstance.post(`/owner/dish`, {
+export const addDish = async (
+	{
 		dishName,
 		dishCategoryId,
 		dishCategoryName,
 		optionIds,
 		price,
 		description,
-		image,
-		tagIds,
+		tags,
+	},
+	imageFile
+) => {
+	const formData = new FormData();
+	const jsonData = {
+		dishName,
+		dishCategoryId,
+		dishCategoryName,
+		optionIds,
+		price,
+		description,
+		tags,
+	};
+	if (imageFile) {
+		formData.append('imageFile', imageFile);
+	}
+	formData.append('dishInfo', JSON.stringify(jsonData));
+
+	const response = await axiosInstance.post(`/owner/dish`, formData, {
+		headers: {
+			'Content-Type': 'multipart/form-data',
+		},
 	});
 	return response.data;
 };
@@ -69,8 +81,7 @@ export const deleteDish = async ({ dishId }) => {
 };
 
 /**
- * 메뉴 추가
- * @typedef {Number} dishId - 상품ID
+ * 메뉴 수정
  * @typedef {String} dishName - 상품명
  * @typedef {Number} dishCategoryId - 카테고리ID
  * @typedef {String} dishCategoryName - 카테고리명
@@ -78,31 +89,48 @@ export const deleteDish = async ({ dishId }) => {
  * @typedef {Number} price - 가격(원)
  * @typedef {Number} description - 상품 설명
  * @typedef {String} image - 이미지
- * @typedef {Array} tagIds - 테그ID 배열 (시그니쳐, 인기메뉴 등)
- * @param {{dishName, dishCategoryId, dishCategoryName, optionIds, price, description, image, tagIds}}
+ * @typedef {Array} tags - 테그ID 배열 (시그니쳐, 인기메뉴 등)
+ * @param {{dishName, dishCategoryId, dishCategoryName, optionIds, price, description, image, tags}}
  * @returns {Object} - Response 내 data 객체, API 문서 참조
  */
-export const editDish = async ({
+export const editDish = async (
 	dishId,
-	dishName,
-	dishCategoryId,
-	dishCategoryName,
-	optionIds,
-	price,
-	description,
-	image,
-	tagIds,
-}) => {
-	const response = await axiosInstance.put(`/owner/dish?dishId=${dishId}`, {
+	{
 		dishName,
 		dishCategoryId,
 		dishCategoryName,
 		optionIds,
 		price,
 		description,
-		image,
-		tagIds,
-	});
+		tags,
+	},
+	imageFile
+) => {
+	const formData = new FormData();
+
+	const jsonData = {
+		dishName,
+		dishCategoryId,
+		dishCategoryName,
+		optionIds,
+		price,
+		description,
+		tags,
+	};
+	if (imageFile) {
+		formData.append('imageFile', imageFile);
+	}
+	formData.append('dishInfo', JSON.stringify(jsonData));
+
+	const response = await axiosInstance.put(
+		`/owner/dish?dishId=${dishId}`,
+		formData,
+		{
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+		}
+	);
 	return response.data;
 };
 
@@ -152,8 +180,8 @@ export const addDishCategory = async ({ dishCategoryName }) => {
  */
 export const addDishOption = async ({
 	optionName,
-	maxChoiceCount,
-	isMandatory,
+	maxChoiceCount = 1,
+	isMandatory = true,
 	choices,
 }) => {
 	const response = await axiosInstance.put(`/owner/option`, {

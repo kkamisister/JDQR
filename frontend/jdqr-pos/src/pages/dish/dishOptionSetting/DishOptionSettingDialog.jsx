@@ -13,20 +13,48 @@ import {
 import { colors } from 'constants/colors';
 import DishOptionList from './DishOptionList';
 import FlatButton from 'components/button/FlatButton';
-import { useQuery } from '@tanstack/react-query';
-import { addDishOption, fetchDishOptionList } from 'utils/apis/dish';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+	addDishOption,
+	deleteDishOption,
+	editDishOption,
+	fetchDishOptionList,
+} from 'utils/apis/dish';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import { enqueueSnackbar } from 'notistack';
+
 const DishOptionSettingDialog = ({ open, onClose }) => {
+	const queryClient = useQueryClient();
 	const { isPending, data: dishOptionList } = useQuery({
 		queryKey: ['optionList'], // keyword를 queryKey에 포함하여 키워드가 변경되면 새로운 요청 실행
 		queryFn: () => fetchDishOptionList(),
+		onSuccess: data => {
+			// 데이터를 가져온 후 state 업데이트
+			console.log(data);
+			if (data?.options.length > 0) {
+				setSelectedOption(data?.options[0]); // 첫 번째 옵션을 기본값으로 설정
+			}
+		},
 	});
 	const [selectedOption, setSelectedOption] = useState(null);
 	const [isNew, setIsNew] = useState(false);
 
-	const handleAddDishOption = () => {};
-	const handleDeleteDishOption = () => {};
-	const handleEditDishOption = () => {};
+	const handleAddDishOption = async () => {
+		await addDishOption(selectedOption);
+		enqueueSnackbar('옵션을 추가했어요', { variant: 'success' });
+		queryClient.invalidateQueries('optionList');
+	};
+	const handleDeleteDishOption = async () => {
+		await deleteDishOption({ optionId: selectedOption.optionId });
+		enqueueSnackbar('옵션을 삭제했어요', { variant: 'error' });
+		queryClient.invalidateQueries('optionList');
+	};
+	const handleEditDishOption = async () => {
+		console.log(selectedOption);
+		await editDishOption(selectedOption);
+		enqueueSnackbar('옵션을 수정했어요', { variant: 'warning' });
+		queryClient.invalidateQueries('optionList');
+	};
 
 	useEffect(() => {
 		console.log(selectedOption);
@@ -129,13 +157,13 @@ const DishOptionSettingDialog = ({ open, onClose }) => {
 													choices: [
 														...selectedOption.choices,
 														{
-															optionName: '새로운 옵션',
+															choiceId: null,
+															choiceName: '새로운 옵션',
 															choices: [],
 														},
 													],
 												};
 											});
-											setIsNew(true);
 										}}
 										sx={{
 											fontSize: '15px',
@@ -147,7 +175,7 @@ const DishOptionSettingDialog = ({ open, onClose }) => {
 								</Stack>
 
 								{selectedOption &&
-									selectedOption.choices.map(choice => (
+									selectedOption.choices.map((choice, idx) => (
 										<Stack
 											direction="row"
 											spacing={1}
@@ -155,12 +183,28 @@ const DishOptionSettingDialog = ({ open, onClose }) => {
 												justifyContent: 'flex-start',
 												alignItems: 'center',
 											}}
-											key={`option-choice-edit-box-${choice.choiceId}`}>
+											key={`option-choice-edit-box-${idx}`}>
 											<TextField
 												label="선택명"
 												sx={{ width: '40%' }}
 												size="small"
 												value={choice.choiceName}
+												onChange={e => {
+													setSelectedOption(prev => {
+														return {
+															...prev,
+															choices: prev.choices.map(
+																_choice => {
+																	if (_choice === choice) {
+																		_choice.choiceName =
+																			e.target.value;
+																	}
+																	return _choice;
+																}
+															),
+														};
+													});
+												}}
 											/>
 											<TextField
 												label="금액"
@@ -176,11 +220,48 @@ const DishOptionSettingDialog = ({ open, onClose }) => {
 														),
 													},
 												}}
+												onChange={e => {
+													setSelectedOption(prev => {
+														return {
+															...prev,
+															choices: prev.choices.map(
+																_choice => {
+																	if (_choice === choice) {
+																		_choice.price =
+																			e.target.value;
+																	}
+																	return _choice;
+																}
+															),
+														};
+													});
+												}}
 											/>
 											<RemoveCircleIcon
-												onClick={() => {
-													if (choice.optionId === undefined) {
-														// TODO: 서버쪽 API가 완성되어야 작성 가능
+												onClick={async () => {
+													// 서버에는 없고 로컬에서만 존재하는 choice
+													if (choice.choiceId === null) {
+														setSelectedOption(prev => {
+															return {
+																...prev,
+																choices: prev.choices.filter(
+																	_choice => _choice !== choice
+																),
+															};
+														});
+													}
+													// 서버에 있는 choice
+													else {
+														setSelectedOption(prev => {
+															return {
+																...prev,
+																choices: prev.choices.filter(
+																	_choice =>
+																		_choice.choiceId !==
+																		choice.choiceId
+																),
+															};
+														});
 													}
 												}}
 												sx={{

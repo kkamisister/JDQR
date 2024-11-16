@@ -7,7 +7,7 @@ const DishOptionListItem = ({ optionName, onClick, selected = false }) => {
 		<Box
 			sx={{
 				backgroundColor: selected
-					? colors.background.box
+					? darken(colors.background.box, 0.2)
 					: colors.background.primary,
 				padding: '20px',
 				fontSize: '20px',

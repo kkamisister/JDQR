@@ -542,10 +542,17 @@ public class OrderServiceImpl implements OrderService {
         // 결제 방식에 따라 다르게 join 해와야 함
         PaymentMethod paymentMethod = parentOrder.getPaymentMethod();
 
+        List<OrderResponseVo> orderResponseVos = orderRepository.findWholeOrderInfos(parentOrder);
+
+        int userCnt = orderResponseVos.stream()
+            .map(OrderResponseVo::getUserId)
+            .collect(Collectors.toSet())
+            .size();
+
 
         // 2-1. N빵 결제 방식일 경우
         if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
-            List<OrderResponseVo> orderResponseVos = orderRepository.findWholeOrderInfos(parentOrder);
+
 
             List<Payment> payments = paymentRepository.findAllByParentOrder(parentOrder);
             int paidAmount = payments.stream()
@@ -640,6 +647,7 @@ public class OrderServiceImpl implements OrderService {
             return TotalOrderInfoResponseDto.builder()
                 .tableName(table.getName())
                 .dishCnt(totalDishCount)
+                .userCnt(userCnt)
                 .price(totalPrice)
                 .restPrice(totalPrice - paidAmount)
                 .orders(orderInfoResponseDtos)
@@ -647,7 +655,6 @@ public class OrderServiceImpl implements OrderService {
         }
         // 2-2. 메뉴별 결제 방식일 경우
         else {
-            List<OrderResponseVo> orderResponseVos = orderRepository.findWholeOrderInfos(parentOrder);
             List<PaymentResponseVo> paymentResponseVos = orderRepository.findWholePaymentInfos(parentOrder);
 
             HashMap<Integer, Integer> orderItemToQuantityMap = new HashMap<>();
@@ -768,6 +775,7 @@ public class OrderServiceImpl implements OrderService {
             return TotalOrderInfoResponseDto.builder()
                 .tableName(table.getName())
                 .dishCnt(totalDishCount)
+                .userCnt(userCnt)
                 .restDishCnt(restDishCnt)
                 .price(totalPrice)
                 .restPrice(restPrice)

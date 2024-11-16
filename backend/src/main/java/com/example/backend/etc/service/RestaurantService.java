@@ -10,6 +10,8 @@ import com.example.backend.etc.dto.RestaurantDto;
 import com.example.backend.etc.dto.RestaurantProfileDto;
 import com.example.backend.etc.dto.RestaurantResponse;
 import com.example.backend.etc.dto.RestaurantResponse.RestaurantInfo;
+import com.example.backend.owner.dto.OwnerRequest;
+import com.example.backend.owner.dto.OwnerRequest.BusinessInfo;
 
 public interface RestaurantService {
 
@@ -19,7 +21,7 @@ public interface RestaurantService {
 
 	RestaurantDetailInfo getRestaurantDetail(Integer restaurantId);
 
-	void updateBusinessStatus(Integer userId);
+	void updateBusinessStatus(BusinessInfo businessInfo, Integer userId);
 	RestaurantBusinessDto getBusinessStatus(Integer userId);
 
 	RestaurantInfo searchByKeyword(String keyword,double minLat,double maxLat,double minLng,double maxLng,int people,boolean together);

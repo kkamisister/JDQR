@@ -2,6 +2,8 @@ package com.example.backend.owner.controller;
 
 import com.example.backend.common.util.JsonUtil;
 import com.example.backend.etc.dto.RestaurantResponse.RestaurantBusinessDto;
+import com.example.backend.owner.dto.OwnerRequest;
+import com.example.backend.owner.dto.OwnerRequest.BusinessInfo;
 import com.example.backend.owner.dto.OwnerRequest.OptionRequestDto;
 import com.example.backend.owner.dto.OwnerResponse.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -385,14 +387,15 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "변경 완료"),
 	})
 	@PutMapping("/restaurant/status")
-	public ResponseEntity<ResponseWithMessage> changeBusinessStatus(HttpServletRequest request){
+	public ResponseEntity<ResponseWithMessage> changeBusinessStatus(
+		@RequestBody BusinessInfo businessInfo, HttpServletRequest request){
 
 		// 유저확인
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
 		// db에 변경사항 저장
-		restaurantService.updateBusinessStatus(userId);
+		restaurantService.updateBusinessStatus(businessInfo,userId);
 
 		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(),
 			"영업여부가 변경되었습니다.");

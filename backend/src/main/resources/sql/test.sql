@@ -1,5 +1,5 @@
 use
-product;
+    product;
 
 -- 1. owners 테이블
 INSERT INTO `owners` (`id`, `created_at`, `updated_at`, `code`, `email`, `name`, `status`)
@@ -39,7 +39,11 @@ VALUES (1, 37.7749, -122.4194, b'1', 1, NOW(), NOW(), '123 Main St, San Francisc
 --     농민백암순대 본점
        (15, 37.5037329376349, 127.052982069884, b'1', 15, NOW(), NOW(), '서울특별시 강남구 선릉로86길 40-4',
         'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_15.jpg', 'Food', '농민백암순대 본점',
-        '02-555-9603', '254-12-01439', 'ACTIVE')
+        '02-555-9603', '254-12-01439', 'ACTIVE'),
+#     멀티캠퍼스
+       (16, 37.5012767241426, 127.039600248343, b'1', 16, NOW(), NOW(), '서울특별시 강남구 테헤란로 212',
+        'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_16.jpg', 'Food', '멀티캠퍼스 20층',
+        '1544-9001', '104-81-53114', 'ACTIVE')
 ;
 
 -- 3. restaurant_categories 테이블
@@ -64,7 +68,8 @@ VALUES (1, 11, 1, NOW(), NOW(), 'ACTIVE'), -- Tasty Restaurant: Fast Food
        (12, 16, 12, NOW(), NOW(), 'ACTIVE'),
        (13, 11, 13, NOW(), NOW(), 'ACTIVE'),
        (14, 12, 14, NOW(), NOW(), 'ACTIVE'),
-       (15, 11, 15, NOW(), NOW(), 'ACTIVE')
+       (15, 11, 15, NOW(), NOW(), 'ACTIVE'),
+       (16, 11, 16, NOW(), NOW(), 'ACTIVE')
 ;
 
 -- 5. dish_categories 테이블
@@ -100,8 +105,15 @@ VALUES (1, 1, NOW(), NOW(), 'Appetizers', 'ACTIVE'),
        (21, 14, NOW(), NOW(), '사이드', 'ACTIVE'),
        (22, 14, NOW(), NOW(), '음료', 'ACTIVE'),
 
---        메인메뉴
-       (23, 15, NOW(), NOW(), '메인 메뉴', 'ACTIVE')
+--        농민백암순대
+       (23, 15, NOW(), NOW(), '메인 메뉴', 'ACTIVE'),
+
+#        멀티캠퍼스
+       (24, 16, NOW(), NOW(), 'A: 한식', 'ACTIVE'),
+       (25, 16, NOW(), NOW(), 'B: 일품', 'ACTIVE'),
+       (26, 16, NOW(), NOW(), '도시락', 'ACTIVE'),
+       (27, 16, NOW(), NOW(), '샌드위치', 'ACTIVE'),
+       (28, 16, NOW(), NOW(), '파스타', 'ACTIVE')
 ;
 
 -- 6. dish 테이블
@@ -252,7 +264,27 @@ VALUES (1, 1, 500, NOW(), NOW(), 'Crispy French Fries', 'french_fries.jpg', 'Fre
        (69, 23, 36000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_69.jpg',
         '모듬 수육', '', 'ACTIVE'),
        (70, 23, 13000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_70.jpg',
-        '토종순대', '', 'ACTIVE')
+        '토종순대', '', 'ACTIVE'),
+
+#     멀티캠퍼스
+       (71, 11, 14000, NOW(), NOW(), '(평일 점심한정)', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_11.jfif',
+        '점심) 즉석한우불고기', '["한정", "시그니처"]', 'ACTIVE'),
+       (72, 12, 29000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_12.jfif', '한우차돌삼합',
+        '[]', 'ACTIVE'),
+       (73, 12, 119000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_13.jfif', '한우투뿔모듬',
+        '[]', 'ACTIVE'),
+       (74, 12, 55000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_14.jfif', '한우파김치전골',
+        '[]', 'ACTIVE'),
+       (75, 12, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_15.jfif', '한우꽃게된장찌개',
+        '[]', 'ACTIVE'),
+       (76, 12, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_16.jfif', '한우차돌짬뽕라면',
+        '[]', 'ACTIVE'),
+       (77, 12, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_17.jfif', '갓김치물냉면',
+        '[]', 'ACTIVE'),
+       (78, 12, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_18.jfif', '갓김치비빔냉면',
+        '[]', 'ACTIVE'),
+       (79, 11, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_19.jfif',
+        '점심) 한우꽃게된장찌개밥상', '["한정"]', 'ACTIVE')
 ;
 -- 7. options 테이블
 INSERT INTO `options` (`id`, `restaurant_id`, `max_choice_count`, `mandatory`, `created_at`, `updated_at`, `name`,
@@ -443,7 +475,6 @@ values (1, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PAID', 'MENU_DIVIDE', 'ACT
        (11, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PENDING', 'UNDEFINED', 'ACTIVE'),
        (12, NOW(), NOW(), '67345a90fb5b4a3df7c2076a', 'PAY_WAITING', 'MENU_DIVIDE', 'ACTIVE'),
        (13, NOW(), NOW(), '67345b67fb5b4a3df7c2076c', 'PAY_WAITING', 'MONEY_DIVIDE', 'ACTIVE')
-
 ;
 
 -- 10. orders 테이블
@@ -467,7 +498,6 @@ VALUES (1, 1, NOW(), NOW(), 'ACTIVE'),
        (15, 12, NOW(), NOW(), 'ACTIVE'),
        (16, 13, NOW(), NOW(), 'ACTIVE'),
        (17, 13, NOW(), NOW(), 'ACTIVE')
-
 ;
 
 --
@@ -487,7 +517,8 @@ VALUES (1, 1, 1, 500, 2, NOW(), NOW(), NOW(), 'user_1', 'ACTIVE'),
 ;
 
 -- 진짜 데이터
-INSERT INTO `order_items` (id, dish_id, order_id, order_price, paid_quantity, quantity, created_at, ordered_at, updated_at, user_id, status)
+INSERT INTO `order_items` (id, dish_id, order_id, order_price, paid_quantity, quantity, created_at, ordered_at,
+                           updated_at, user_id, status)
 values (11, 27, 11, 5000, 0, 2, NOW(), NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440000', 'ACTIVE'),
        (12, 27, 11, 4500, 0, 4, NOW(), NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440000', 'ACTIVE'),
        (13, 35, 12, 4800, 0, 5, NOW(), NOW(), NOW(), 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 'ACTIVE'),

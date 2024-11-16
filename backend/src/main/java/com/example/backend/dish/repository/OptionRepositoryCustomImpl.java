@@ -16,12 +16,12 @@ public class OptionRepositoryCustomImpl extends Querydsl4RepositorySupport imple
     @Override
     public List<OptionVo> findAllOptionByRestaurant(Restaurant restaurant) {
         return select(Projections.constructor(OptionVo.class, option.id, option.name, option.maxChoiceCount, option.mandatory, choice.id, choice.name, choice.price))
-            .from(choice)
-            .join(choice.option, option)
+            .from(option)
+            .leftJoin(option.choices, choice)
             .where(
                 option.restaurant.eq(restaurant),
                 option.status.eq(ACTIVE),
-                choice.status.eq(ACTIVE)
+                choice.isNull().or(choice.status.eq(ACTIVE))
             )
             .fetch();
     }

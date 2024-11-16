@@ -5,6 +5,8 @@ import { colors } from "../../constants/colors";
 import MoneyDivideList from "./MoneyDivideList";
 import MenuDivideList from "./MenuDivideList";
 
+// 하 대소문자도 구분 못하는 멍청이 git아
+
 export default function PaymentList({ orders }) {
   // console.log(orders);
   const [activeTab, setActiveTab] = useState(0);

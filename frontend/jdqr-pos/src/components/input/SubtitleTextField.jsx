@@ -12,7 +12,7 @@ const SubtitleTextField = ({ title, value, setValue, onKeyDown, sx }) => {
 			<TextField
 				sx={{ width: '100%' }}
 				size="small"
-				value={value}
+				value={value || ''}
 				onKeyDown={onKeyDown}
 				onChange={e => {
 					setValue(e.target.value);

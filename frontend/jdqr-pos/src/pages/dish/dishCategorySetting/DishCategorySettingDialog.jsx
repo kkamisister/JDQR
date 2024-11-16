@@ -1,22 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
 	Dialog,
 	Stack,
 	Box,
-	Button,
 	Typography,
-	TextField,
 	Chip,
+	TextField,
+	Button,
 	darken,
 } from '@mui/material';
-import { colors } from 'constants/colors';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-	fetchDishCategoryList,
 	addDishCategory,
 	deleteDishCategory,
+	fetchDishCategoryList,
 } from 'utils/apis/dish';
 import { enqueueSnackbar } from 'notistack';
+import { colors } from 'constants/colors';
+
 const DishCategorySettingDialog = ({ open, onClose }) => {
 	const queryClient = useQueryClient();
 
@@ -44,9 +45,11 @@ const DishCategorySettingDialog = ({ open, onClose }) => {
 	};
 
 	const handleDeleteDishCategory = async dishCategoryId => {
-		await deleteDishCategory({ dishCategoryId });
+		const result = await deleteDishCategory({ dishCategoryId });
 		queryClient.invalidateQueries('dishList');
-		enqueueSnackbar('카테고리를 제거했어요', { variant: 'error' });
+		if (result.message === '다른 메뉴에 포함된 카테고리 입니다') {
+			enqueueSnackbar('사용 중인 카테고리에요', { variant: 'warning' });
+		} else enqueueSnackbar('카테고리를 제거했어요', { variant: 'error' });
 	};
 
 	const handleEnterKeyPress = async event => {
@@ -68,6 +71,7 @@ const DishCategorySettingDialog = ({ open, onClose }) => {
 					{categoryList &&
 						categoryList.data.dishCategories.map(_category => (
 							<Chip
+								key={`category-chip-${_category.dishCategoryId}`}
 								label={_category.dishCategoryName}
 								onDelete={() => {
 									handleDeleteDishCategory(_category.dishCategoryId);

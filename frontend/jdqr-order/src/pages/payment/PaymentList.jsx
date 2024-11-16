@@ -6,6 +6,7 @@ import MoneyDivideList from "./MoneyDivideList";
 import MenuDivideList from "./MenuDivideList";
 
 export default function PaymentList({ orders }) {
+  // console.log(orders);
   const [activeTab, setActiveTab] = useState(0);
   const handleTabChange = (index) => {
     setActiveTab(index);

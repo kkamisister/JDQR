@@ -79,20 +79,19 @@ export default function CartList() {
         sx={{
           color: colors.main.primary500,
           fontSize: "18px",
-          width: "30%",
+          minWidth: "30%",
           alignSelf: "center",
         }}
       >
         메뉴 더 담기
       </Button>
-      <Footer />
-
       <Box>
         {totalQuantity > 0 && totalPrice && (
           <BaseButton count={totalQuantity} onClick={submitOrder}>
             {`${totalPrice.toLocaleString()}원 주문하기`}
           </BaseButton>
         )}
+        <Footer />
       </Box>
     </Stack>
   );

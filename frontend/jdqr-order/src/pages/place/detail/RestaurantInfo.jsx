@@ -13,7 +13,6 @@ const RestaurantInfo = ({ restaurant, open }) => {
         borderRadius: "10px",
         alignItems: "center",
         width: "100%",
-        marginTop: "15px",
       }}
     >
       <Avatar // 1. 식당 이미지
@@ -68,7 +67,9 @@ const RestaurantInfo = ({ restaurant, open }) => {
               fontSize: "15px",
               borderRadius: "10px",
               backgroundColor: colors.background.box,
-              color: restaurant.open ? colors.point.red : colors.text.sub1,
+              color: restaurant.open
+                ? colors.main.primary500
+                : colors.text.sub1,
               ".MuiChip-label": {
                 padding: 0,
               },
@@ -82,7 +83,9 @@ const RestaurantInfo = ({ restaurant, open }) => {
               fontSize: "15px",
               borderRadius: "10px",
               backgroundColor: colors.background.box,
-              color: restaurant.open ? colors.point.red : colors.text.sub1,
+              color: restaurant.open
+                ? colors.main.primary500
+                : colors.text.sub1,
               ".MuiChip-label": {
                 padding: 0,
               },

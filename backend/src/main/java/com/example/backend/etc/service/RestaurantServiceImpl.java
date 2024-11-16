@@ -39,6 +39,8 @@ import com.example.backend.etc.entity.RestaurantCategoryMap;
 import com.example.backend.etc.repository.RestaurantCategoryMapRepository;
 import com.example.backend.etc.repository.RestaurantCategoryRepository;
 import com.example.backend.etc.repository.RestaurantRepository;
+import com.example.backend.owner.dto.OwnerRequest;
+import com.example.backend.owner.dto.OwnerRequest.BusinessInfo;
 import com.example.backend.owner.entity.Owner;
 import com.example.backend.owner.repository.OwnerRepository;
 import com.example.backend.table.entity.Table;
@@ -417,13 +419,13 @@ public class RestaurantServiceImpl implements RestaurantService {
 	 * @param restaurantId
 	 */
 	@Override
-	public void updateBusinessStatus(Integer restaurantId) {
+	public void updateBusinessStatus(BusinessInfo businessInfo,Integer restaurantId) {
 		//1. 식당을 조회한다
 		Restaurant restaurant = restaurantRepository.findById(restaurantId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
 
-		//2. 식당 테이블(restaurants)의 open컬럼 값이 true면 false로, false면 true로 변환
-		restaurant.setOpen(!restaurant.getOpen());
+		//2. 입력받은 여부로 영업상태로 변경
+		restaurant.setOpen(businessInfo.open());
 
 		//3. 변경 사항을 저장하여 db에 반영
 		restaurantRepository.save(restaurant);
@@ -443,6 +445,8 @@ public class RestaurantServiceImpl implements RestaurantService {
 		//1. 식당을 조회한다
 		Restaurant restaurant = restaurantRepository.findByOwner(owner)
 			.orElseThrow(() -> new JDQRException(ErrorCode.RESTAURANT_NOT_FOUND));
+
+		log.warn("restaurant : {}",restaurant);
 
 		//2. 응답을 리턴한다
 		RestaurantBusinessDto resDto =

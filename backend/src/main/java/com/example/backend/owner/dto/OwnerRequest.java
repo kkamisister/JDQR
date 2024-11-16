@@ -19,4 +19,11 @@ public record OwnerRequest() {
 	){
 
 	}
+
+	@Schema(name = "영업 여부 DTO",description = "영업 전환 정보를 담은 DTO")
+	public record BusinessInfo(
+		Boolean open
+	){
+
+	}
 }

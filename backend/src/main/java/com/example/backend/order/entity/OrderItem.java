@@ -54,18 +54,4 @@ public class OrderItem extends BaseEntity {
     @OneToMany(mappedBy = "orderItem")
     private List<OrderItemChoice> orderItemChoices = new ArrayList<>();
 
-    @Override
-    public String toString() {
-        return "OrderItem{" +
-            "id=" + id +
-            ", order=" + order +
-            ", userId='" + userId + '\'' +
-            ", dish=" + dish +
-            ", quantity=" + quantity +
-            ", paidQuantity=" + paidQuantity +
-            ", orderPrice=" + orderPrice +
-            ", orderedAt=" + orderedAt +
-            ", orderStatus=" + orderStatus +
-            '}';
-    }
 }

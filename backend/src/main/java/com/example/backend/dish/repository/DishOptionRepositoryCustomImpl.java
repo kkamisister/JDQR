@@ -8,7 +8,9 @@ import java.util.List;
 import com.example.backend.common.repository.Querydsl4RepositorySupport;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.DishOption;
+import com.example.backend.dish.entity.Option;
 import com.example.backend.dish.entity.QChoice;
+import com.example.backend.dish.entity.QOption;
 
 public class DishOptionRepositoryCustomImpl extends Querydsl4RepositorySupport implements DishOptionRepositoryCustom {
 	@Override
@@ -18,6 +20,14 @@ public class DishOptionRepositoryCustomImpl extends Querydsl4RepositorySupport i
 			.join(dishOption.option, option).fetchJoin()
 			.join(option.choices, QChoice.choice).fetchJoin()
 			.where(dishOption.dish.eq(dish))
+			.fetch();
+	}
+
+	@Override
+	public List<DishOption> findByOption(Option option) {
+		return selectFrom(dishOption)
+			.join(dishOption.option, QOption.option).fetchJoin()
+			.where(dishOption.option.eq(option))
 			.fetch();
 	}
 }

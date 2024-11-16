@@ -1,5 +1,6 @@
 package com.example.backend.owner.service;
 
+import static com.example.backend.common.enums.EntityStatus.*;
 import static com.example.backend.dish.dto.DishResponse.*;
 import static com.example.backend.owner.dto.OwnerResponse.*;
 
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
+import com.example.backend.common.enums.EntityStatus;
 import com.example.backend.common.service.ImageS3Service;
 import com.example.backend.common.util.TagParser;
 import com.example.backend.dish.dto.ChoiceDto;
@@ -136,8 +138,10 @@ public class OwnerServiceImpl implements OwnerService{
 		dish.setTags(dishInfo.tags());
 
 		//메뉴의 정보(이미지)를 수정한다.
-		String imageUrl = imageS3Service.uploadImageToS3(multipartFile);
-		dish.setImage(imageUrl);
+		if(!multipartFile.isEmpty()){
+			String imageUrl = imageS3Service.uploadImageToS3(multipartFile);
+			dish.setImage(imageUrl);
+		}
 
 		//메뉴의 정보(카테고리)를 수정한다.
 		Integer dishCategoryId = dishInfo.dishCategoryId();
@@ -270,6 +274,92 @@ public class OwnerServiceImpl implements OwnerService{
 			.toList();
 
 		choiceRepository.saveAll(choices);
+	}
+
+	/**
+	 * 옵션을 삭제하는 메서드
+	 * @param userId
+	 * @param optionId
+	 */
+	@Override
+	public void deleteOption(Integer userId, Integer optionId) {
+
+		//1. 점주를 조회한다
+		Owner owner = ownerRepository.findById(userId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
+
+		//2. 옵션을 조회한다
+		Option option = optionRepository.findById(optionId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.OPTIONGROUP_NOT_FOUND));
+
+		//3. option 삭제시도
+		// 우선 dishOption에 연관된 dish가 있다면 실패해야한다
+		List<DishOption> dishOptions = dishOptionRepository.findByOption(option);
+
+		if(!ObjectUtils.isEmpty(dishOptions)){
+			throw new JDQRException(ErrorCode.OCCUPIED_OPTION);
+		}
+		else{
+			// 이 경우, option의 status를 delete로 변경하고 나머지 연관된 entity를 수정한다
+			List<Choice> choices = choiceRepository.findByOption(option);
+			for(Choice choice : choices){
+				choice.changeStatus(DELETE);
+			}
+			option.changeStatus(DELETE); // soft delete
+		}
+	}
+
+	/**
+	 * 옵션을 수정하는 메서드
+	 * @param userId
+	 * @param optionId
+	 * @param optionDto
+	 */
+	@Override
+	public void updateOption(Integer userId, Integer optionId, OptionRequestDto optionDto) {
+
+		//1. 점주를 찾는다
+		Owner owner = ownerRepository.findById(userId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
+
+		//2. 옵션을 찾는다
+		Option option = optionRepository.findById(optionId)
+			.orElseThrow(() -> new JDQRException(ErrorCode.OPTIONGROUP_NOT_FOUND));
+
+		// 기존 옵션이 가진 choice들을 가지고온다
+		List<Choice> originalChoices = choiceRepository.findByOption(option);
+
+		//3. 옵션의 이름을 수정한다
+		option.changeOptionName(optionDto);
+
+		// 우선 옵션에 딸린 choice를 먼저 수정해야한다
+		List<ChoiceDto> choices = optionDto.choices();
+
+		Map<Integer,Boolean> choiceIdMap = new HashMap<>();
+		for(ChoiceDto choiceDto : choices){
+			Integer choiceId = choiceDto.getChoiceId();
+			if(ObjectUtils.isEmpty(choiceId)){
+				// 새롭게 생성된 Choice -> 저장
+				Choice choice = Choice.of(choiceDto, option);
+				choiceRepository.save(choice);
+			}
+			else{
+				// 기존에 존재하던 choice인 경우 -> 내용을 수정한다
+				Choice choice = choiceRepository.findById(choiceId)
+					.orElseThrow(() -> new JDQRException(ErrorCode.CHOICE_NOT_FOUND));
+
+				choice.changeChoice(choiceDto);
+				choiceIdMap.put(choiceId,true);
+			}
+		}
+
+		// 기존 originalChoices를 돌며 필요없게 된 choice를 삭제한다
+		for(Choice choice : originalChoices){
+			Integer choiceId = choice.getId();
+			if(!choiceIdMap.containsKey(choiceId)){
+				choice.changeStatus(DELETE);
+			}
+		}
 	}
 
 	/**

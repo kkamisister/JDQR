@@ -13,6 +13,7 @@ public enum ErrorCode {
 	USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "사용자가 존재하지 않습니다"),
 	// 메뉴 관련 에러
 	DISH_NOT_FOUND(HttpStatus.BAD_REQUEST, "메뉴가 존재하지 않습니다"),
+	OCCUPIED_OPTION(HttpStatus.OK,"다른 메뉴에 포함된 옵션입니다."),
 
 	// 카테고리 관련 에러
 	DUPLICATED_CATEGORY(HttpStatus.OK, "중복된 카테고리 입니다"),
@@ -35,6 +36,9 @@ public enum ErrorCode {
 
 	// 옵션관련 에러
 	OPTIONGROUP_NOT_FOUND(HttpStatus.BAD_REQUEST,"옵션그룹이 존재하지 않습니다"),
+
+	// choice관련 에러
+	CHOICE_NOT_FOUND(HttpStatus.BAD_REQUEST,"세부옵션이 존재하지 않습니다"),
 
 	// 태그관련 에러
 	TAG_NOT_FOUND(HttpStatus.BAD_REQUEST, "태그가 존재하지 않습니다"),

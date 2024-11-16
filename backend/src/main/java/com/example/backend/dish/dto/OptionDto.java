@@ -21,9 +21,8 @@ import lombok.ToString;
 @ToString
 public class OptionDto {
 
-	private int optionId;
+	private Integer optionId;
 	private String optionName;
-	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private List<ChoiceDto> choices;
 
 	@Override
@@ -33,7 +32,7 @@ public class OptionDto {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		OptionDto optionDto = (OptionDto)o;
-		return optionId == optionDto.optionId && Objects.equals(choices, optionDto.choices);
+		return Objects.equals(optionId, optionDto.optionId) && Objects.equals(choices, optionDto.choices);
 	}
 
 	@Override

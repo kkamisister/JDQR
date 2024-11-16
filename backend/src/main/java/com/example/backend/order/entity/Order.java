@@ -19,4 +19,6 @@ public class Order extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_order_id")
     private ParentOrder parentOrder;
+
+
 }

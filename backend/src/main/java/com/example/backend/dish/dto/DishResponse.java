@@ -81,11 +81,13 @@ public record DishResponse() {
 		int price,
 		String description,
 		String image,
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 		List<OptionDto> options,
 		@JsonInclude(JsonInclude.Include.NON_EMPTY)
 		List<String> tags,
 		@JsonInclude(JsonInclude.Include.NON_NULL)
-		Integer quantity
+		Integer quantity,
+		Integer menuPrice
 	){
 		@Override
 		public boolean equals(Object o) {
@@ -112,7 +114,8 @@ public record DishResponse() {
 				this.image,
 				this.options,
 				this.tags,
-				quantity
+				quantity,
+				this.menuPrice
 			);
 		}
 
@@ -129,6 +132,15 @@ public record DishResponse() {
 		}
 
 		public static DishDetailInfo of(Dish dish,List<OptionDto> options){
+
+			Integer menuPrice = dish.getPrice();
+			for(OptionDto option : options){
+				List<ChoiceDto> choices = option.getChoices();
+				for(ChoiceDto choice : choices){
+					menuPrice += choice.getPrice();
+				}
+			}
+
 			return DishDetailInfo.builder()
 				.dishId(dish.getId())
 				.dishName(dish.getName())
@@ -137,6 +149,7 @@ public record DishResponse() {
 				.image(dish.getImage())
 				.options(options)
 				.tags(Collections.emptyList())
+				.menuPrice(menuPrice)
 				.build();
 		}
 	}

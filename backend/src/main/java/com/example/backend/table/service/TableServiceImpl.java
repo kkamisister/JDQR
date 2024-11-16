@@ -4,8 +4,10 @@ import static com.example.backend.table.dto.TableRequest.*;
 import static com.example.backend.table.dto.TableResponse.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.example.backend.common.enums.EntityStatus;
+import com.example.backend.dish.dto.ChoiceDto;
 import com.example.backend.dish.dto.DishResponse.DishDetailInfo;
 import com.example.backend.dish.dto.OptionDto;
 import com.example.backend.dish.entity.Dish;
@@ -14,6 +16,8 @@ import com.example.backend.dish.entity.Option;
 import com.example.backend.dish.repository.DishOptionRepository;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.etc.entity.Restaurant;
+import com.example.backend.order.entity.OrderItem;
+import com.example.backend.order.entity.OrderItemChoice;
 import com.example.backend.order.entity.ParentOrder;
 import com.example.backend.order.enums.OrderStatus;
 import com.example.backend.order.repository.OrderItemRepository;
@@ -29,6 +33,7 @@ import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
 import com.example.backend.common.util.GenerateLink;
 import com.example.backend.etc.repository.RestaurantRepository;
+import com.example.backend.table.dto.TableOrderResponseVo;
 import com.example.backend.table.entity.Table;
 import com.example.backend.table.repository.TableRepository;
 
@@ -46,10 +51,8 @@ public class TableServiceImpl implements TableService{
 	private final RestaurantRepository restaurantRepository;
 	private final TableRepository tableRepository;
 	private final GenerateLink generateLink;
-	private final OrderRepository orderRepository;
 	private final OrderItemRepository orderItemRepository;
 	private final DishRepository dishRepository;
-	private final DishOptionRepository dishOptionRepository;
 	private final ParentOrderRepository parentOrderRepository;
 
 	/**
@@ -111,8 +114,8 @@ public class TableServiceImpl implements TableService{
 	@Override
 	public void updateTable(TableInfo tableInfo, Integer userId) {
 
-		log.warn("업데이트 시작");
-		log.warn("tableInfo : {}",tableInfo);
+		// log.warn("업데이트 시작");
+		// log.warn("tableInfo : {}",tableInfo);
 		//1. 점주를 찾는다
 		ownerRepository.findById(userId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
@@ -121,7 +124,7 @@ public class TableServiceImpl implements TableService{
 		Table table = tableRepository.findById(tableInfo.tableId())
 			.orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
-		log.warn("tableId : {}",table.getId());
+		// log.warn("tableId : {}",table.getId());
 		//3. 업데이트한다
 		table.updateTable(tableInfo);
 
@@ -177,6 +180,10 @@ public class TableServiceImpl implements TableService{
 		for(Table table : tables){
 			Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(table.getId());
 
+			if(table.getUseStatus().equals(UseStatus.AVAILABLE)){ // 남은 좌석의 수를 카운팅
+				leftSeatNum += table.getPeople();
+			}
+
 			// 테이블에 한 번도 주문이 들어가지 않은 상태일 경우
 			if (optionalParentOrder.isEmpty()) {
 				tableDetailInfos.add(getBaseTableInfo(table));
@@ -186,25 +193,37 @@ public class TableServiceImpl implements TableService{
 			ParentOrder parentOrder = optionalParentOrder.get();
 
 			Map<DishDetailInfo, Integer> dishCountMap = new LinkedHashMap<>();
-			if(table.getUseStatus().equals(UseStatus.AVAILABLE)){ // 남은 좌석의 수를 카운팅
-				leftSeatNum += table.getPeople();
-			}
 
 			// 아직 결제되지 않은 항목만 가지고온다
 			if(parentOrder.getOrderStatus().equals(OrderStatus.PENDING) || parentOrder.getOrderStatus().equals(OrderStatus.PAY_WAITING)){
-				// 해당 주문에 있는 모든 Dish를 가지고온다
 
-				List<Dish> dishes = dishRepository.findAllByOrder(parentOrder);
-				for(Dish dish : dishes){
-					List<DishOption> dishOptions = dishOptionRepository.findByDish(dish);
-					List<Option> options = dishOptions.stream().map(DishOption::getOption).toList();
-					List<OptionDto> optionDtos = options.stream().map(OptionDto::of).toList();
-					// log.warn("optionDtos : {}",optionDtos);
+				List<OrderItem> orderItems = orderItemRepository.findOrderItemByParentOrder(parentOrder);
+
+				// orderItem에 있는 dish에 대해서 dishOption과 choice를 찾아서 반환해야한다
+				for(OrderItem orderItem : orderItems){
+					// log.warn("orderItem : {}",orderItem);
+					List<TableOrderResponseVo> voList = orderItemRepository.findDishOptionsAndChoicesByOrderItem(
+						orderItem);
+
+					// 모두 한 orderItem에 대한 정보를 담고있으므로, 처음것을 가지고온다
+					TableOrderResponseVo firstVo = voList.get(0);
+
+					Map<Integer, List<TableOrderResponseVo>> optionsMap = voList.stream()
+						.collect(Collectors.groupingBy(vo -> vo.getOptionId() == null ? -1 : vo.getOptionId()));
+
+					// optionDtos를 생성한다
+					// optionId와 choice는 1:N이므로 여러 optionDtos가 생길 수 있다
+					List<OptionDto> optionDtos = getOptionDtos(optionsMap);
+
+					Dish dish = dishRepository.findById(firstVo.getDishId())
+						.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+
+					// 한 메뉴에 대해 optionDto를 가진 dishDetailInfo를 생성한다
 					DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish,optionDtos);
 
-					// log.warn("dishDetailInfo : {}",dishDetailInfo);
+					// 이때, 완전히 동일한 상태(메뉴,세부옵션 동일)가 있을 수 있으므로 ( 유저별로 orderItem 레코드가 기록되기 때문)
+					// Map의 equals를 재정의 하여 동일한 메뉴를 카운팅한다
 					dishCountMap.put(dishDetailInfo, dishCountMap.getOrDefault(dishDetailInfo, 0) + 1);
-					// log.warn("개수 : {}",dishCountMap.get(dishDetailInfo));
 				}
 			}
 
@@ -213,14 +232,56 @@ public class TableServiceImpl implements TableService{
 				.map(entry -> entry.getKey().withQuantity(entry.getValue()))
 				.toList();
 
-
-			TableDetailInfo tableDetailInfo = TableDetailInfo.of(table,result);
+			// 각 메뉴의 세부옵션을 다 더한 가격을 산출하여 총 가격을 구하는데 사용한다
+			int totalPrice = 0;
+			for(DishDetailInfo dishDetailInfo : result) {
+				List<OptionDto> options = dishDetailInfo.options();
+				int choicePrice = 0;
+				for(OptionDto optionDto : options) {
+					choicePrice += optionDto.getChoices().stream()
+						.mapToInt(ChoiceDto::getPrice)
+						.sum();
+				}
+				// 현재 음식의 진짜 가격(본 가격 + 옵션반영가격)에 수량을 곱한다
+				totalPrice += (dishDetailInfo.price() + choicePrice) * dishDetailInfo.quantity();
+			}
+			TableDetailInfo tableDetailInfo = TableDetailInfo.of(table,result,totalPrice);
 			tableDetailInfos.add(tableDetailInfo);
 		}
+
+
 
 		TableResultDto tableResultDto = new TableResultDto(tableDetailInfos,leftSeatNum);
 
 		return tableResultDto;
+	}
+
+	/**
+	 * (한옵션 - 세부옵션들)로 만든 OptionDto의 리스트를 반환하는 메서드.
+	 * @param optionsMap
+	 * @return
+	 */
+	private static List<OptionDto> getOptionDtos(Map<Integer, List<TableOrderResponseVo>> optionsMap) {
+		List<OptionDto> optionDtos = optionsMap.entrySet().stream()
+			.filter(entry -> entry.getKey() != -1)
+			.map(entry -> {
+				Integer optionId = entry.getKey();
+				List<TableOrderResponseVo> optionVoList = entry.getValue();
+
+				String optionName = optionVoList.get(0).getOptionName();
+
+				List<ChoiceDto> choiceDtos = optionVoList.stream()
+					.map(vo -> new ChoiceDto(vo.getChoiceId(), vo.getChoiceName(),vo.getChoicePrice()))
+					.collect(Collectors.toList());
+
+				return OptionDto.builder()
+					.optionId(optionId)
+					.optionName(optionName)
+					.choices(choiceDtos)
+					.build();
+			})
+			.toList();
+		return optionDtos;
 	}
 
 	/**
@@ -232,7 +293,7 @@ public class TableServiceImpl implements TableService{
 			.name(table.getName())
 			.color(table.getColor())
 			.qrLink(table.getQrCode())
-			.people(0)
+			.people(table.getPeople())
 			.dishes(new ArrayList<>())
 			.build();
 	}
@@ -263,20 +324,40 @@ public class TableServiceImpl implements TableService{
 
 		Map<DishDetailInfo, Integer> dishCountMap = new LinkedHashMap<>();
 
-		int totalPrice = 0;
 		// 아직 결제되지 않은 항목만 가지고온다
-		if(parentOrder.getOrderStatus().equals(OrderStatus.PENDING)){
-			// 해당 주문에 있는 모든 Dish를 가지고온다
-			List<Dish> dishes = dishRepository.findAllByOrder(parentOrder);
-			for(Dish dish : dishes){
-				List<DishOption> dishOptions = dishOptionRepository.findByDish(dish);
-				List<Option> options = dishOptions.stream().map(DishOption::getOption).toList();
-				List<OptionDto> optionDtos = options.stream().map(OptionDto::of).toList();
-				DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish,optionDtos);
+		if(parentOrder.getOrderStatus().equals(OrderStatus.PENDING) || parentOrder.getOrderStatus().equals(OrderStatus.PAY_WAITING)){
 
+			log.warn("parentOrder : {}",parentOrder);
+			List<OrderItem> orderItems = orderItemRepository.findOrderItemByParentOrder(parentOrder);
+			for(OrderItem orderItem : orderItems){
+				log.warn("orderItem : {}",orderItem);
+			}
+
+			// orderItem에 있는 dish에 대해서 dishOption과 choice를 찾아서 반환해야한다
+			for(OrderItem orderItem : orderItems) {
+				List<TableOrderResponseVo> voList = orderItemRepository.findDishOptionsAndChoicesByOrderItem(
+					orderItem);
+
+				// 모두 한 orderItem에 대한 정보를 담고있으므로, 처음것을 가지고온다
+				TableOrderResponseVo firstVo = voList.get(0);
+
+				// optionId별로 groupBy하여 vo객체를 대응시킨다
+				Map<Integer, List<TableOrderResponseVo>> optionsMap = voList.stream()
+					.collect(Collectors.groupingBy(vo -> vo.getOptionId() == null ? -1 : vo.getOptionId()));
+
+				// optionDtos를 생성한다
+				// optionId와 choice는 1:N이므로 여러 optionDtos가 생길 수 있다
+				List<OptionDto> optionDtos = getOptionDtos(optionsMap);
+
+				Dish dish = dishRepository.findById(firstVo.getDishId())
+					.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+
+				// 한 메뉴에 대해 optionDto를 가진 dishDetailInfo를 생성한다
+				DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish, optionDtos);
+
+				// 이때, 완전히 동일한 상태(메뉴,세부옵션 동일)가 있을 수 있으므로 ( 유저별로 orderItem 레코드가 기록되기 때문)
+				// Map의 equals를 재정의 하여 동일한 메뉴를 카운팅한다
 				dishCountMap.put(dishDetailInfo, dishCountMap.getOrDefault(dishDetailInfo, 0) + 1);
-
-				totalPrice += dish.getPrice();
 			}
 		}
 
@@ -285,6 +366,19 @@ public class TableServiceImpl implements TableService{
 			.map(entry -> entry.getKey().withQuantity(entry.getValue()))
 			.toList();
 
+		// 각 메뉴의 세부옵션을 다 더한 가격을 산출하여 총 가격을 구하는데 사용한다
+		int totalPrice = 0;
+		for(DishDetailInfo dishDetailInfo : result) {
+			List<OptionDto> options = dishDetailInfo.options();
+			int choicePrice = 0;
+			for(OptionDto optionDto : options) {
+				choicePrice += optionDto.getChoices().stream()
+					.mapToInt(ChoiceDto::getPrice)
+					.sum();
+			}
+			// 현재 음식의 진짜 가격(본 가격 + 옵션반영가격)에 수량을 곱한다
+			totalPrice += (dishDetailInfo.price() + choicePrice) * dishDetailInfo.quantity();
+		}
 
 		TableDetailInfo tableDetailInfo = TableDetailInfo.of(table,result,totalPrice);
 

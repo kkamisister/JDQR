@@ -5,7 +5,7 @@ import RestaurantDetailDishItemCard from "../../../components/card/RestaurantDet
 import { Box, Stack } from "@mui/material"
 import { colors } from "../../../constants/colors"
 
-const RestaurantDetailBox = ({ categories, dishes, restaurant }) => {
+const RestaurantDetailBox = ({ categories, dishes }) => {
   const handleCategoryClick = (category) => {
     scroller.scrollTo(category, {
       duration: 800,

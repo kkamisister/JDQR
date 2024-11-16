@@ -29,7 +29,7 @@ public enum ErrorCode {
 	INVALID_ORDER(HttpStatus.BAD_REQUEST, "비정상적인 주문입니다"),
 	PARENT_ORDER_NOT_FOUND(HttpStatus.BAD_REQUEST, "상위 주문이 존재하지 않습니다"),
 	ORDER_ALREADY_PAID(HttpStatus.BAD_REQUEST, "이미 결제된 주문입니다"),
-	PAYMENT_METHOD_NOT_VALID(HttpStatus.BAD_REQUEST, "잘못된 결제 방식으로 결제를 시도하였습니다"),
+	PAYMENT_INVALID(HttpStatus.BAD_REQUEST, "잘못된 결제 요청입니다"),
 	EXCEED_TOTAL_PURCHASE_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액이 총 주문 금액을 초과하였습니다"),
 	EXCEED_MENU_PURCHASE_AMOUNT(HttpStatus.BAD_REQUEST, "이미 결제된 메뉴에 대해 결제를 시도하였습니다"),
 	TOSS_CONFIRM_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "토스 확정 api 호출 중 에러가 발생하였습니다"),

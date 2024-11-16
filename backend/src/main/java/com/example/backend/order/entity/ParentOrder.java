@@ -25,6 +25,9 @@ public class ParentOrder extends BaseEntity {
     @Column(name = "order_status")
     private OrderStatus orderStatus;
 
+    @Column(name = "serve_num")
+    private Integer serveNum;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;

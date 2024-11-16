@@ -354,9 +354,10 @@ public class OrderServiceImpl implements OrderService {
 
         // 1. 결제 방식을 확인한다
         PaymentMethod paymentMethod = paymentRequestDto.type();
+        Integer serveNum = paymentRequestDto.serveNum();
 
         // 2. 해당 테이블의 가장 최근 parentOrder를 확인하고, 결제 방식을 업데이트시킨다
-        ParentOrder parentOrder = updatePaymentMethodOfOrder(tableId, paymentMethod);
+        ParentOrder parentOrder = updatePaymentMethodOfOrder(tableId, paymentMethod, serveNum);
 
         // 3. paymentMethod 에 따라 다르게 재고 관리를 시행
         Payment payment;
@@ -1131,10 +1132,11 @@ public class OrderServiceImpl implements OrderService {
      *
      * @param tableId       : 주문하는 테이블의 id
      * @param paymentMethod : 결제하기를 원하는 결제방식
+     * @param serveNum
      */
     @Transactional
     @RedLock(key = "'order_status'")
-    protected ParentOrder updatePaymentMethodOfOrder(String tableId, PaymentMethod paymentMethod) {
+    protected ParentOrder updatePaymentMethodOfOrder(String tableId, PaymentMethod paymentMethod, Integer serveNum) {
         // 1. 테이블의 가장 최근 order 가져오기
         ParentOrder parentOrder = orderRepository.findUnpaidOrders(tableId);
 
@@ -1153,8 +1155,18 @@ public class OrderServiceImpl implements OrderService {
         // 다를 경우 에러를 반환
         else {
             if (!oldPaymentMethod.equals(paymentMethod)) {
-                throw new JDQRException(ErrorCode.PAYMENT_METHOD_NOT_VALID);
+                throw new JDQRException(ErrorCode.PAYMENT_INVALID);
             }
+        }
+
+        // 3. 결제 방식이 N빵 방식일 경우, serve_num이 동일한지 체크한다
+        if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
+            Integer savedServedNum = parentOrder.getServeNum();
+            if (savedServedNum != null && !savedServedNum.equals(serveNum)) {
+                throw new JDQRException(ErrorCode.PAYMENT_INVALID);
+            }
+
+            parentOrder.setServeNum(serveNum);
         }
 
         // 3. 바뀐 결제 방식 저장

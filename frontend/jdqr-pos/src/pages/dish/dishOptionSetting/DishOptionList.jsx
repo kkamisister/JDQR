@@ -3,7 +3,7 @@ import React from 'react';
 import DishOptionListItem from './DishOptionListItem';
 
 const DishOptionList = ({
-	optionList,
+	optionList = [],
 	selectedOption,
 	setSelectedOption,
 	setIsNew,
@@ -25,7 +25,7 @@ const DishOptionList = ({
 							setIsNew(false);
 						}}
 						key={`dish-option-list-${option.optionId}`}
-						selected={selectedOption === option.optionId}
+						selected={selectedOption?.optionId === option?.optionId}
 					/>
 				))}
 		</Stack>

@@ -31,8 +31,8 @@ export const fetchDishDetailByDishId = async dishId => {
  * @typedef {Number} price - 가격(원)
  * @typedef {Number} description - 상품 설명
  * @typedef {String} image - 이미지
- * @typedef {Array} tagIds - 테그ID 배열 (시그니쳐, 인기메뉴 등)
- * @param {{dishName, dishCategoryId, dishCategoryName, optionIds, price, description, image, tagIds}}
+ * @typedef {Array} tags - 테그ID 배열 (시그니쳐, 인기메뉴 등)
+ * @param {{dishName, dishCategoryId, dishCategoryName, optionIds, price, description, image, tags}}
  * @returns {Object} - Response 내 data 객체, API 문서 참조
  */
 export const addDish = async (
@@ -43,26 +43,24 @@ export const addDish = async (
 		optionIds,
 		price,
 		description,
-		image,
-		tagIds,
+		tags,
 	},
 	imageFile
 ) => {
 	const formData = new FormData();
-	formData.append('imageFile', imageFile);
-	formData.append(
-		'dishInfo',
-		JSON.stringify({
-			dishName,
-			dishCategoryId,
-			dishCategoryName,
-			optionIds,
-			price,
-			description,
-			image: `dishName.png`,
-			tagIds,
-		})
-	);
+	const jsonData = {
+		dishName,
+		dishCategoryId,
+		dishCategoryName,
+		optionIds,
+		price,
+		description,
+		tags,
+	};
+	if (imageFile) {
+		formData.append('imageFile', imageFile);
+	}
+	formData.append('dishInfo', JSON.stringify(jsonData));
 
 	const response = await axiosInstance.post(`/owner/dish`, formData, {
 		headers: {
@@ -83,8 +81,7 @@ export const deleteDish = async ({ dishId }) => {
 };
 
 /**
- * 메뉴 추가
- * @typedef {Number} dishId - 상품ID
+ * 메뉴 수정
  * @typedef {String} dishName - 상품명
  * @typedef {Number} dishCategoryId - 카테고리ID
  * @typedef {String} dishCategoryName - 카테고리명
@@ -92,31 +89,48 @@ export const deleteDish = async ({ dishId }) => {
  * @typedef {Number} price - 가격(원)
  * @typedef {Number} description - 상품 설명
  * @typedef {String} image - 이미지
- * @typedef {Array} tagIds - 테그ID 배열 (시그니쳐, 인기메뉴 등)
- * @param {{dishName, dishCategoryId, dishCategoryName, optionIds, price, description, image, tagIds}}
+ * @typedef {Array} tags - 테그ID 배열 (시그니쳐, 인기메뉴 등)
+ * @param {{dishName, dishCategoryId, dishCategoryName, optionIds, price, description, image, tags}}
  * @returns {Object} - Response 내 data 객체, API 문서 참조
  */
-export const editDish = async ({
+export const editDish = async (
 	dishId,
-	dishName,
-	dishCategoryId,
-	dishCategoryName,
-	optionIds,
-	price,
-	description,
-	image,
-	tagIds,
-}) => {
-	const response = await axiosInstance.put(`/owner/dish?dishId=${dishId}`, {
+	{
 		dishName,
 		dishCategoryId,
 		dishCategoryName,
 		optionIds,
 		price,
 		description,
-		image,
-		tagIds,
-	});
+		tags,
+	},
+	imageFile
+) => {
+	const formData = new FormData();
+
+	const jsonData = {
+		dishName,
+		dishCategoryId,
+		dishCategoryName,
+		optionIds,
+		price,
+		description,
+		tags,
+	};
+	if (imageFile) {
+		formData.append('imageFile', imageFile);
+	}
+	formData.append('dishInfo', JSON.stringify(jsonData));
+
+	const response = await axiosInstance.put(
+		`/owner/dish?dishId=${dishId}`,
+		formData,
+		{
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+		}
+	);
 	return response.data;
 };
 
@@ -166,11 +180,11 @@ export const addDishCategory = async ({ dishCategoryName }) => {
  */
 export const addDishOption = async ({
 	optionName,
-	maxChoiceCount,
-	isMandatory,
+	maxChoiceCount = 1,
+	isMandatory = true,
 	choices,
 }) => {
-	const response = await axiosInstance.put(`/owner/option`, {
+	const response = await axiosInstance.post(`/owner/option`, {
 		optionName,
 		maxChoiceCount,
 		isMandatory,
@@ -195,5 +209,48 @@ export const fetchDishOptionList = async () => {
  */
 export const fetchDishOptionDetail = async ({ optionId }) => {
 	const response = await axiosInstance.get(`/owner/option/${optionId}`);
+	return response.data;
+};
+
+/**
+ * 옵션 수정
+ * @typedef {Number} optionName - 옵션 이름
+ * @typedef {String} maxChoiceCount - 최대 선택 갯수
+ * @typedef {Number} isMandatory - 옵션 필수 여부
+ * @typedef {Array} choices - 옵션 내부 선택 리스트
+ * @typedef {{choiceName:String, price:Number}} choice - 옵션 내부 선택
+ * @param {{optionName, maxChoiceCount, isMandatory, choices}}
+ * @returns {Object} - Response 내 data 객체, API 문서 참조
+ */
+export const editDishOption = async ({
+	optionId,
+	optionName,
+	maxChoiceCount = 1,
+	isMandatory = true,
+	choices,
+}) => {
+	console.log(`/owner/option?optionId=${optionId}`);
+	const response = await axiosInstance.put(
+		`/owner/option?optionId=${optionId}`,
+		{
+			optionName,
+			maxChoiceCount,
+			isMandatory,
+			choices,
+		}
+	);
+	return response.data;
+};
+
+/**
+ * 옵션 삭제
+ * @typedef {Number} optionId - 옵션 ID
+ * @param {{optionId}} - 옵션 ID
+ * @returns {Object} - Response 내 data 객체, API 문서 참조
+ */
+export const deleteDishOption = async ({ optionId }) => {
+	const response = await axiosInstance.delete(
+		`/owner/option?optionId=${optionId}`
+	);
 	return response.data;
 };

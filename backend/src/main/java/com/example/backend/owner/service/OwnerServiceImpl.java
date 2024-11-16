@@ -138,7 +138,7 @@ public class OwnerServiceImpl implements OwnerService{
 		dish.setTags(dishInfo.tags());
 
 		//메뉴의 정보(이미지)를 수정한다.
-		if(!multipartFile.isEmpty()){
+		if(!ObjectUtils.isEmpty(multipartFile)){
 			String imageUrl = imageS3Service.uploadImageToS3(multipartFile);
 			dish.setImage(imageUrl);
 		}

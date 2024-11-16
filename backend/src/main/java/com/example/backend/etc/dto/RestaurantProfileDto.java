@@ -53,11 +53,6 @@ public class RestaurantProfileDto {
 	)
 	private String registrationNumber;
 	@Schema(
-		description = "식당 이미지 입니다.",
-		example = "https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_22.jfif"
-	)
-	private String image;
-	@Schema(
 		description = "위도 정보 입니다.",
 		example = "33.2340982390423"
 	)
@@ -82,7 +77,6 @@ public class RestaurantProfileDto {
 			.phoneNumber(restaurant.getPhoneNumber())
 			.industry(restaurant.getIndustry())
 			.registrationNumber(restaurant.getRegistrationNumber())
-			.image(restaurant.getImage())
 			.lat(restaurant.getLatitude())
 			.lng(restaurant.getLongitude())
 			.build();

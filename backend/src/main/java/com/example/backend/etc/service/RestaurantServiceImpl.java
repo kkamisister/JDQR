@@ -10,10 +10,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.backend.common.enums.UseStatus;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
+import com.example.backend.common.service.ImageS3Service;
 import com.example.backend.common.util.TagParser;
 import com.example.backend.dish.dto.DishResponse.DishDataDto;
 import com.example.backend.dish.dto.DishResponse.DishDetailInfo;
@@ -58,6 +60,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 	private final OwnerRepository ownerRepository;
 	private final DishRepository dishRepository;
 	private final DishOptionRepository dishOptionRepository;
+	private final ImageS3Service imageS3Service;
 	/**
 	 * 유저의 화면범위에 존재하는 가맹점을 반환하는 메서드
 	 * @param minLat
@@ -160,14 +163,16 @@ public class RestaurantServiceImpl implements RestaurantService {
 	 * @param userId
 	 */
 	@Override
-	public void createRestaurant(RestaurantProfileDto profile,Integer userId) {
+	public void createRestaurant(RestaurantProfileDto profile, MultipartFile imageFile,Integer userId) {
 
 		//1. 점주를 찾는다
 		Owner owner = ownerRepository.findById(userId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
 
 		//2. 입력받은 정보로 사업장을 등록한다
-		Restaurant restaurant = Restaurant.of(profile,owner);
+		String imageUrl = imageS3Service.uploadImageToS3(imageFile);
+		Restaurant restaurant = Restaurant.of(profile,imageUrl,owner);
+
 
 		restaurantRepository.save(restaurant);
 	}

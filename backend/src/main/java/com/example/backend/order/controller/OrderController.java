@@ -105,9 +105,21 @@ public class OrderController {
 		messagingTemplate.convertAndSend("/sub/cart/"+tableId, simpleResponseMessage);
 	}
 
+	@Operation(summary = "상위 주문 상태 조회", description = "parentOrder의 상태를 PENDING -> PAY_WAITING으로 변경하는 api")
+	@GetMapping("/status")
+	public ResponseEntity<ResponseWithData<ParentOrderInfoResponseDto>> getOrderStatus(HttpServletRequest request) {
+		String tableId = (String)request.getAttribute("tableId");
+
+		ParentOrderInfoResponseDto data = orderService.getParentOrderInfo(tableId);
+
+		ResponseWithData<ParentOrderInfoResponseDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(), "주문 상태 조회를 완료하였습니다", data);
+
+		return ResponseEntity.status(responseWithData.status()).body(responseWithData);
+	}
+
 	@Operation(summary = "주문 상태 변경", description = "parentOrder의 상태를 PENDING -> PAY_WAITING으로 변경하는 api")
-	@PostMapping("/payment/init")
-	public ResponseEntity<ResponseWithMessage> startPayment(HttpServletRequest request) {
+	@PostMapping("/status")
+	public ResponseEntity<ResponseWithMessage> updateOrderStatus(HttpServletRequest request) {
 		String tableId = (String)request.getAttribute("tableId");
 
 		SimpleResponseMessage message = orderService.initPayment(tableId);

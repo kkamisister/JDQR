@@ -28,4 +28,6 @@ public interface OrderService {
 	TotalOrderInfoResponseDto getTotalPaymentInfo(String tableId);
 
 	SimpleResponseMessage initPayment(String tableId);
+
+	ParentOrderInfoResponseDto getParentOrderInfo(String tableId);
 }

@@ -1,6 +1,7 @@
 package com.example.backend.order.dto;
 
 
+import com.example.backend.order.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -19,6 +20,15 @@ public record OrderResponse() {
         Integer price,
         Integer restPrice,
         List<OrderInfoResponseDto> orders
+    ) {
+
+    }
+
+    @Schema(name = "상위 주문 내역 조회 결과 반환 dto", description = "상위 주문의 정보를 담은 dto")
+    @Builder
+    public record ParentOrderInfoResponseDto(
+        Integer parentOrderId,
+        OrderStatus orderStatus
     ) {
 
     }

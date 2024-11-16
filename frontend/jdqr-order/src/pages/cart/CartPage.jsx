@@ -5,7 +5,7 @@ import CartList from "./CartList";
 
 export default function CartPage() {
   return (
-    <Box sx={{ bgcolor: colors.background.box, height: "100vh" }}>
+    <Box sx={{ height: "100vh" }}>
       <Header title="장바구니" BackPage={true} />
       <CartList />
     </Box>

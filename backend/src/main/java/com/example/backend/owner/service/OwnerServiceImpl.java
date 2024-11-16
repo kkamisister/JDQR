@@ -188,12 +188,18 @@ public class OwnerServiceImpl implements OwnerService{
 		// 3. optionVos를 가지고 알맞은 api 반환 형식으로 가공한다.
 		// 3-1. stream의 groupingBy를 이용해 optionId를 key로 분류한다.
 		Map<Integer, List<OptionVo>> optionGroupByOptionId = optionVos.stream()
-			.collect(Collectors.groupingBy(OptionVo::getOptionId));
+			.collect(Collectors.groupingBy(
+				OptionVo::getOptionId,
+				LinkedHashMap::new, // LinkedHashMap으로 결과를 저장
+				Collectors.toList()
+			));
+
 
 		// 3-2. 각 option에 대해 세부 옵션 정보를 저장한다.
 		List<OptionResponseDto> optionResponseDtos = optionGroupByOptionId.entrySet().stream()
 			.map(optionEntry -> {
 				Integer optionId = optionEntry.getKey();
+				log.warn("optionId : {}",optionId);
 				List<OptionVo> values = optionEntry.getValue();
 
 				return getOptionResponseDto(optionId, values);
@@ -218,6 +224,7 @@ public class OwnerServiceImpl implements OwnerService{
 
 		// 세부 옵션 정보 구하기
 		List<ChoiceDto> choiceDtos = values.stream()
+			.filter(optionVo -> optionVo.getChoiceId() != null)
 			.map(optionVo -> ChoiceDto.builder()
 				.choiceId(optionVo.getChoiceId())
 				.choiceName(optionVo.getChoiceName())

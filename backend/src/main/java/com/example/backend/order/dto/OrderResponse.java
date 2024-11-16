@@ -16,6 +16,7 @@ public record OrderResponse() {
     public record TotalOrderInfoResponseDto(
         String tableName,
         Integer dishCnt,
+        Integer userCnt,
         Integer restDishCnt,
         Integer price,
         Integer restPrice,

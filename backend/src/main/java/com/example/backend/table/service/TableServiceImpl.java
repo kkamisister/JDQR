@@ -180,6 +180,10 @@ public class TableServiceImpl implements TableService{
 		for(Table table : tables){
 			Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(table.getId());
 
+			if(table.getUseStatus().equals(UseStatus.AVAILABLE)){ // 남은 좌석의 수를 카운팅
+				leftSeatNum += table.getPeople();
+			}
+
 			// 테이블에 한 번도 주문이 들어가지 않은 상태일 경우
 			if (optionalParentOrder.isEmpty()) {
 				tableDetailInfos.add(getBaseTableInfo(table));
@@ -189,9 +193,6 @@ public class TableServiceImpl implements TableService{
 			ParentOrder parentOrder = optionalParentOrder.get();
 
 			Map<DishDetailInfo, Integer> dishCountMap = new LinkedHashMap<>();
-			if(table.getUseStatus().equals(UseStatus.AVAILABLE)){ // 남은 좌석의 수를 카운팅
-				leftSeatNum += table.getPeople();
-			}
 
 			// 아직 결제되지 않은 항목만 가지고온다
 			if(parentOrder.getOrderStatus().equals(OrderStatus.PENDING) || parentOrder.getOrderStatus().equals(OrderStatus.PAY_WAITING)){
@@ -244,8 +245,6 @@ public class TableServiceImpl implements TableService{
 				// 현재 음식의 진짜 가격(본 가격 + 옵션반영가격)에 수량을 곱한다
 				totalPrice += (dishDetailInfo.price() + choicePrice) * dishDetailInfo.quantity();
 			}
-
-
 			TableDetailInfo tableDetailInfo = TableDetailInfo.of(table,result,totalPrice);
 			tableDetailInfos.add(tableDetailInfo);
 		}
@@ -294,7 +293,7 @@ public class TableServiceImpl implements TableService{
 			.name(table.getName())
 			.color(table.getColor())
 			.qrLink(table.getQrCode())
-			.people(0)
+			.people(table.getPeople())
 			.dishes(new ArrayList<>())
 			.build();
 	}

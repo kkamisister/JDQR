@@ -26,4 +26,8 @@ public interface OrderService {
 //	void addDummyOrderData(DummyOrderDto productInfo);
 
 	TotalOrderInfoResponseDto getTotalPaymentInfo(String tableId);
+
+	SimpleResponseMessage initPayment(String tableId);
+
+	ParentOrderInfoResponseDto getParentOrderInfo(String tableId);
 }

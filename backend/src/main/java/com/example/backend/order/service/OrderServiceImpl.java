@@ -100,11 +100,19 @@ public class OrderServiceImpl implements OrderService {
      *
      * @param tableId
      * @param productInfo
+     * @throws JDQRException if order status is PAY_WAITING
      */
     @Override
     @Transactional
     // @RedLock(key = "'table:' + #tableId", waitTime = 5000L,leaseTime = 1000L)
     public void addItem(String tableId, CartDto productInfo) {
+
+        // 0. validation 로직 추가
+        // 현재 테이블의 parentOrder가 결제 대기 중인 상태가 아니어야 함
+        Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId);
+        if (optionalParentOrder.isPresent() && optionalParentOrder.get().getOrderStatus().equals(OrderStatus.PAY_WAITING)) {
+            throw new JDQRException(ErrorCode.INVALID_ORDER);
+        }
 
         log.warn("productInfo : {}", productInfo);
         // 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
@@ -337,6 +345,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public InitialPaymentResponseDto payForOrder(String tableId, PaymentRequestDto paymentRequestDto) {
+        // 0. validation 로직 추가
+        // 현재 테이블의 parentOrder가 결제 대기 중인 상태가 아니어야 함
+        Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId);
+        if (optionalParentOrder.isPresent() && optionalParentOrder.get().getOrderStatus().equals(OrderStatus.PAY_WAITING)) {
+            throw new JDQRException(ErrorCode.INVALID_ORDER);
+        }
+
         // 1. 결제 방식을 확인한다
         PaymentMethod paymentMethod = paymentRequestDto.type();
 
@@ -418,7 +433,7 @@ public class OrderServiceImpl implements OrderService {
 //		}
 
         // 3. stream의 groupingBy 옵션을 이용하여 join된 결과물을 종류별로 분리
-        // orderId -> dishId -> List<OrderResponseVo> 구조
+        // orderId -> orderItemId List<OrderResponseVo> 구조
         Map<Integer, Map<Integer, List<OrderResponseVo>>> orderGroup = orderResponseVos.stream()
             .collect(Collectors.groupingBy(OrderResponseVo::getOrderId,
                 Collectors.groupingBy(OrderResponseVo::getOrderItemId)));
@@ -763,6 +778,40 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Transactional
+    @Override
+    public SimpleResponseMessage initPayment(String tableId) {
+        ParentOrder parentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId)
+            .orElseThrow(() -> new JDQRException(ErrorCode.PARENT_ORDER_NOT_FOUND));
+
+        if (parentOrder.getOrderStatus() != OrderStatus.PENDING && parentOrder.getOrderStatus() != OrderStatus.PAY_WAITING) {
+            throw new JDQRException(ErrorCode.VALIDATION_ERROR_INTERNAL);
+        }
+
+        parentOrder.setOrderStatus(OrderStatus.PAY_WAITING);
+        parentOrderRepository.save(parentOrder);
+
+        return SimpleResponseMessage.ORDER_STATUS_CHANGED;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ParentOrderInfoResponseDto getParentOrderInfo(String tableId) {
+        Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId);
+
+        if (optionalParentOrder.isEmpty()) {
+            return ParentOrderInfoResponseDto.builder()
+                .orderStatus(OrderStatus.PENDING)
+                .build();
+        }
+
+        ParentOrder parentOrder = optionalParentOrder.get();
+        return ParentOrderInfoResponseDto.builder()
+            .parentOrderId(parentOrder.getId())
+            .orderStatus(parentOrder.getOrderStatus())
+            .build();
+    }
+
     /**
      * 테이블에 들어간 주문이 없을 때, 기본 OrderInfoResponseDto를 반환
      *
@@ -1061,7 +1110,6 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = orderRepository.findAllByParentOrder(parentOrder);
 
         List<OrderItem> orderItems = orderItemRepository.findOrderItemByOrder(orders).stream()
-            .filter(orderItem -> orderItem.getOrderStatus().equals(OrderStatus.PENDING))
             .toList();
 
         return orderItems.stream()
@@ -1187,7 +1235,6 @@ public class OrderServiceImpl implements OrderService {
             .quantity(productInfo.getQuantity())
             .paidQuantity(0)
             .orderPrice(orderPrice)
-            .orderStatus(OrderStatus.PENDING)
             .orderedAt(productInfo.getOrderedAt())
             .build();
     }

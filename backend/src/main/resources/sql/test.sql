@@ -39,7 +39,7 @@ VALUES (1, 37.7749, -122.4194, b'1', 1, NOW(), NOW(), '123 Main St, San Francisc
 --     농민백암순대 본점
        (15, 37.5037329376349, 127.052982069884, b'1', 15, NOW(), NOW(), '서울특별시 강남구 선릉로86길 40-4',
         'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_15.jpg', 'Food', '농민백암순대 본점',
-        '02-555-9603', '254-12-01439', 'ACTIVE'),
+        '02-555-9603', '254-12-01439', 'ACTIVE')
 ;
 
 -- 3. restaurant_categories 테이블
@@ -342,7 +342,7 @@ INSERT INTO `dish_options` (`id`, `dish_id`, `option_id`, `created_at`, `updated
 VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
        (2, 2, 2, NOW(), NOW(), 'ACTIVE'), -- Nachos: Extra Cheese
        (3, 3, 1, NOW(), NOW(), 'ACTIVE'), -- Chicken Sandwich: Double Meat
-       (3, 4, 2, NOW(), NOW(), 'ACTIVE'), -- Veggie Burger: No Onion
+       (4, 4, 2, NOW(), NOW(), 'ACTIVE'), -- Veggie Burger: No Onion
        (5, 5, 2, NOW(), NOW(), 'ACTIVE'), -- Burrito: Extra Sauce
        (6, 6, 2, NOW(), NOW(), 'ACTIVE'), -- Chocolate Cake: Add Spicy
        (7, 7, 2, NOW(), NOW(), 'ACTIVE'), -- Garlic Bread: Whole Wheat Bread
@@ -426,43 +426,110 @@ VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
 --        (79, 44, 4, NOW(), NOW(), 'ACTIVE'),
 ;
 
--- -- 10. orders 테이블
--- INSERT INTO `orders` (`id`, `menu_cnt`, `created_at`, `updated_at`, `table_id`, `order_status`, `payment_method`,
---                       `status`)
--- VALUES (1, 3, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PENDING', 'MENU_DIVIDE', 'ACTIVE'),
---        (2, 2, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
---        (3, 4, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
---        (4, 1, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PENDING', 'MENU_DIVIDE', 'ACTIVE'),
---        (5, 2, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
---        (6, 3, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
---        (7, 2, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PENDING', 'MENU_DIVIDE', 'ACTIVE'),
---        (8, 5, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
---        (9, 3, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
---        (10, 4, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MENU_DIVIDE', 'ACTIVE');
+-- parent_orders 테이블
+INSERT INTO `parent_orders` (id, created_at, updated_at, table_id, order_status, payment_method, status)
+values (1, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PAID', 'MENU_DIVIDE', 'ACTIVE'),
+       (2, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
+       (3, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
+       (4, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MENU_DIVIDE', 'ACTIVE'),
+       (5, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
+       (6, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
+       (7, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PAID', 'MENU_DIVIDE', 'ACTIVE'),
+       (8, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MONEY_DIVIDE', 'ACTIVE'),
+       (9, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'CANCELLED', 'UNDEFINED', 'ACTIVE'),
+       (10, NOW(), NOW(), '672ad435085e4f131b0ecadd', 'PAID', 'MENU_DIVIDE', 'ACTIVE'),
+
+--     진짜 데이터
+       (11, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PENDING', 'UNDEFINED', 'ACTIVE'),
+       (12, NOW(), NOW(), '67345a90fb5b4a3df7c2076a', 'PAY_WAITING', 'MENU_DIVIDE', 'ACTIVE'),
+       (13, NOW(), NOW(), '67345b67fb5b4a3df7c2076c', 'PAY_WAITING', 'MONEY_DIVIDE', 'ACTIVE')
+
+;
+
+-- 10. orders 테이블
+INSERT INTO `orders` (id, parent_order_id, created_at, updated_at, status)
+VALUES (1, 1, NOW(), NOW(), 'ACTIVE'),
+       (2, 2, NOW(), NOW(), 'ACTIVE'),
+       (3, 3, NOW(), NOW(), 'ACTIVE'),
+       (4, 4, NOW(), NOW(), 'ACTIVE'),
+       (5, 5, NOW(), NOW(), 'ACTIVE'),
+       (6, 6, NOW(), NOW(), 'ACTIVE'),
+       (7, 7, NOW(), NOW(), 'ACTIVE'),
+       (8, 8, NOW(), NOW(), 'ACTIVE'),
+       (9, 9, NOW(), NOW(), 'ACTIVE'),
+       (10, 10, NOW(), NOW(), 'ACTIVE'),
+
+       -- 진짜 데이터
+       (11, 11, NOW(), NOW(), 'ACTIVE'),
+       (12, 11, NOW(), NOW(), 'ACTIVE'),
+       (13, 12, NOW(), NOW(), 'ACTIVE'),
+       (14, 12, NOW(), NOW(), 'ACTIVE'),
+       (15, 12, NOW(), NOW(), 'ACTIVE'),
+       (16, 13, NOW(), NOW(), 'ACTIVE'),
+       (17, 13, NOW(), NOW(), 'ACTIVE')
+
+;
+
 --
 -- -- 11. order_items 테이블
--- INSERT INTO `order_items` (`dish_id`, `id`, `order_id`, `order_price`, `quantity`, `created_at`, `ordered_at`,
---                            `updated_at`, `user_id`, `status`)
--- VALUES (1, 1, 1, 500, 2, NOW(), NOW(), NOW(), 'user_1', 'ACTIVE'),
---        (2, 2, 1, 700, 1, NOW(), NOW(), NOW(), 'user_2', 'ACTIVE'),
---        (3, 3, 2, 1500, 3, NOW(), NOW(), NOW(), 'user_3', 'ACTIVE'),
---        (4, 4, 2, 1300, 1, NOW(), NOW(), NOW(), 'user_4', 'ACTIVE'),
---        (5, 5, 3, 1200, 2, NOW(), NOW(), NOW(), 'user_5', 'ACTIVE'),
---        (6, 6, 3, 800, 1, NOW(), NOW(), NOW(), 'user_6', 'ACTIVE'),
---        (7, 7, 4, 400, 3, NOW(), NOW(), NOW(), 'user_7', 'ACTIVE'),
---        (8, 8, 4, 350, 2, NOW(), NOW(), NOW(), 'user_8', 'ACTIVE'),
---        (9, 9, 5, 600, 1, NOW(), NOW(), NOW(), 'user_9', 'ACTIVE'),
---        (10, 10, 5, 1000, 1, NOW(), NOW(), NOW(), 'user_10', 'ACTIVE');
---
--- -- 12. order_item_options 테이블
--- INSERT INTO `order_item_choices` (`id`, `choice_id`, `order_item_id`, `created_at`, `updated_at`, `status`)
--- VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- Order Item 1: Small Size
---        (2, 2, 2, NOW(), NOW(), 'ACTIVE'), -- Order Item 2: Large Size
---        (3, 3, 3, NOW(), NOW(), 'ACTIVE'), -- Order Item 3: Extra Cheese
---        (4, 4, 4, NOW(), NOW(), 'ACTIVE'), -- Order Item 4: Extra Sauce
---        (5, 5, 5, NOW(), NOW(), 'ACTIVE'), -- Order Item 5: No Salt
---        (6, 6, 6, NOW(), NOW(), 'ACTIVE'), -- Order Item 6: Add Spicy
---        (7, 7, 7, NOW(), NOW(), 'ACTIVE'), -- Order Item 7: Double Meat
---        (8, 8, 8, NOW(), NOW(), 'ACTIVE'), -- Order Item 8: No Onion
---        (9, 9, 9, NOW(), NOW(), 'ACTIVE'), -- Order Item 9: Whole Wheat Bread
---        (10, 10, 10, NOW(), NOW(), 'ACTIVE');
+INSERT INTO `order_items` (`dish_id`, `id`, `order_id`, `order_price`, `quantity`, `created_at`, `ordered_at`,
+                           `updated_at`, `user_id`, `status`)
+VALUES (1, 1, 1, 500, 2, NOW(), NOW(), NOW(), 'user_1', 'ACTIVE'),
+       (2, 2, 1, 700, 1, NOW(), NOW(), NOW(), 'user_2', 'ACTIVE'),
+       (3, 3, 2, 1500, 3, NOW(), NOW(), NOW(), 'user_3', 'ACTIVE'),
+       (4, 4, 2, 1300, 1, NOW(), NOW(), NOW(), 'user_4', 'ACTIVE'),
+       (5, 5, 3, 1200, 2, NOW(), NOW(), NOW(), 'user_5', 'ACTIVE'),
+       (6, 6, 3, 800, 1, NOW(), NOW(), NOW(), 'user_6', 'ACTIVE'),
+       (7, 7, 4, 400, 3, NOW(), NOW(), NOW(), 'user_7', 'ACTIVE'),
+       (8, 8, 4, 350, 2, NOW(), NOW(), NOW(), 'user_8', 'ACTIVE'),
+       (9, 9, 5, 600, 1, NOW(), NOW(), NOW(), 'user_9', 'ACTIVE'),
+       (10, 10, 5, 1000, 1, NOW(), NOW(), NOW(), 'user_10', 'ACTIVE')
+;
+
+-- 진짜 데이터
+INSERT INTO `order_items` (id, dish_id, order_id, order_price, paid_quantity, quantity, created_at, ordered_at, updated_at, user_id, status)
+values (11, 27, 11, 5000, 0, 2, NOW(), NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440000', 'ACTIVE'),
+       (12, 27, 11, 4500, 0, 4, NOW(), NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440000', 'ACTIVE'),
+       (13, 35, 12, 4800, 0, 5, NOW(), NOW(), NOW(), 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 'ACTIVE'),
+
+       (14, 30, 13, 5200, 1, 2, NOW(), NOW(), NOW(), 'a8098c1a-f86e-11da-bd1a-00112444be1e', 'ACTIVE'),
+       (15, 30, 13, 5200, 1, 2, NOW(), NOW(), NOW(), '16fd2706-8baf-433b-82eb-8c7fada847da', 'ACTIVE'),
+       (16, 44, 13, 6200, 0, 1, NOW(), NOW(), NOW(), 'd94f8b9f-1527-423d-90ed-23668f31d3b0', 'ACTIVE'),
+
+       (17, 47, 14, 5300, 0, 2, NOW(), NOW(), NOW(), 'd94f8b9f-1527-423d-90ed-23668f31d3b0', 'ACTIVE'),
+       (18, 31, 15, 4500, 0, 2, NOW(), NOW(), NOW(), 'd94f8b9f-1527-423d-90ed-23668f31d3b0', 'ACTIVE'),
+       (19, 36, 16, 4300, 1, 2, NOW(), NOW(), NOW(), 'd94f8b9f-1527-423d-90ed-23668f31d3b0', 'ACTIVE'),
+       (20, 39, 17, 4500, 2, 3, NOW(), NOW(), NOW(), 'd94f8b9f-1527-423d-90ed-23668f31d3b0', 'ACTIVE')
+;
+
+-- 12. order_item_options 테이블
+INSERT INTO `order_item_choices` (`id`, `choice_id`, `order_item_id`, `created_at`, `updated_at`, `status`)
+VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- Order Item 1: Small Size
+       (2, 2, 2, NOW(), NOW(), 'ACTIVE'), -- Order Item 2: Large Size
+       (3, 3, 3, NOW(), NOW(), 'ACTIVE'), -- Order Item 3: Extra Cheese
+       (4, 4, 4, NOW(), NOW(), 'ACTIVE'), -- Order Item 4: Extra Sauce
+       (5, 5, 5, NOW(), NOW(), 'ACTIVE'), -- Order Item 5: No Salt
+       (6, 6, 6, NOW(), NOW(), 'ACTIVE'), -- Order Item 6: Add Spicy
+       (7, 7, 7, NOW(), NOW(), 'ACTIVE'), -- Order Item 7: Double Meat
+       (8, 8, 8, NOW(), NOW(), 'ACTIVE'), -- Order Item 8: No Onion
+       (9, 9, 9, NOW(), NOW(), 'ACTIVE'), -- Order Item 9: Whole Wheat Bread
+       (10, 10, 10, NOW(), NOW(), 'ACTIVE');
+
+-- 진짜 데이터
+INSERT INTO `order_item_choices` (id, order_item_id, choice_id, created_at, updated_at, status)
+VALUES (11, 11, 25, NOW(), NOW(), 'ACTIVE'),
+       (12, 11, 33, NOW(), NOW(), 'ACTIVE'),
+       (13, 12, 33, NOW(), NOW(), 'ACTIVE'),
+       (14, 13, 36, NOW(), NOW(), 'ACTIVE'),
+
+       (15, 14, 30, NOW(), NOW(), 'ACTIVE'),
+       (16, 15, 30, NOW(), NOW(), 'ACTIVE'),
+       (17, 16, 29, NOW(), NOW(), 'ACTIVE'),
+
+       (18, 18, 27, NOW(), NOW(), 'ACTIVE'),
+       (19, 18, 35, NOW(), NOW(), 'ACTIVE'),
+       (20, 20, 31, NOW(), NOW(), 'ACTIVE')
+;
+update dish
+set tags = '[]'
+where tags = '';

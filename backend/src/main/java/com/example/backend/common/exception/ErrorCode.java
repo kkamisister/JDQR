@@ -25,6 +25,8 @@ public enum ErrorCode {
 	TABLE_NOT_FOUND(HttpStatus.BAD_REQUEST,"테이블이 존재하지 않습니다"),
 
 	// 결제관련 에러
+	INVALID_ORDER(HttpStatus.BAD_REQUEST, "비정상적인 주문입니다"),
+	PARENT_ORDER_NOT_FOUND(HttpStatus.BAD_REQUEST, "상위 주문이 존재하지 않습니다"),
 	ORDER_ALREADY_PAID(HttpStatus.BAD_REQUEST, "이미 결제된 주문입니다"),
 	PAYMENT_METHOD_NOT_VALID(HttpStatus.BAD_REQUEST, "잘못된 결제 방식으로 결제를 시도하였습니다"),
 	EXCEED_TOTAL_PURCHASE_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액이 총 주문 금액을 초과하였습니다"),

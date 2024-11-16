@@ -191,7 +191,6 @@ public final class TestDataGenerator {
 			.quantity(quantity)
 			.paidQuantity(paidQuantity)
 			.orderPrice(orderPrice)
-			.orderStatus(orderStatus)
 			.build();
 
 	}

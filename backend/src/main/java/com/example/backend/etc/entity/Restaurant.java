@@ -48,7 +48,7 @@ public class Restaurant extends BaseEntity {
     @Column(name = "open")
     private Boolean open;
 
-    public static Restaurant of(RestaurantProfileDto profile,Owner owner){
+    public static Restaurant of(RestaurantProfileDto profile,String imageUrl,Owner owner){
         return Restaurant.builder()
             .owner(owner)
             .name(profile.getRestaurantName())
@@ -57,7 +57,7 @@ public class Restaurant extends BaseEntity {
             .latitude(profile.getLat())
             .longitude(profile.getLng())
             .industry(profile.getIndustry())
-            .image(profile.getImage())
+            .image(imageUrl)
             .registrationNumber(profile.getRegistrationNumber())
             .open(Boolean.FALSE)
             .build();

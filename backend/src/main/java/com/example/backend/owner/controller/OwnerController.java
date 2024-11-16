@@ -340,13 +340,17 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "조회 완료"),
 	})
 	@PostMapping("/restaurant")
-	public ResponseEntity<ResponseWithMessage> createRestaurant(@RequestBody @Valid RestaurantProfileDto restaurantProfile,
+	public ResponseEntity<ResponseWithMessage> createRestaurant(@RequestParam("restaurantInfo") @Valid String json,
+		@RequestParam("imageFile") MultipartFile imageFile,
 		HttpServletRequest request) {
 
+		log.warn("imageFile : {}",imageFile);
 		String id = (String)request.getAttribute("userId");
 		Integer userId = Integer.valueOf(id);
 
-		restaurantService.createRestaurant(restaurantProfile,userId);
+		RestaurantProfileDto restaurantProfile = JsonUtil.read(json, RestaurantProfileDto.class);
+
+		restaurantService.createRestaurant(restaurantProfile,imageFile,userId);
 
 		ResponseWithMessage responseWithMessage = new ResponseWithMessage(HttpStatus.OK.value(),
 			"사업장 정보 설정에 성공하였습니다");

@@ -8,7 +8,7 @@ export default function DishTab({ dishCategories, onTabClick }) {
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
-    // onTabClick(dishCategories[newValue]);
+    onTabClick(dishCategories[newValue])
   }
 
   return (

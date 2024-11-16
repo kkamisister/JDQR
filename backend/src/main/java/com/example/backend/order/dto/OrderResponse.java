@@ -66,5 +66,14 @@ public record OrderResponse() {
 
     }
 
+    @Schema(name = "결제 정보 업데이트 api 응답 형식", description = " status와 detailMessage를 담고 있음")
+    @Builder
+    public record PaymentConfirmResponseDto(
+        String status,
+        String detailMessage
+    ) {
+
+    }
+
 
 }

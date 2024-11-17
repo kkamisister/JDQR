@@ -68,7 +68,7 @@ public class RedisHashRepositoryImpl implements RedisHashRepository{
 
 		Object cachedData = redisTemplate.opsForHash().get(tableId,userId);
 		if(cachedData != null) {
-			log.warn("cachedData : {}",cachedData);
+			// log.warn("cachedData : {}",cachedData);
 			return JsonUtil.readMap(JsonUtil.objectToString(cachedData),
 				new TypeReference<Map<Integer, CartDto>>() {
 				});

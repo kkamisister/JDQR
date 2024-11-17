@@ -1,10 +1,9 @@
 import React from "react"
 import { Element, scroller } from "react-scroll"
 import DishTab from "../../../components/tab/DishTab"
-import { IconButton, Box, Stack, Typography, Divider } from "@mui/material"
+import { Box, Stack, Typography, Divider } from "@mui/material"
 import { colors } from "../../../constants/colors"
-import DishItemCard from "../../../components/card/DishItemCard"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import RestaurantDetailDishItemCard from "../../../components/card/RestaurantDetailDishItemCard"
 
 const RestaurantDetailBox = ({ categories, dishes }) => {
   const handleCategoryClick = (category) => {
@@ -64,21 +63,7 @@ const RestaurantDetailBox = ({ categories, dishes }) => {
               </Typography>
               {category.items.map((dish, dishIndex) => (
                 <Box key={dish.dishId}>
-                  <DishItemCard dish={dish}>
-                    {dish.options && dish.options.length > 0 && (
-                      <IconButton
-                        sx={{
-                          color: colors.text.sub2,
-                          alignSelf: "center",
-                        }}
-                        onClick={() =>
-                          console.log(`옵션 보기: ${dish.options}`)
-                        }
-                      >
-                        <ExpandMoreIcon />
-                      </IconButton>
-                    )}
-                  </DishItemCard>
+                  <RestaurantDetailDishItemCard dish={dish} />
 
                   {dishIndex < category.items.length - 1 && (
                     <Divider variant="middle" />

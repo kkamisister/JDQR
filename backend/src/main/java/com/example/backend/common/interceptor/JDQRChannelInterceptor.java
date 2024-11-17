@@ -113,6 +113,7 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 			if (Boolean.TRUE.equals(
 				redisTemplate.opsForSet().isMember("subscribed_sessions:" + destination, sessionId))) {
 				log.warn("중복 구독 발생: sessionId = {}, destination = {}", sessionId, destination);
+				return;
 			}
 
 			if (destination != null && destination.contains("/sub/cart")) {

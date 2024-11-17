@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import com.example.backend.common.annotation.CustomPositive;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,7 +36,7 @@ public class CartDto {
 	private List<String> choiceNames;
 	private List<Integer> choiceIds;
 	private int price; // 기존 가격 + choice 가격을 합친 price
-	@Positive(message = "수량은 음수일 수 없습니다")
+	@CustomPositive
 	private Integer quantity;
 	private LocalDateTime orderedAt;
 

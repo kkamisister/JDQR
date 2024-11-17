@@ -1,11 +1,14 @@
 package com.example.backend.etc.repository;
 
+import static com.example.backend.dish.entity.QDishCategory.*;
 import static com.example.backend.etc.entity.QRestaurant.*;
 import static com.example.backend.etc.entity.QRestaurantCategoryMap.*;
 
 import java.util.List;
 
 import com.example.backend.common.repository.Querydsl4RepositorySupport;
+import com.example.backend.dish.entity.Dish;
+import com.example.backend.dish.entity.QDishCategory;
 import com.example.backend.etc.entity.QRestaurant;
 import com.example.backend.etc.entity.QRestaurantCategoryMap;
 import com.example.backend.etc.entity.Restaurant;
@@ -58,4 +61,6 @@ public class RestaurantRepositoryCustomImpl extends Querydsl4RepositorySupport i
 			.limit(10)
 			.fetch();
 	}
+
+
 }

@@ -17,8 +17,11 @@ import com.example.backend.common.util.RandomUtil;
 import com.example.backend.common.util.TimeUtil;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.Choice;
+import com.example.backend.dish.entity.DishCategory;
 import com.example.backend.dish.repository.DishRepository;
 import com.example.backend.dish.repository.ChoiceRepository;
+import com.example.backend.etc.entity.Restaurant;
+import com.example.backend.etc.repository.RestaurantRepository;
 import com.example.backend.order.dto.*;
 import com.example.backend.order.dto.CartRequest.*;
 import com.example.backend.order.dto.OrderRequest.*;
@@ -53,7 +56,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final TableRepository tableRepository;
     private final GenerateLink generateLink;
-    private final NotificationService notificationService;
     private final RedisHashRepository redisHashRepository;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
@@ -117,8 +119,19 @@ public class OrderServiceImpl implements OrderService {
 
         log.warn("productInfo : {}", productInfo);
         // 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
-        dishRepository.findById(productInfo.getDishId())
+        Dish dish = dishRepository.findById(productInfo.getDishId())
             .orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+
+        // 1.5 그런 메뉴가 있으면, 식당에 그런 메뉴를 파는지도 확인
+        Table table = tableRepository.findById(tableId)
+                .orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
+
+        int restaurantId = table.getRestaurantId();
+        DishCategory dishCategory = dish.getDishCategory();
+        Restaurant restaurant = dishCategory.getRestaurant();
+        if(restaurant.getId() != restaurantId){
+            throw new ValidationException(List.of("존재하지 않는 메뉴입니다"));
+        }
 
         // 2. 테이블 장바구니에 물품을 담는다
         //<tableId,<userId,<hashCode,항목>>>
@@ -168,11 +181,11 @@ public class OrderServiceImpl implements OrderService {
         // 3-2. 현재 테이블과 연결된 사람수를 받아온다
         Integer subscriberSize = redisHashRepository.getCurrentUserCnt(tableId);
 
-		// 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
-		Table table = tableRepository.findById(tableId)
-			.orElseThrow(() -> new ValidationException(List.of("해당 테이블이 존재하지 않습니다.")));
-
-        log.warn("table : {}", table);
+		// // 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
+		// Table table = tableRepository.findById(tableId)
+		// 	.orElseThrow(() -> new ValidationException(List.of("해당 테이블이 존재하지 않습니다.")));
+        //
+        // log.warn("table : {}", table);
 
         // 3-4. 최종적으로 전송할 데이터
         List<CartDto> cartList = allCartDatas.values().stream()

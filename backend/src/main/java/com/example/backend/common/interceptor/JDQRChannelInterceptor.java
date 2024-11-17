@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.example.backend.common.annotation.RedLock;
 import com.example.backend.common.enums.OnlineUser;
 import com.example.backend.common.event.CartEvent;
 import com.example.backend.common.exception.ErrorCode;
@@ -146,12 +147,13 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 
 	private void decrementOnlineUserCount(String tableId) {
 		log.warn("인원수 감소 !!!!");
-		Integer currentCount = (Integer) redisTemplate.opsForHash().get(ONLINE_USER.getExplain(), tableId);
-
-		// currentCount가 null이거나 1 이상일 때만 감소시킴
-		if (currentCount != null && currentCount > 0) {
-			redisTemplate.opsForHash().increment(ONLINE_USER.getExplain(), tableId, -1);
-		}
+		redisTemplate.opsForHash().increment(ONLINE_USER.getExplain(), tableId, -1);
+		// Integer currentCount = (Integer) redisTemplate.opsForHash().get(ONLINE_USER.getExplain(), tableId);
+		//
+		// // currentCount가 null이거나 1 이상일 때만 감소시킴
+		// if (currentCount != null && currentCount > 0) {
+		// 	redisTemplate.opsForHash().increment(ONLINE_USER.getExplain(), tableId, -1);
+		// }
 	}
 
 }

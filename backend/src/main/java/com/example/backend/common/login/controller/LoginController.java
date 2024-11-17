@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.backend.common.dto.CommonResponse;
+import com.example.backend.common.dto.CommonResponse.ResponseWithData;
 import com.example.backend.common.login.dto.LoginInfo;
 import com.example.backend.common.login.dto.LoginRequestDto;
 import com.example.backend.common.login.service.LoginService;
@@ -34,9 +36,14 @@ public class LoginController {
 		@ApiResponse(responseCode = "200", description = "로그인 완료"),
 	})
 	@PostMapping("")
-	public ResponseEntity<LoginInfo> login(@RequestBody LoginRequestDto loginRequestDto) {
+	public ResponseEntity<ResponseWithData<LoginInfo>> login(@RequestBody LoginRequestDto loginRequestDto) {
 		// log.warn("code = {}",code);
 		LoginInfo loginInfo = loginService.login(loginRequestDto);
-		return new ResponseEntity<>(loginInfo, HttpStatus.OK);
+
+		ResponseWithData<LoginInfo> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(),
+			"로그인에 성공하였습니다",loginInfo);
+
+		return ResponseEntity.status(responseWithData.status())
+			.body(responseWithData);
 	}
 }

@@ -67,9 +67,10 @@ const RestaurantInfo = ({ restaurant, open }) => {
               fontSize: "15px",
               borderRadius: "10px",
               backgroundColor: colors.background.box,
-              color: restaurant.open
-                ? colors.main.primary500
-                : colors.text.sub1,
+              color:
+                restaurant.open && restaurant.restSeatNum > 0
+                  ? colors.main.primary500
+                  : colors.text.sub1,
               ".MuiChip-label": {
                 padding: 0,
               },
@@ -83,9 +84,10 @@ const RestaurantInfo = ({ restaurant, open }) => {
               fontSize: "15px",
               borderRadius: "10px",
               backgroundColor: colors.background.box,
-              color: restaurant.open
-                ? colors.main.primary500
-                : colors.text.sub1,
+              color:
+                restaurant.open && restaurant.restSeatNum > 0
+                  ? colors.main.primary500
+                  : colors.text.sub1,
               ".MuiChip-label": {
                 padding: 0,
               },

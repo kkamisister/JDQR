@@ -64,29 +64,26 @@ export default function CartList() {
   };
 
   return (
-    <Stack
-      spacing={5}
-      sx={{
-        bgcolor: colors.background.white,
-        mt: 2,
-      }}
-    >
-      <CartListItem title="내가 담은 메뉴" dishes={myDishes} />
-      <CartListItem title="일행이 담은 메뉴" dishes={othersDishes} />
+    <Stack>
+      {myDishes?.length > 0 && (
+        <CartListItem title="내가 담은 메뉴" dishes={myDishes} />
+      )}
+      {othersDishes?.length > 0 && (
+        <CartListItem title="일행이 담은 메뉴" dishes={othersDishes} />
+      )}
       <Button
         endIcon={<AddCircleIcon />}
         onClick={goToDish}
         sx={{
           color: colors.main.primary500,
           fontSize: "18px",
-          width: "30%",
+          minWidth: "30%",
           alignSelf: "center",
+          py: 2,
         }}
       >
         메뉴 더 담기
       </Button>
-      <Footer />
-
       <Box>
         {totalQuantity > 0 && totalPrice && (
           <BaseButton count={totalQuantity} onClick={submitOrder}>

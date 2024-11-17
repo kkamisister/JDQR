@@ -1,12 +1,13 @@
 import React from "react"
-import { scroller } from "react-scroll"
+import { Element, scroller } from "react-scroll"
 import DishTab from "../../../components/tab/DishTab"
-import RestaurantDetailDishItemCard from "../../../components/card/RestaurantDetailDishItemCard"
-import { Box, Stack } from "@mui/material"
+import { Box, Stack, Typography, Divider } from "@mui/material"
 import { colors } from "../../../constants/colors"
+import RestaurantDetailDishItemCard from "../../../components/card/RestaurantDetailDishItemCard"
 
 const RestaurantDetailBox = ({ categories, dishes }) => {
   const handleCategoryClick = (category) => {
+    console.log("category:", category) // 클릭된 카테고리 이름
     scroller.scrollTo(category, {
       duration: 800,
       delay: 0,
@@ -14,8 +15,15 @@ const RestaurantDetailBox = ({ categories, dishes }) => {
       containerId: "scrollable-dish-list",
     })
   }
+
   return (
-    <Stack padding="10px" height="100%">
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+      }}
+    >
       <DishTab dishCategories={categories} onTabClick={handleCategoryClick} />
       <Box
         id="scrollable-dish-list"
@@ -32,13 +40,41 @@ const RestaurantDetailBox = ({ categories, dishes }) => {
           scrollbarWidth: "none",
         }}
       >
-        {dishes.map((dishCategory) =>
-          dishCategory.items.map((dish) => (
-            <RestaurantDetailDishItemCard key={dish.dishId} dish={dish} />
-          ))
-        )}
+        {dishes.map((category, index) => (
+          <Element
+            name={category.dishCategoryName}
+            key={category.dishCategoryId}
+          >
+            <Stack
+              sx={{
+                bgcolor: colors.background.white,
+                mb: 2,
+                p: 1,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: 600,
+                  fontSize: "16px",
+                  p: "10px",
+                }}
+              >
+                {category.dishCategoryName} {/* 카테고리명 */}
+              </Typography>
+              {category.items.map((dish, dishIndex) => (
+                <Box key={dish.dishId}>
+                  <RestaurantDetailDishItemCard dish={dish} />
+
+                  {dishIndex < category.items.length - 1 && (
+                    <Divider variant="middle" />
+                  )}
+                </Box>
+              ))}
+            </Stack>
+          </Element>
+        ))}
       </Box>
-    </Stack>
+    </Box>
   )
 }
 

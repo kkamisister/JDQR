@@ -49,7 +49,7 @@ export default function DishList({ dishes, categories }) {
           },
           msOverflowStyle: "none",
           scrollbarWidth: "none",
-          "-webkit-overflow-scrolling": "touch",
+          webkitOverflowScrolling: "touch",
         }}
       >
         {dishes.map((category, index) => (

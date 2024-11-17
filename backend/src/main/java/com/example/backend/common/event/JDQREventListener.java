@@ -67,7 +67,7 @@ public class JDQREventListener {
 		CartInfo sendData = CartInfo.of(cartList,table.getName(),subscriberSize,totalPrice,totalQuantity,null);
 
 		// notificationService.sentToClient(tableId,sendData);
-		log.warn("sendData : {}",sendData);
+		// log.warn("sendData : {}",sendData);
 		messagingTemplate.convertAndSend("/sub/cart/"+tableId,sendData);
 	}
 

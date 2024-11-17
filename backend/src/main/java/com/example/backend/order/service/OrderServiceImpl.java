@@ -203,7 +203,7 @@ public class OrderServiceImpl implements OrderService {
         CartInfo sendData = CartInfo.of(cartList, table.getName(), subscriberSize, totalPrice, totalQuantity, userCartItemDto);
 
         // notificationService.sentToClient(tableId,sendData);
-        log.warn("sendData : {}", sendData);
+        // log.warn("sendData : {}", sendData);
         messagingTemplate.convertAndSend("/sub/cart/" + tableId, sendData);
     }
 

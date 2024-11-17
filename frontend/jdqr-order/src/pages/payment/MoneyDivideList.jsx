@@ -1,9 +1,13 @@
-import { Stack, Box, Divider, Typography } from "@mui/material";
+import { Stack } from "@mui/material";
 import MoneyDivideInfo from "./MoneyDivideInfo";
-import DishItemCard from "../../components/card/DishItemCard";
-import { colors } from "../../constants/colors";
+import MoneyDivideListItem from "./MoneyDivideListItem";
+import BaseButton from "../../components/button/BaseButton";
+import { useState } from "react";
+import { usePaymentStore } from "../../stores/paymentStore";
 
 const MoneyDivideList = ({ orders }) => {
+  const money = usePaymentStore((state) => state.money);
+  const bill = Math.ceil(money).toLocaleString();
   const dishes = orders.orders.flatMap((order) => order.dishes);
 
   const conjoinedDishes = dishes.reduce((acc, dish) => {
@@ -17,6 +21,7 @@ const MoneyDivideList = ({ orders }) => {
       acc[key].quantity += dish.quantity;
     } else {
       acc[key] = {
+        key,
         dishId: dish.dishId,
         dishName: dish.dishName,
         price: dish.price,
@@ -32,7 +37,7 @@ const MoneyDivideList = ({ orders }) => {
   }, {});
 
   const conjoinedDishesArray = Object.values(conjoinedDishes);
-  // console.log(orders);
+
   return (
     <Stack>
       <MoneyDivideInfo
@@ -40,24 +45,10 @@ const MoneyDivideList = ({ orders }) => {
         initPortion={1}
         totalPrice={orders.price}
       />
-      {conjoinedDishesArray.map((dish) => {
-        const optionDescription = dish.options
-          ?.map((option) => option.choiceName)
-          .join(", ");
-        return (
-          <Box>
-            <DishItemCard
-              dish={{ ...dish, description: optionDescription || "" }}
-              hasImage={false}
-            >
-              <Typography fontSize={12}>
-                총 수량 <span style={{ fontSize: 16 }}>{dish.quantity}</span>개
-              </Typography>
-            </DishItemCard>
-            <Divider variant="middle" />
-          </Box>
-        );
-      })}
+      {conjoinedDishesArray.map((dish) => (
+        <MoneyDivideListItem key={dish.key} dish={dish} />
+      ))}
+      <BaseButton>{bill}원 결제하기</BaseButton>
     </Stack>
   );
 };

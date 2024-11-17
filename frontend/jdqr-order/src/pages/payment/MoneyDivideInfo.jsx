@@ -2,6 +2,7 @@ import { Stack, Input, Typography } from "@mui/material";
 import { colors } from "../../constants/colors";
 import NumberSelector from "../../components/selector/NumberSelector";
 import { useState, useEffect } from "react";
+import { usePaymentStore } from "../../stores/paymentStore";
 
 export default function MoneyDivideInfo({
   initTotal,
@@ -10,17 +11,15 @@ export default function MoneyDivideInfo({
 }) {
   const [total, setTotal] = useState(initTotal || 1);
   const [portion, setPortion] = useState(initPortion || 1);
-  const [money, setMoney] = useState(0);
+  const setMoney = usePaymentStore((state) => state.setMoney);
 
   useEffect(() => {
     if (total > 0 && portion > 0) {
       setMoney(totalPrice * (portion / total));
-      // console.log(totalPrice, "이게 토탈");
-      // console.log(money);
     } else {
       setMoney(0);
     }
-  }, [total, portion, totalPrice]);
+  }, [total, portion, totalPrice, setMoney]);
 
   return (
     <Stack
@@ -41,10 +40,13 @@ export default function MoneyDivideInfo({
         <Typography>인당 결제 금액:</Typography>
         <Input
           disabled
-          value={Math.ceil(money).toLocaleString()}
+          value={(total > 0 && portion > 0
+            ? Math.ceil(totalPrice * (portion / total))
+            : 0
+          ).toLocaleString()}
           endAdornment="원"
         />
-        <Typography>{`(총액: ${totalPrice.toLocaleString()}원)`}</Typography>
+        {/* <Typography>{`(총액: ${totalPrice.toLocaleString()}원)`}</Typography> */}
       </Stack>
     </Stack>
   );

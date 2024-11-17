@@ -56,6 +56,8 @@ public class JDQREventListener {
 		else if(operator.equals(MINUS)){
 			subscriberSize = redisTemplate.opsForHash().increment(ONLINE_USER.getExplain(), tableId, -1).intValue();
 		}
+
+		if(subscriberSize < 0)subscriberSize = 0;
 		log.warn("현재 연결된 사람 수 :{}",subscriberSize);
 
 		// 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다

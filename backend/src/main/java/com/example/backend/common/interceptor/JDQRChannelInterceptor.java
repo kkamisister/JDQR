@@ -99,22 +99,16 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 
 				// 만료된 세션을 표기한다
 				redisTemplate.opsForSet().add("processed-disconnects",sessionId);
-				redisTemplate.expire("processed-disconnects",5, TimeUnit.MINUTES);
+				redisTemplate.expire("processed-disconnects",10, TimeUnit.MINUTES);
+
 				// 여기에다가 구독시 tableId에 속한 장바구니 데이터를 보내는 이벤트 설정
-				publisher.publishEvent(new CartEvent(tableId, MINUS));
+				publisher.publishEvent(new CartEvent(tableId, sessionId,MINUS));
 			}
 
 		}
 		if(StompCommand.SUBSCRIBE.equals(accessor.getCommand())){
 			String destination = accessor.getDestination(); // 구독 요청의 URL 확인
 			String sessionId = accessor.getSessionId();
-
-			// 이미 구독된 세션인지 확인
-			if (Boolean.TRUE.equals(
-				redisTemplate.opsForSet().isMember("subscribed_sessions:" + destination, sessionId))) {
-				log.warn("중복 구독 발생: sessionId = {}, destination = {}", sessionId, destination);
-				return;
-			}
 
 			if (destination != null && destination.contains("/sub/cart")) {
 
@@ -125,11 +119,8 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 				// 추후 경로 구분을 위한 destination 설정. 여기서 해놔야 연결끊어질때 구분가능함
 				accessor.getSessionAttributes().put("destination", dest);
 
-				// 세션을 저장하고 만료 시간 설정
-				redisTemplate.opsForSet().add("subscribed_sessions:" + destination, sessionId);
-				redisTemplate.expire("subscribed_sessions:" + destination, 5, TimeUnit.MINUTES);
 				// 여기에다가 구독시 tableId에 속한 장바구니 데이터를 보내는 이벤트 설정
-				publisher.publishEvent(new CartEvent(tableId,PLUS));
+				publisher.publishEvent(new CartEvent(tableId,sessionId,PLUS));
 			} else {
 				log.warn("구독 요청에 예상치 않은 destination: {}", destination);
 			}

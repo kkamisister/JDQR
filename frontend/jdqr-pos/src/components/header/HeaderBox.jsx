@@ -22,7 +22,9 @@ const HeaderBox = () => {
 
 	// useState 이용, 랜더링 후 첫 값은 nowTime return 값 사용
 	const [clock, setclock] = useState(currentTime);
-
+	const restaurantName = JSON.parse(
+		sessionStorage.getItem('restaurantInfo')
+	).restaurantName;
 	// 1초마다 clock의 값을 다시 계산 후 랜더링 (setClock 이용)
 	setInterval(() => setclock(currentTime), 1000);
 
@@ -56,7 +58,7 @@ const HeaderBox = () => {
 					}}
 				/>
 				<Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-					{'바나프레소 강남테헤란로점'}
+					{restaurantName}
 				</Typography>
 			</Stack>
 		</Stack>

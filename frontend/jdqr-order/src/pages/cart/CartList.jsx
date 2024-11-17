@@ -64,15 +64,13 @@ export default function CartList() {
   };
 
   return (
-    <Stack
-      spacing={5}
-      sx={{
-        bgcolor: colors.background.white,
-        mt: 2,
-      }}
-    >
-      <CartListItem title="내가 담은 메뉴" dishes={myDishes} />
-      <CartListItem title="일행이 담은 메뉴" dishes={othersDishes} />
+    <Stack>
+      {myDishes?.length > 0 && (
+        <CartListItem title="내가 담은 메뉴" dishes={myDishes} />
+      )}
+      {othersDishes?.length > 0 && (
+        <CartListItem title="일행이 담은 메뉴" dishes={othersDishes} />
+      )}
       <Button
         endIcon={<AddCircleIcon />}
         onClick={goToDish}
@@ -81,6 +79,7 @@ export default function CartList() {
           fontSize: "18px",
           minWidth: "30%",
           alignSelf: "center",
+          py: 2,
         }}
       >
         메뉴 더 담기
@@ -91,7 +90,6 @@ export default function CartList() {
             {`${totalPrice.toLocaleString()}원 주문하기`}
           </BaseButton>
         )}
-        <Footer />
       </Box>
     </Stack>
   );

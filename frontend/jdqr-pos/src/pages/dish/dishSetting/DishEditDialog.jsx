@@ -90,7 +90,7 @@ const DishEditDialog = ({
 	const handleImageUpload = event => {
 		const file = event.target.files[0];
 		if (file) {
-			setImageRawSrc(file);
+			setImageRawSrc(() => file);
 			const reader = new FileReader();
 			reader.onload = () => {
 				setImageSrc(reader.result); // base64 URL로 설정
@@ -117,7 +117,7 @@ const DishEditDialog = ({
 		setEditedDishInfo(dishInfo);
 		setImageRawSrc('');
 		setImageSrc('');
-	}, [dishInfo, imageRawSrc, imageSrc]);
+	}, [dishInfo]);
 	return (
 		<Dialog maxWidth={'md'} fullWidth={true} onClose={onClose} open={open}>
 			<Stack
@@ -141,7 +141,7 @@ const DishEditDialog = ({
 						{!editedDishInfo.image && !imageSrc && (
 							<EmptyImageBox sx={{ width: '300px', height: '300px' }} />
 						)}
-						{editedDishInfo.image && (
+						{editedDishInfo.image && !imageSrc && (
 							<ImageBox
 								src={dishInfo.image}
 								alt={'음식 이미지'}

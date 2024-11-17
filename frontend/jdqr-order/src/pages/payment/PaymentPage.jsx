@@ -1,11 +1,12 @@
-import BaseButton from "../../components/button/BaseButton";
-import { Stack, Box } from "@mui/material";
+import { Stack, Box, Typography } from "@mui/material";
 import Header from "../../components/header/Header";
 import PaymentList from "./PaymentList";
 import Footer from "../../components/footer/Footer";
 import { useQuery } from "@tanstack/react-query";
 import { fetchPaymentList } from "../../utils/apis/order";
 import LoadingSpinner from "../../components/Spinner/LoadingSpinner";
+import NoFoodIcon from "@mui/icons-material/NoFood";
+import { colors } from "../../constants/colors";
 
 const PaymentPage = () => {
   // const mockData = {
@@ -72,7 +73,17 @@ const PaymentPage = () => {
       )}
       {!isLoading && !isError && <PaymentList orders={paymentList} />}
       {paymentList && paymentList.orders.dishes?.length === 0 && (
-        <Box>주문 내역이 없습니다</Box>
+        <Stack sx={{ textAlign: "center", alignItems: "center" }}>
+          <NoFoodIcon sx={{ fontSize: 100, color: colors.main.primary500 }} />
+          <Typography
+            sx={{
+              fontweight: 600,
+              fontSize: 20,
+            }}
+          >
+            주문 내역이 없습니다.
+          </Typography>
+        </Stack>
       )}
       <Footer />
     </Box>

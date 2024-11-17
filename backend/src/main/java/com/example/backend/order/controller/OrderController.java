@@ -109,7 +109,7 @@ public class OrderController {
 		messagingTemplate.convertAndSend("/sub/cart/"+tableId, paymentConfirmResponseDto);
 	}
 
-	@Operation(summary = "상위 주문 상태 조회", description = "parentOrder의 상태를 PENDING -> PAY_WAITING으로 변경하는 api")
+	@Operation(summary = "상위 주문 상태 조회", description = "parentOrder의 상태를 조회하는 api")
 	@GetMapping("/status")
 	public ResponseEntity<ResponseWithData<ParentOrderInfoResponseDto>> getOrderStatus(HttpServletRequest request) {
 		String tableId = (String)request.getAttribute("tableId");

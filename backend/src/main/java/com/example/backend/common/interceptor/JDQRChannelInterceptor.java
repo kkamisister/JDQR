@@ -1,25 +1,15 @@
-// JDQRChannelInterceptor.java
 package com.example.backend.common.interceptor;
 
 import static com.example.backend.common.enums.OnlineUser.*;
+import static com.example.backend.common.enums.Operator.*;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
 
-import com.example.backend.common.annotation.RedLock;
-import com.example.backend.common.enums.OnlineUser;
+import com.example.backend.common.enums.Operator;
 import com.example.backend.common.event.CartEvent;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
-import com.example.backend.common.redis.repository.RedisHashRepository;
 import com.example.backend.common.util.TokenProvider;
-import com.example.backend.order.dto.CartDto;
-import com.example.backend.order.dto.CartResponse;
-import com.example.backend.table.entity.Table;
-import com.example.backend.table.repository.TableRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.*;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
@@ -48,7 +37,7 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-		log.warn("preSend : {}",accessor);
+		// log.warn("preSend : {}",accessor);
 
 		// CONNECT 프레임에 대해서만 처리
 		if (StompCommand.CONNECT.equals(accessor.getCommand())) {
@@ -59,8 +48,6 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 
 				if(accessToken.equals("dummyTableToken")){
 					accessor.getSessionAttributes().put("tableId","6721aa9b0d22a923091eef73");
-					// // 인원 수 증가
-					// incrementOnlineUserCount("6721aa9b0d22a923091eef73");
 					return message;
 				}
 
@@ -75,8 +62,6 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 					String tableId = tokenProvider.extractSubject(accessToken);
 					// 세션 속성에 사용자 ID 저장
 					accessor.getSessionAttributes().put("tableId", tableId);
-					// // 인원 수 증가
-					// incrementOnlineUserCount(tableId);
 				} else {
 					throw new JDQRException(ErrorCode.TOKEN_IS_NOT_VALID);
 				}
@@ -91,16 +76,17 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 	public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
-		log.warn("postSend : {}",accessor);
-
-		// 연결이 된 경우에 한해서 인원을 증가시킨다
-		if(StompCommand.CONNECT.equals(accessor.getCommand())){
-			String tableId = (String)accessor.getSessionAttributes().get("tableId");
-			// 인원 수 증가
-			incrementOnlineUserCount(tableId);
-		}
+		// log.warn("postSend : {}",accessor);
 		// DISCONNECT 프레임에 대해서만 처리
 		if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
+
+			String sessionId = accessor.getSessionId();
+
+			// 동일한 세션으로부터 중복된 DISCONNECT오는것을 대비하여 거는 필터링
+			if(Boolean.TRUE.equals(redisTemplate.opsForSet().isMember("processed-disconnects", sessionId))){
+				log.warn("Duplicate DISCONNECT event for sessionId : {}",sessionId);
+				return;
+			}
 
 			// 목적지를 찾는다
 			String dest = (String)accessor.getSessionAttributes().get("destination");
@@ -110,12 +96,12 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 			// /sub/cart의 경우에만 이벤트를 호출한다
 			if(dest != null && dest.equals("/sub/cart")){
 				String tableId = (String)accessor.getSessionAttributes().get("tableId");
-				decrementOnlineUserCount(tableId);  // 인원수 감소
 
-				// log.warn("tableId :  {}",tableId);
-
+				// 만료된 세션을 표기한다
+				redisTemplate.opsForSet().add("processed-disconnects",sessionId);
+				redisTemplate.expire("processed-disconnects",5, TimeUnit.MINUTES);
 				// 여기에다가 구독시 tableId에 속한 장바구니 데이터를 보내는 이벤트 설정
-				publisher.publishEvent(new CartEvent(tableId));
+				publisher.publishEvent(new CartEvent(tableId, MINUS));
 			}
 
 		}
@@ -132,28 +118,10 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 				accessor.getSessionAttributes().put("destination", dest);
 
 				// 여기에다가 구독시 tableId에 속한 장바구니 데이터를 보내는 이벤트 설정
-				publisher.publishEvent(new CartEvent(tableId));
-
+				publisher.publishEvent(new CartEvent(tableId,PLUS));
 			} else {
 				log.warn("구독 요청에 예상치 않은 destination: {}", destination);
 			}
 		}
 	}
-
-	private void incrementOnlineUserCount(String tableId) {
-		log.warn("인원수 증가 !!!!");
-		redisTemplate.opsForHash().increment(ONLINE_USER.getExplain(), tableId, 1);
-	}
-
-	private void decrementOnlineUserCount(String tableId) {
-		log.warn("인원수 감소 !!!!");
-		redisTemplate.opsForHash().increment(ONLINE_USER.getExplain(), tableId, -1);
-		// Integer currentCount = (Integer) redisTemplate.opsForHash().get(ONLINE_USER.getExplain(), tableId);
-		//
-		// // currentCount가 null이거나 1 이상일 때만 감소시킴
-		// if (currentCount != null && currentCount > 0) {
-		// 	redisTemplate.opsForHash().increment(ONLINE_USER.getExplain(), tableId, -1);
-		// }
-	}
-
 }

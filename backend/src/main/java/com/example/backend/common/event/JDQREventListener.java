@@ -1,5 +1,7 @@
 package com.example.backend.common.event;
 
+import static com.example.backend.common.enums.OnlineUser.*;
+import static com.example.backend.common.enums.Operator.*;
 import static com.example.backend.order.dto.CartResponse.*;
 
 import java.util.Comparator;
@@ -8,10 +10,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.example.backend.common.enums.Operator;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
 import com.example.backend.common.redis.repository.RedisHashRepository;
@@ -31,25 +35,33 @@ public class JDQREventListener {
 	private final RedisHashRepository redisHashRepository;
 	private final TableRepository tableRepository;
 	private final SimpMessagingTemplate messagingTemplate;
+	private final RedisTemplate<String,Object> redisTemplate;
 
 	// @Async
 	@EventListener
 	public void sendData(CartEvent event) throws InterruptedException {
 		// 3. 전송할 데이터를 생성한다
 		String tableId = event.getTableId();
+		Operator operator = event.getOperator();
 		// 3-1. 현재 테이블의 장바구니를 가지고온다.
 		// 맵은 (userId,해당 유저가 담은 항목들) 의 형식
 		Map<String, Map<Integer, CartDto>> allCartDatas = redisHashRepository.getAllCartDatas(tableId);
 
 		// 3-2. 현재 테이블과 연결된 사람수를 받아온다
-		Integer subscriberSize = redisHashRepository.getCurrentUserCnt(tableId);
-
+		log.warn("인원수 변화 !!!!");
+		Integer subscriberSize = null;
+		if(operator.equals(PLUS)){
+			subscriberSize = redisTemplate.opsForHash().increment(ONLINE_USER.getExplain(), tableId, 1).intValue();
+		}
+		else if(operator.equals(MINUS)){
+			subscriberSize = redisTemplate.opsForHash().increment(ONLINE_USER.getExplain(), tableId, -1).intValue();
+		}
 		log.warn("현재 연결된 사람 수 :{}",subscriberSize);
 
 		// 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
 		Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
 
-		log.warn("table : {}",table.getId());
+		// log.warn("table : {}",table.getId());
 
 		// 3-4. 최종적으로 전송할 데이터
 		List<CartDto> cartList = allCartDatas.values().stream()

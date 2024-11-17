@@ -117,7 +117,7 @@ public class OrderServiceImpl implements OrderService {
             throw new JDQRException(ErrorCode.INVALID_ORDER);
         }
 
-        log.warn("productInfo : {}", productInfo);
+        // log.warn("productInfo : {}", productInfo);
         // 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
         Dish dish = dishRepository.findById(productInfo.getDishId())
             .orElseThrow(() -> new ValidationException(List.of("존재하지 않는 메뉴입니다")));
@@ -167,7 +167,7 @@ public class OrderServiceImpl implements OrderService {
             userCartItemDto.setItem(productInfo);
             userCartItemDto.setUserId(productInfo.getUserId());
 
-            log.warn("userCartItemDto : {}", userCartItemDto);
+            // log.warn("userCartItemDto : {}", userCartItemDto);
 
             cachedCartData.put(productInfo.hashCode(), productInfo);
             redisHashRepository.saveHashData(key, productInfo.getUserId(), cachedCartData, 20L);
@@ -211,9 +211,9 @@ public class OrderServiceImpl implements OrderService {
         Dish dish = dishRepository.findById(productInfo.getDishId())
             .orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
 
-        log.warn("dish : {}", dish);
+        // log.warn("dish : {}", dish);
 
-        log.warn("choiceIds : {}", productInfo.getChoiceIds());
+        // log.warn("choiceIds : {}", productInfo.getChoiceIds());
         List<Choice> choices = choiceRepository.findAllById(productInfo.getChoiceIds());
         List<String> choiceNames = choices.stream().map(Choice::getName)
             .toList();

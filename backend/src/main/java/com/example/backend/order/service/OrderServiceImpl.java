@@ -120,11 +120,11 @@ public class OrderServiceImpl implements OrderService {
         log.warn("productInfo : {}", productInfo);
         // 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
         Dish dish = dishRepository.findById(productInfo.getDishId())
-            .orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+            .orElseThrow(() -> new ValidationException(List.of("존재하지 않는 메뉴입니다")));
 
         // 1.5 그런 메뉴가 있으면, 식당에 그런 메뉴를 파는지도 확인
         Table table = tableRepository.findById(tableId)
-                .orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
+                .orElseThrow(() -> new ValidationException(List.of("존재하지 않는 테이블입니다")));
 
         int restaurantId = table.getRestaurantId();
         DishCategory dishCategory = dish.getDishCategory();
@@ -240,7 +240,7 @@ public class OrderServiceImpl implements OrderService {
 
         // 1. productInfo에서 id를 꺼내서 그런 메뉴가 있는지부터 확인
         dishRepository.findById(productInfo.getDishId())
-            .orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+            .orElseThrow(() -> new ValidationException(List.of("존재하지 않는 메뉴입니다")));
 
         // 2. 해당 유저의 장바구니에서 제거한다
         //<tableId,<userId,<hashCode,항목>>>
@@ -262,7 +262,7 @@ public class OrderServiceImpl implements OrderService {
             redisHashRepository.saveHashData(key, productInfo.getUserId(), cachedCartData, 20L);
 
         } else {
-            throw new JDQRException(ErrorCode.FUCKED_UP_QR);
+            throw new ValidationException(List.of("장바구니에 존재하지 않는 품목입니다"));
         }
         // 3. 전송할 데이터를 생성한다
 
@@ -275,7 +275,7 @@ public class OrderServiceImpl implements OrderService {
         Integer subscriberSize = redisHashRepository.getCurrentUserCnt(tableId);
 
         // 3-3. 현재 테이블의 이름을 가져오기위해 테이블을 조회한다
-        Table table = tableRepository.findById(tableId).orElseThrow(() -> new JDQRException(ErrorCode.TABLE_NOT_FOUND));
+        Table table = tableRepository.findById(tableId).orElseThrow(() -> new ValidationException(List.of("존재하지 않는 테이블입니다")));
 
         // 3-4. 최종적으로 전송할 데이터
         List<CartDto> cartList = allCartDatas.values().stream()

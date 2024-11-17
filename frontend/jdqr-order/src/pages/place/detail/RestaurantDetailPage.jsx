@@ -40,7 +40,11 @@ const RestaurantDetailPage = () => {
   }
 
   if (!restaurantData || !restaurantData.restaurant) {
-    return <div>식당정보...불러오는데 실패했지.....꼭 알아야할까?</div>
+    return (
+      <div>
+        식당정보...불러오는데 실패했지.....어차피 맛있을텐데..꼭 알아야할까?
+      </div>
+    )
   }
 
   return (

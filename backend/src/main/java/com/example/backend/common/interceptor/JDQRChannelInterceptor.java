@@ -58,8 +58,8 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 
 				if(accessToken.equals("dummyTableToken")){
 					accessor.getSessionAttributes().put("tableId","6721aa9b0d22a923091eef73");
-					// 인원 수 증가
-					incrementOnlineUserCount("6721aa9b0d22a923091eef73");
+					// // 인원 수 증가
+					// incrementOnlineUserCount("6721aa9b0d22a923091eef73");
 					return message;
 				}
 
@@ -74,8 +74,8 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 					String tableId = tokenProvider.extractSubject(accessToken);
 					// 세션 속성에 사용자 ID 저장
 					accessor.getSessionAttributes().put("tableId", tableId);
-					// 인원 수 증가
-					incrementOnlineUserCount(tableId);
+					// // 인원 수 증가
+					// incrementOnlineUserCount(tableId);
 				} else {
 					throw new JDQRException(ErrorCode.TOKEN_IS_NOT_VALID);
 				}
@@ -92,6 +92,12 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 
 		log.warn("postSend : {}",accessor);
 
+		// 연결이 된 경우에 한해서 인원을 증가시킨다
+		if(StompCommand.CONNECT.equals(accessor.getCommand())){
+			String tableId = (String)accessor.getSessionAttributes().get("tableId");
+			// 인원 수 증가
+			incrementOnlineUserCount(tableId);
+		}
 		// DISCONNECT 프레임에 대해서만 처리
 		if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
 
@@ -101,7 +107,7 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 			// log.warn("dest : {}",dest);
 
 			// /sub/cart의 경우에만 이벤트를 호출한다
-			if(dest.equals("/sub/cart")){
+			if(dest != null && dest.equals("/sub/cart")){
 				String tableId = (String)accessor.getSessionAttributes().get("tableId");
 				decrementOnlineUserCount(tableId);  // 인원수 감소
 
@@ -121,7 +127,7 @@ public class JDQRChannelInterceptor implements ChannelInterceptor {
 				// log.warn("dest : {}",dest);
 				String tableId = destination.substring(destination.lastIndexOf("/") + 1);
 
-				// 추후 경로 구분을 위한 destination 설정
+				// 추후 경로 구분을 위한 destination 설정. 여기서 해놔야 연결끊어질때 구분가능함
 				accessor.getSessionAttributes().put("destination", dest);
 
 				// 여기에다가 구독시 tableId에 속한 장바구니 데이터를 보내는 이벤트 설정

@@ -10,20 +10,31 @@ import axiosInstance from './axiosInstance';
  * @returns {Object} -API 문서 참조
  */
 export const fetchLoginInfoByCode = async code => {
-	const response = await axiosInstance.post(`/owner/login`, {
-		code: code,
-	});
-	const data = response.data;
-	sessionStorage.setItem('accessToken', data.authToken.accessToken);
-	sessionStorage.setItem('name', data.userName);
+	try {
+		const response = await axiosInstance.post(`/owner/login`, {
+			code: code,
+		});
+		const data = response.data;
+		const accessToken = data.data.authToken.accessToken;
+		console.log(accessToken);
+		sessionStorage.setItem('accessToken', accessToken);
 
-	// 받은 API Key로 axios instance에 Authorization 설정
-	axiosInstance.defaults.headers.common[
-		'Authorization'
-	] = `Bearer ${data.authToken.accessToken}`;
-	console.log(axiosInstance.defaults.headers.common['Authorization']);
+		// 받은 API Key로 axios instance에 Authorization 설정
+		axiosInstance.defaults.headers.common[
+			'Authorization'
+		] = `Bearer ${accessToken}`;
+		console.log(axiosInstance.defaults.headers.common['Authorization']);
+		sessionStorage.setItem('restaurantName', data.data.restaurantName);
+		return response.data;
+	} catch (error) {
+		// 에러가 발생했지만 response가 있는 경우, response의 데이터를 반환
+		if (error.response && error.response.data) {
+			return error.response.data;
+		}
 
-	return response.data;
+		// response가 없는 경우, 에러를 그대로 throw
+		throw error;
+	}
 };
 
 /**

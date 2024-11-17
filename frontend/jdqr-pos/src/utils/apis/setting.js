@@ -43,7 +43,7 @@ export const registerRestaurant = async ({
  * @returns {Promise} - API 문서 참조
  */
 export const fetchRestaurant = async () => {
-	const response = await axiosInstance.delete(`/owner/restaurant`);
+	const response = await axiosInstance.get(`/owner/restaurant`);
 	return response.data;
 };
 
@@ -51,8 +51,8 @@ export const fetchRestaurant = async () => {
  * 영업 여부 전환
  * @returns {Promise} - API 문서 참조
  */
-export const changeBusinessHoursRestaurant = async () => {
-	return axiosInstance.put(`/owner/restaurant/status`);
+export const changeBusinessHoursRestaurant = async ({ open }) => {
+	return await axiosInstance.put(`/owner/restaurant/status`, { open });
 };
 
 /**
@@ -60,6 +60,6 @@ export const changeBusinessHoursRestaurant = async () => {
  * @returns {Promise} - API 문서 참조
  */
 export const fetchBusinessHoursRestaurant = async () => {
-	const response = await axiosInstance.delete(`/owner/restaurant/status`);
+	const response = await axiosInstance.get(`/owner/restaurant/status`);
 	return response.data;
 };

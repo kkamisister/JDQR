@@ -41,7 +41,7 @@ const DishEditDialog = ({
 	const queryClient = useQueryClient();
 	const [editedDishInfo, setEditedDishInfo] = useState(dishInfo);
 	const [settingMenu, setSettingMenu] = useState(0);
-	const { isCategoryPending, data: categoryList } = useQuery({
+	const { isPending: isCategoryPending, data: categoryList } = useQuery({
 		queryKey: ['categoryList'], // keyword를 queryKey에 포함하여 키워드가 변경되면 새로운 요청 실행
 		queryFn: () => fetchDishCategoryList(),
 	});
@@ -81,7 +81,7 @@ const DishEditDialog = ({
 		onClose();
 	};
 
-	const { isOptionPending, data: optionList } = useQuery({
+	const { isPending: isOptionPending, data: optionList } = useQuery({
 		queryKey: ['optionList'], // keyword를 queryKey에 포함하여 키워드가 변경되면 새로운 요청 실행
 		queryFn: () => fetchDishOptionList(),
 	});

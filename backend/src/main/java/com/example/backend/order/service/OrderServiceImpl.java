@@ -476,7 +476,7 @@ public class OrderServiceImpl implements OrderService {
                                     .optionName(option.getOptionName())
                                     .choiceId(option.getChoiceId())
                                     .choiceName(option.getChoiceName())
-                                    .price(option.getDishPrice())
+                                    .price(option.getChoicePrice())
                                     .build()
                                 );
                             }
@@ -606,7 +606,7 @@ public class OrderServiceImpl implements OrderService {
                                         .optionName(option.getOptionName())
                                         .choiceId(option.getChoiceId())
                                         .choiceName(option.getChoiceName())
-                                        .price(option.getDishPrice())
+                                        .price(option.getChoicePrice())
                                         .build()
                                     );
                                 }
@@ -712,7 +712,7 @@ public class OrderServiceImpl implements OrderService {
                                     .optionName(option.getOptionName())
                                     .choiceId(option.getChoiceId())
                                     .choiceName(option.getChoiceName())
-                                    .price(option.getDishPrice())
+                                    .price(option.getChoicePrice())
                                     .build()
                                 )
                                 .toList();

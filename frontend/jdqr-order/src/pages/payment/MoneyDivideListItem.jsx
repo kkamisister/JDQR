@@ -8,7 +8,6 @@ export default function MoneyDivideListItem({ dish }) {
   return (
     <>
       <DishItemCard
-        key={dish.key}
         dish={{ ...dish, description: optionDescription || "" }}
         hasImage={false}
       >
@@ -16,7 +15,7 @@ export default function MoneyDivideListItem({ dish }) {
           <Typography fontSize={12}>
             총 수량 <span style={{ fontSize: 16 }}>{dish.quantity}</span>개
           </Typography>
-          <Typography fontsize={14}>
+          <Typography fontSize={14}>
             총 {dish.totalPrice.toLocaleString()}원
           </Typography>
         </Stack>

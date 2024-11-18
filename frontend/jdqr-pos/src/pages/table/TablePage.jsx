@@ -153,15 +153,17 @@ const TablePage = () => {
 						/>
 					)}
 					<Stack spacing={1}>
-						{selectedTable && (
-							<FlatButton
-								text="QR 보기"
-								onClick={() => {
-									handleClickOpen();
-								}}
-								color={colors.point.blue}
-							/>
-						)}
+						{selectedTable &&
+							(rightMenu === rightMenuPreset.EDIT ||
+								rightMenu === rightMenuPreset.ORDER) && (
+								<FlatButton
+									text="QR 보기"
+									onClick={() => {
+										handleClickOpen();
+									}}
+									color={colors.point.blue}
+								/>
+							)}
 						{rightMenu === rightMenuPreset.EDIT && selectedTable && (
 							<FlatButton
 								text="테이블 저장"

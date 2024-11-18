@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useWebSocketStore from "../../../stores/SocketStore";
-import { Box, Typography, Button, Stack } from "@mui/material";
+import { Box, Typography, Button, Stack, keyframes } from "@mui/material";
 import { colors } from "../../../constants/colors";
-import LoadingSpinner from "../../../components/Spinner/LoadingSpinner";
-import BaseButton from "../../../components/button/BaseButton";
+import LockClockIcon from "@mui/icons-material/LockClock";
 
 export default function PaymentValidationPage() {
   const navigate = useNavigate();
@@ -12,6 +11,25 @@ export default function PaymentValidationPage() {
   const { client, connect } = useWebSocketStore();
   const tableId = sessionStorage.getItem("tableId");
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const shakeAnimation = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+`;
+
+  // const payType = searchParams.get("")
 
   useEffect(() => {
     if (!client) {
@@ -73,22 +91,28 @@ export default function PaymentValidationPage() {
   }, [client, searchParams, tableId, isSubscribed]);
 
   return (
-    <Stack spacing={2} alignContent={"center"}>
-      <LoadingSpinner
-        message={
-          <Stack>
-            <Typography textAlign={"center"}>{`주문번호: ${searchParams.get(
-              "orderId"
-            )}`}</Typography>
-            <Typography textAlign={"center"}>
-              {`결제 금액 ${Number(
-                searchParams.get("amount")
-              ).toLocaleString()}원`}
-              에 대한 결제 검증을 진행 중입니다.
-            </Typography>
-          </Stack>
-        }
+    <Stack
+      height={"80vh"}
+      spacing={2}
+      justifyContent={"center"}
+      alignItems={"center"}
+      textAlign={"center"}
+    >
+      <LockClockIcon
+        sx={{
+          fontSize: 150,
+          color: colors.main.primary500,
+          animation: `${shakeAnimation} 1s ease-in-out infinite`, // 흔들림 애니메이션 적용
+        }}
       />
+
+      <Typography textAlign={"center"}>{`주문번호: ${searchParams.get(
+        "orderId"
+      )}`}</Typography>
+      <Typography textAlign={"center"}>
+        {`결제 금액 ${Number(searchParams.get("amount")).toLocaleString()}원`}에
+        대한 결제 검증을 진행 중입니다.
+      </Typography>
     </Stack>
   );
 }

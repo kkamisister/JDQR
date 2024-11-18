@@ -143,7 +143,7 @@ public class DishServiceImpl implements DishService {
 			.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
 
 		//3. 메뉴의 옵션들을 가지고온다
-		List<DishOption> dishOptions = dishOptionRepository.findByDishId(dishId);
+		List<DishOption> dishOptions = dishOptionRepository.findByDish(dish);
 
 		List<OptionDto> optionDtos = new ArrayList<>();
 		for(DishOption dishOption : dishOptions){

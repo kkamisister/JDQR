@@ -53,7 +53,7 @@ public class JDQREventListener {
 
 		// 처음 구독하는 세션인 경우만, 인원수 변경을 해야한다
 		Integer subscriberSize = null;
-		if(!Boolean.TRUE.equals(redisTemplate.opsForSet().isMember("subscribed_sessions:" + sessionId, sessionId))){
+		if(!Boolean.TRUE.equals(redisTemplate.opsForSet().isMember("subscribed_sessions", sessionId))){
 			redisTemplate.opsForSet().add("subscribed_sessions", sessionId);
 			redisTemplate.expire("subscribed_sessions", 10, TimeUnit.MINUTES);
 

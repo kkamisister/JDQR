@@ -1,10 +1,12 @@
 package com.example.backend.dish.repository;
 
+import static com.example.backend.common.enums.EntityStatus.*;
 import static com.example.backend.dish.entity.QDishOption.*;
 import static com.example.backend.dish.entity.QOption.*;
 
 import java.util.List;
 
+import com.example.backend.common.enums.EntityStatus;
 import com.example.backend.common.repository.Querydsl4RepositorySupport;
 import com.example.backend.dish.entity.Dish;
 import com.example.backend.dish.entity.DishOption;
@@ -19,7 +21,7 @@ public class DishOptionRepositoryCustomImpl extends Querydsl4RepositorySupport i
 		return selectFrom(dishOption)
 			.join(dishOption.option, option).fetchJoin()
 			.join(option.choices, QChoice.choice).fetchJoin()
-			.where(dishOption.dish.eq(dish))
+			.where(dishOption.dish.eq(dish).and(dishOption.status.eq(ACTIVE)))
 			.fetch();
 	}
 
@@ -27,7 +29,7 @@ public class DishOptionRepositoryCustomImpl extends Querydsl4RepositorySupport i
 	public List<DishOption> findByOption(Option option) {
 		return selectFrom(dishOption)
 			.join(dishOption.option, QOption.option).fetchJoin()
-			.where(dishOption.option.eq(option))
+			.where(dishOption.option.eq(option).and(dishOption.status.eq(ACTIVE)))
 			.fetch();
 	}
 }

@@ -15,9 +15,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TableOrderResponseVo {
-
+	private Integer orderItemId;
 	private Integer dishId;
 	private String dishName;
+	private String description;
+	private String image;
+
 	private int price;
 	private Integer optionId;
 	private String optionName;

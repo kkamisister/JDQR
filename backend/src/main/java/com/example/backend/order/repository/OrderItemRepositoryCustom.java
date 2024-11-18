@@ -13,4 +13,6 @@ public interface OrderItemRepositoryCustom {
     List<OrderItem> findOrderItemByParentOrder(ParentOrder parentOrder);
 
     List<TableOrderResponseVo> findDishOptionsAndChoicesByOrderItem(OrderItem orderItem);
+
+    List<TableOrderResponseVo> findAllDishOptionsAndChoicesByParentOrder(ParentOrder parentOrder);
 }

@@ -8,7 +8,8 @@ import useWebSocketStore from "../../stores/SocketStore";
 
 const clientKey = "test_ck_d46qopOB89JwBn4D9R7d3ZmM75y0"; // TossPayments 클라이언트 키
 const userId = sessionStorage.getItem("userId") || ""; // 사용자 ID 가져오기
-const customerKey = userId.length > 50 ? userId.slice(0, 45) : userId; // 사용자 키 45자 제한
+const customerKey =
+  `K2.${userId}`.length > 250 ? `K2.${userId}`.slice(0, 250) : `K2.${userId}`;
 
 const MoneyDivideList = ({ orders }) => {
   const dishes = orders.orders.flatMap((order) => order.dishes);

@@ -5,6 +5,9 @@ import BaseButton from "../../components/button/BaseButton";
 import { moneyDivide } from "../../utils/apis/order";
 import { useState, useEffect } from "react";
 import useWebSocketStore from "../../stores/SocketStore";
+import { useQuery } from "@tanstack/react-query";
+import { fetchPaymentList } from "../../utils/apis/order";
+import PaymentModal from "../../components/modal/PaymentModal";
 
 const clientKey = "test_ck_d46qopOB89JwBn4D9R7d3ZmM75y0"; // TossPayments 클라이언트 키
 const userId = sessionStorage.getItem("userId") || ""; // 사용자 ID 가져오기
@@ -19,6 +22,22 @@ const MoneyDivideList = ({ orders }) => {
   const { client, connect } = useWebSocketStore();
   const [ready, setReady] = useState(false);
   const [paymentWidget, setPaymentWidget] = useState(null);
+
+  // 추가된 상태: 모달 표시 상태
+  const [showModal, setShowModal] = useState(false);
+
+  // UseQuery로 paymentList 가져오기
+  const {
+    data: paymentList,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["paymentList"],
+    queryFn: fetchPaymentList,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+  });
 
   const conjoinedDishes = dishes.reduce((acc, dish) => {
     const key = `${dish.dishId}-${dish.options
@@ -61,7 +80,6 @@ const MoneyDivideList = ({ orders }) => {
         const widget = window.TossPayments(clientKey);
         setPaymentWidget(widget);
         setReady(true);
-        console.log("TossPayments 초기화 성공:", widget);
       } else {
         console.error("TossPayments 객체를 로드하지 못했습니다.");
       }
@@ -76,15 +94,14 @@ const MoneyDivideList = ({ orders }) => {
     };
   }, [client, connect]);
 
-  const moneyPay = async () => {
+  const moneyPay = async ({ peopleNum, serveNum }) => {
     try {
       const response = await moneyDivide({
-        peopleNum: total,
-        serveNum: portion,
+        peopleNum,
+        serveNum,
       });
 
       const { tossOrderId, amount } = response;
-      console.log("moneyPay 성공:", response);
       return { tossOrderId, amount };
     } catch (error) {
       console.error("moneyPay 요청 중 에러 발생:", error);
@@ -92,29 +109,17 @@ const MoneyDivideList = ({ orders }) => {
     }
   };
 
-  const handlePayment = async () => {
-    if (!paymentWidget || !ready) {
-      console.error("TossPayments 객체가 준비되지 않았습니다.");
-      return;
-    }
-
-    try {
-      console.log("결제 요청 시작");
-      const { tossOrderId, amount } = await moneyPay(); // moneyPay 호출
-
-      await paymentWidget.requestPayment("카드", {
-        amount, // moneyPay로 받은 결제 금액
-        orderId: tossOrderId, // moneyPay로 받은 tossOrderId
-        orderName: `${orders.tableName}의 주문`,
-        successUrl: `${window.location.origin}/success`,
-        failUrl: `${window.location.origin}/fail`,
-        customerKey,
+  // WebSocket 메시지를 구독하고 paymentList를 갱신
+  useEffect(() => {
+    if (client && client.connected) {
+      client.subscribe("/sub/payment", () => {
+        refetch(); // 메시지를 받을 때마다 데이터를 다시 가져옴
+        if (paymentList?.restPrice > 0) {
+          setShowModal(true); // 잔여 금액이 있을 경우 모달 표시
+        }
       });
-    } catch (error) {
-      console.error("결제 요청 중 오류:", error);
-      alert("결제 요청 중 오류가 발생했습니다. 다시 시도해 주세요.");
     }
-  };
+  }, [client, refetch, paymentList]);
 
   const handleVaulesChange = ({ total, portion, money }) => {
     setTotal(total);
@@ -122,34 +127,32 @@ const MoneyDivideList = ({ orders }) => {
     setMoney(money);
   };
 
-  useEffect(() => {
-    const tableId = sessionStorage.getItem("tableId");
-    if (client && client.connected && tableId) {
-      client.subscribe(`/sub/payment/${tableId}`, (message) => {
-        try {
-          const parsedBody = JSON.parse(message.body || message._body);
-          console.log("수신된 메시지 내용:", parsedBody);
-        } catch (error) {
-          console.error("메시지 파싱 오류:", error);
-        }
-      });
-    }
-  }, [client]);
-
   return (
-    <Stack>
-      <MoneyDivideInfo
-        initTotal={orders.userCnt}
-        totalPrice={orders.price}
-        onValuesChange={handleVaulesChange}
-      />
-      {conjoinedDishesArray.map((dish) => (
-        <MoneyDivideListItem key={dish.key} dish={dish} />
-      ))}
-      <BaseButton onClick={handlePayment} disabled={!ready}>
-        {money.toLocaleString()}원 결제하기
-      </BaseButton>
-    </Stack>
+    <>
+      {/* 잔여 금액 모달 */}
+      {showModal && paymentList?.restPrice > 0 && (
+        <PaymentModal
+          restPrice={paymentList.restPrice}
+          peopleNum={paymentList.peopleNum} // 결제 가능한 인분 수 전달
+          onPayment={moneyPay} // moneyPay 전달
+          paymentWidget={paymentWidget} // TossPayments 객체 전달
+          customerKey={customerKey}
+        />
+      )}
+      <Stack>
+        <MoneyDivideInfo
+          initTotal={orders.userCnt}
+          totalPrice={orders.price}
+          onValuesChange={handleVaulesChange}
+        />
+        {conjoinedDishesArray.map((dish) => (
+          <MoneyDivideListItem key={dish.key} dish={dish} />
+        ))}
+        <BaseButton onClick={() => setShowModal(true)} disabled={!ready}>
+          {money.toLocaleString()}원 결제하기
+        </BaseButton>
+      </Stack>
+    </>
   );
 };
 

@@ -2,6 +2,7 @@ import { Avatar, Box, IconButton, Stack, Typography } from "@mui/material";
 import { colors } from "../../constants/colors";
 import DishTagChip from "../chip/DishTagChip";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { useState } from "react";
 
 const DishItemCard = ({
   dish,
@@ -10,12 +11,15 @@ const DishItemCard = ({
   hasImage = true,
   hasOption = false,
   children,
+  isSelected,
   sx,
 }) => {
   return (
     <Stack
+      onClick={onClick}
       sx={{
         ...sx,
+        backgroundColor: isSelected ? colors.main.primary100 : "transparent",
         "&:hover": {
           backgroundColor: colors.background.primary,
         },
@@ -27,7 +31,6 @@ const DishItemCard = ({
       }}
     >
       <Stack
-        onClick={onClick}
         direction="row"
         spacing={2}
         sx={{

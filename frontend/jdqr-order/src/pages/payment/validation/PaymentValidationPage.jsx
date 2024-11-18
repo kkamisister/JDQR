@@ -29,7 +29,7 @@ export default function PaymentValidationPage() {
   }
 `;
 
-  // const payType = searchParams.get("")
+  const paymentType = searchParams.get("paymentType");
 
   useEffect(() => {
     if (!client) {

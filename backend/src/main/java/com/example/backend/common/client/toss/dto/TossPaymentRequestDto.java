@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class TossPaymentRequestDto {
   private String paymentKey;
   private Integer amount;

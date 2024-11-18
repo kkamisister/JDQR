@@ -8,6 +8,7 @@ import com.example.backend.common.util.JsonUtil;
 import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
@@ -45,12 +46,12 @@ public class TossWebClient {
       return response;
     } catch (Exception e) {
 
-      String tossResponse = e.getMessage();
-      TossErrorResponse tossErrorResponse = JsonUtil.read(tossResponse, TossErrorResponse.class);
+      System.out.println("e.getMessage() = " + e.getMessage());
+      
       return TossPaymentResponseDto.builder()
         .success(false)
-        .errorMessage(tossErrorResponse.getMessage())
-        .errorCode(tossErrorResponse.getCode())
+        .errorMessage(e.getMessage())
+        .errorCode(HttpStatus.INTERNAL_SERVER_ERROR.name())
         .build();
     }
 

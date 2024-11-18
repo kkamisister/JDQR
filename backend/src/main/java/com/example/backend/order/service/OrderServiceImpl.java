@@ -416,7 +416,7 @@ public class OrderServiceImpl implements OrderService {
             TossPaymentResponseDto tossPaymentResponseDto = tossWebClient.requestPayment(tossPaymentRequestDto);
 
             // toss api가 실패할 경우 -> 에러 던지기
-            if (!tossPaymentResponseDto.getSuccess()) throw new JDQRException(ErrorCode.TOSS_CONFIRM_ERROR);
+            if (!tossPaymentResponseDto.getSuccess()) return SimpleResponseMessage.PAYMENT_FAILED;
 
             // 3. 주문에 대한 결제가 모두 끝났는지를 체크
             return checkOrderIsFinished(tableId, tossOrderId);
@@ -705,16 +705,20 @@ public class OrderServiceImpl implements OrderService {
                             OrderResponseVo baseOrder = values.get(0);
 
                             // 옵션들에 대한 정보를 담는 list 구하기
-                            List<OptionDetailDto> options = values.stream()
-                                .map(option -> OptionDetailDto.builder()
-                                    .optionId(option.getOptionId())
-                                    .optionName(option.getOptionName())
-                                    .choiceId(option.getChoiceId())
-                                    .choiceName(option.getChoiceName())
-                                    .price(option.getChoicePrice())
-                                    .build()
-                                )
-                                .toList();
+                            List<OptionDetailDto> options = new ArrayList<>();
+
+                            for (OrderResponseVo option : values) {
+                                if (option.getOptionId() != null) {
+                                    options.add(OptionDetailDto.builder()
+                                        .optionId(option.getOptionId())
+                                        .optionName(option.getOptionName())
+                                        .choiceId(option.getChoiceId())
+                                        .choiceName(option.getChoiceName())
+                                        .price(option.getChoicePrice())
+                                        .build()
+                                    );
+                                }
+                            }
 
                             int optionPrice = options.stream()
                                 .mapToInt(OptionDetailDto::getPrice)
@@ -953,9 +957,11 @@ public class OrderServiceImpl implements OrderService {
     protected SimpleResponseMessage updatePaymentStatusToSuccess(String tossOrderId, SimpleTossPaymentRequestDto tossPaymentSimpleResponseDto) {
         Payment payment = paymentRepository.findByTossOrderId(tossOrderId);
 
+        System.out.println("payment = " + payment);
+
         // paymentKey가 이미 존재하는 경우 -> 이미 결제를 시도한 거래임
         // 에러 반환
-        if (!payment.getPaymentKey().isEmpty()) {
+        if (payment.getPaymentKey() != null) {
             throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
         }
         payment.setPaymentKey(tossPaymentSimpleResponseDto.paymentKey());

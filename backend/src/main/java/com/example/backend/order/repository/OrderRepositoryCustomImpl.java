@@ -7,6 +7,7 @@ import com.example.backend.order.entity.ParentOrder;
 import com.example.backend.order.entity.Payment;
 import com.example.backend.order.entity.QParentOrder;
 import com.example.backend.order.enums.OrderStatus;
+import com.example.backend.order.enums.PaymentStatus;
 import com.querydsl.core.types.Projections;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implem
             .from(QParentOrder.parentOrder)
             .join(payment).on(payment.parentOrder.eq(QParentOrder.parentOrder))
             .join(paymentDetail).on(paymentDetail.payment.eq(payment))
+            .where(payment.paymentStatus.eq(PaymentStatus.PAID))
             .fetch()
             ;
     }

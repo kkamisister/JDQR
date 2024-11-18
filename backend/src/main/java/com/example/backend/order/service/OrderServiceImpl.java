@@ -359,13 +359,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public InitialPaymentResponseDto payForOrder(String tableId, PaymentRequestDto paymentRequestDto) {
-        // 0. validation 로직 추가
-        // 현재 테이블의 parentOrder가 결제 대기 중인 상태가 아니어야 함
-        Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId);
-        if (optionalParentOrder.isPresent() && optionalParentOrder.get().getOrderStatus().equals(OrderStatus.PAY_WAITING)) {
-            throw new JDQRException(ErrorCode.INVALID_ORDER);
-        }
-
         // 1. 결제 방식을 확인한다
         PaymentMethod paymentMethod = paymentRequestDto.type();
         Integer serveNum = paymentRequestDto.serveNum();
@@ -1156,11 +1149,17 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @RedLock(key = "'order_status'")
     protected ParentOrder updatePaymentMethodOfOrder(String tableId, PaymentMethod paymentMethod, Integer serveNum) {
-        // 1. 테이블의 가장 최근 order 가져오기
-        ParentOrder parentOrder = orderRepository.findUnpaidOrders(tableId);
+        // 1. validation 체크
+        // 현재 테이블의 parentOrder가 이미 결제가 종료된 상태가 아니어야 함
+        Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId);
+        if (optionalParentOrder.isEmpty()) {
+            throw new JDQRException(ErrorCode.PARENT_ORDER_NOT_FOUND);
+        }
 
-        if (!parentOrder.getOrderStatus().equals(OrderStatus.PAY_WAITING))
-            throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
+        ParentOrder parentOrder = optionalParentOrder.get();
+        if (parentOrder.getOrderStatus().getGroup().equals(OrderStatusGroup.FINISHED)) {
+            throw new JDQRException(ErrorCode.INVALID_ORDER);
+        }
 
         // 2. 테이블을 확인 후 결제 방식(payment_method column)을 업데이트하기
         PaymentMethod oldPaymentMethod = parentOrder.getPaymentMethod();

@@ -381,7 +381,7 @@ public class OrderServiceImpl implements OrderService {
         }
         // 3-2. paymentMethod 가 MENU_DIVIDE 일 경우
         else {
-            payment = createBasePaymentForMenuDivide(paymentRequestDto);
+            payment = createBasePaymentForMenuDivide(parentOrder, paymentRequestDto);
         }
 
         return InitialPaymentResponseDto.builder()
@@ -1040,10 +1040,11 @@ public class OrderServiceImpl implements OrderService {
      * 메뉴별 결제를 할 경우에 해당 결제 정보가 담긴 payment entity를 추가한다.
      * 동시성 처리를 위해 Lock 적용
      *
+     * @param parentOrder
      * @param paymentRequestDto : 결제 정보가 담긴 record
      */
     @Transactional
-    protected Payment createBasePaymentForMenuDivide(PaymentRequestDto paymentRequestDto) {
+    protected Payment createBasePaymentForMenuDivide(ParentOrder parentOrder, PaymentRequestDto paymentRequestDto) {
         List<OrderItemRequestDto> orderItemRequestDtos = paymentRequestDto.orderItemInfos();
         List<Integer> orderItemIds = orderItemRequestDtos.stream()
             .map(OrderItemRequestDto::orderItemId)
@@ -1072,6 +1073,7 @@ public class OrderServiceImpl implements OrderService {
         String tossOrderId = generateOrderId();
 
         Payment payment = Payment.builder()
+            .parentOrder(parentOrder)
             .tossOrderId(tossOrderId)
             .amount(purchasePrice)
             .paymentStatus(PaymentStatus.PENDING)

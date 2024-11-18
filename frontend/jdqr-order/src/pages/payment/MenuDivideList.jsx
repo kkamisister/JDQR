@@ -6,6 +6,8 @@ import QuantitySelectDialog from "../../components/dialog/QuantitySelectDialog";
 import useWebSocketStore from "../../stores/SocketStore";
 import BaseButton from "../../components/button/BaseButton";
 import { menuDivide } from "../../utils/apis/order";
+import { useQuery } from "@tanstack/react-query"; // 추가된 import
+import { fetchPaymentList } from "../../utils/apis/order"; // 추가된 import
 
 const clientKey = "test_ck_d46qopOB89JwBn4D9R7d3ZmM75y0"; // TossPayments 클라이언트 키
 const userId = sessionStorage.getItem("userId");
@@ -21,6 +23,18 @@ export default function MenuDivideList({ orders }) {
   const { client, connect } = useWebSocketStore();
   const [ready, setReady] = useState(false);
   const [paymentWidget, setPaymentWidget] = useState(null);
+
+  // fetchPaymentList를 useQuery로 관리
+  const {
+    refetch, // WebSocket 메시지를 받을 때 갱신할 함수
+  } = useQuery({
+    queryKey: ["paymentList"],
+    queryFn: fetchPaymentList,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchInterval: false, // WebSocket에서 수동으로 갱신
+    enabled: false, // 기본적으로 비활성화
+  });
 
   const filteredDishes = showOnlyMine
     ? allDishes.filter(
@@ -41,7 +55,6 @@ export default function MenuDivideList({ orders }) {
         const widget = window.TossPayments(clientKey);
         setPaymentWidget(widget);
         setReady(true);
-        // console.log("TossPayments 초기화 성공:", widget);
       } else {
         console.error("TossPayments 객체를 로드하지 못했습니다.");
       }
@@ -55,6 +68,23 @@ export default function MenuDivideList({ orders }) {
       document.body.removeChild(script);
     };
   }, [client, connect]);
+
+  // WebSocket 구독 및 메시지 수신 시 fetchPaymentList 갱신
+  useEffect(() => {
+    if (client && client.connected) {
+      client.subscribe("/sub/payment", (message) => {
+        try {
+          const parsedMessage = JSON.parse(message.body || message._body);
+          console.log("수신된 WebSocket 메시지:", parsedMessage);
+
+          // fetchPaymentList 갱신
+          refetch(); // WebSocket 메시지를 받을 때마다 fetchPaymentList 호출
+        } catch (error) {
+          console.error("WebSocket 메시지 처리 오류:", error);
+        }
+      });
+    }
+  }, [client, refetch]); // WebSocket 연결 상태와 refetch를 의존성으로 설정
 
   const handleDishClick = (dish) => {
     if (dish.restQuantity > 1) {

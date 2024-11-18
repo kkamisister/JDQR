@@ -17,14 +17,14 @@ const RestaurantDetailPage = () => {
   } = useQuery({
     queryKey: ["restaurant", restaurantId],
     queryFn: async () => {
-      console.log("레스토랑 아이디는 이렇게.....생겼다지......", restaurantId)
+      // console.log("레스토랑 아이디는 이렇게.....생겼다지......", restaurantId)
       const response = await fetchRestaurantDetail(restaurantId)
-      console.log("api 응답은....이렇게...생겼다지....", response)
+      // console.log("api 응답은....이렇게...생겼다지....", response)
       return response
     },
     enabled: !!restaurantId,
   })
-  console.log("당신은.....데이터를...불러왔지...:", restaurantData)
+  // console.log("당신은.....데이터를...불러왔지...:", restaurantData)
 
   if (isLoading) {
     return (

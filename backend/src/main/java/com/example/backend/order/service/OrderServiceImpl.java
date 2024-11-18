@@ -1013,13 +1013,10 @@ public class OrderServiceImpl implements OrderService {
                     paymentRepository.save(payment);
                     return SimpleResponseMessage.PAYMENT_EXCEED_MENU_AMOUNT;
                 }
-
-                orderItems.add(orderItem);
             }
 
-            for (int i = 0; i < orderItems.size(); i++) {
-                OrderItem orderItem = orderItems.get(i);
-                PaymentDetail paymentDetail = paymentDetails.get(i);
+            for (PaymentDetail paymentDetail : paymentDetails) {
+                OrderItem orderItem = paymentDetail.getOrderItem();
                 orderItem.setPaidQuantity(orderItem.getPaidQuantity() + paymentDetail.getQuantity());
                 orderItems.add(orderItem);
             }

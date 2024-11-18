@@ -29,8 +29,8 @@ export default function BaseButton({
           color: disabled ? colors.main.primary300 : colors.text.white,
         },
         "& .MuiBox-root": {
-          bgcolor: disabled ? colors.background.white : colors.main.primary500,
-          color: disabled ? colors.main.primary500 : colors.text.white,
+          bgcolor: colors.background.white,
+          color: disabled ? colors.text.white : colors.main.primary500,
         },
       }}
     >

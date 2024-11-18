@@ -7,7 +7,7 @@ import { fetchPaymentList } from "../../utils/apis/order";
 import LoadingSpinner from "../../components/Spinner/LoadingSpinner";
 import NoFoodIcon from "@mui/icons-material/NoFood";
 import { colors } from "../../constants/colors";
-
+import { useEffect } from "react";
 const PaymentPage = () => {
   const {
     data: paymentList,
@@ -20,7 +20,11 @@ const PaymentPage = () => {
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
-
+  useEffect(() => {
+    if (paymentList) {
+      console.log("Fetched payment data:", paymentList);
+    }
+  }, [paymentList]);
   return (
     <Box>
       <Header title="결제하기" BackPage={true} />

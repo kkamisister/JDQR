@@ -28,7 +28,7 @@ public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implem
         return selectFrom(parentOrder)
             .where(parentOrder.tableId.eq(tableId))
             .orderBy(parentOrder.id.desc())
-            .fetchOne();
+            .fetchFirst();
     }
 
     @Override

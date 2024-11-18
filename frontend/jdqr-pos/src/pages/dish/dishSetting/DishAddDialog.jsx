@@ -96,6 +96,10 @@ const DishAddDialog = ({
 		);
 		queryClient.invalidateQueries('dishList');
 		enqueueSnackbar('메뉴를 추가했어요', { variant: 'success' });
+
+		setImageSrc(null);
+		setImageRawSrc(null);
+		setNewDishInfo(dishInfo);
 		onClose();
 	};
 

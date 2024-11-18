@@ -101,14 +101,17 @@ public class OrderController {
 		@Header("tossOrderId") String tossOrderId,  // 필요에 따라 헤더로 받기
 		@Header("status") String status
 	) {
-//		SimpleResponseMessage simpleResponseMessage = orderService.finishPayment(tableId, tossOrderId, status, simpleTossPaymentRequestDto);
-//
-//
-//		PaymentConfirmResponseDto paymentConfirmResponseDto = PaymentConfirmResponseDto.builder()
-//			.status(simpleResponseMessage.name())
-//			.detailMessage(simpleResponseMessage.getMessage())
-//			.build();
-		String paymentConfirmResponseDto = "보내졌음?";
+
+
+		SimpleResponseMessage simpleResponseMessage = orderService.finishPayment(tableId, tossOrderId, status, simpleTossPaymentRequestDto);
+
+
+		PaymentConfirmResponseDto paymentConfirmResponseDto = PaymentConfirmResponseDto.builder()
+			.status(simpleResponseMessage.name())
+			.detailMessage(simpleResponseMessage.getMessage())
+			.build();
+//		String tableId = "6721aa9b0d22a923091eef73";
+//		String paymentConfirmResponseDto = "보내졌음?";
 		messagingTemplate.convertAndSend("/sub/payment/"+tableId, paymentConfirmResponseDto);
 	}
 

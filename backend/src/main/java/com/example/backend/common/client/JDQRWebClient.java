@@ -1,5 +1,6 @@
 package com.example.backend.common.client;
 
+import com.example.backend.common.client.toss.dto.TossErrorResponse;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.common.exception.JDQRException;
 import io.netty.channel.ChannelOption;
@@ -105,18 +106,38 @@ public class JDQRWebClient {
         return this.post(uri, body, headerMulti);
     }
 
+//    public WebClient.ResponseSpec post(String uri, Object body, MultiValueMap<String, String> headers) {
+//        return webClient.post()
+//            .uri(uri)
+//            .headers(httpHeaders -> httpHeaders.addAll(headers))
+//            .bodyValue(body)
+//            .retrieve()
+//            .onStatus(HttpStatusCode::is4xxClientError, response
+//                -> response.bodyToMono(String.class)
+//                .flatMap(r -> Mono.error(new JDQRException(ErrorCode.WEBCLIENT_400_ERROR))))
+//            .onStatus(HttpStatusCode::is5xxServerError, response
+//                -> response.bodyToMono(String.class)
+//                .flatMap(r -> Mono.error(new JDQRException(ErrorCode.WEBCLIENT_500_ERROR))));
+//    }
+
     public WebClient.ResponseSpec post(String uri, Object body, MultiValueMap<String, String> headers) {
         return webClient.post()
             .uri(uri)
             .headers(httpHeaders -> httpHeaders.addAll(headers))
             .bodyValue(body)
             .retrieve()
-            .onStatus(HttpStatusCode::is4xxClientError, response
-                -> response.bodyToMono(String.class)
-                .flatMap(r -> Mono.error(new JDQRException(ErrorCode.WEBCLIENT_400_ERROR))))
-            .onStatus(HttpStatusCode::is5xxServerError, response
-                -> response.bodyToMono(String.class)
-                .flatMap(r -> Mono.error(new JDQRException(ErrorCode.WEBCLIENT_500_ERROR))));
+            .onStatus(HttpStatusCode::is4xxClientError, response ->
+                response.bodyToMono(TossErrorResponse.class)
+                    .flatMap(asdf -> {
+                        System.err.println("Error Body: " + asdf);
+                        return Mono.error(new JDQRException(ErrorCode.WEBCLIENT_400_ERROR));
+                    }))
+            .onStatus(HttpStatusCode::is5xxServerError, response ->
+                response.createException()
+                    .flatMap(originalException -> {
+                        originalException.printStackTrace(); // 원래 예외의 스택 트레이스를 출력
+                        return Mono.error(new JDQRException(ErrorCode.WEBCLIENT_500_ERROR));
+                    }));
     }
 
     public WebClient.ResponseSpec post(String uri, Object body, MultiValueMap<String, String> headers, long timeoutMillis) {

@@ -16,7 +16,7 @@ import {
 	addTable,
 	editTable,
 } from 'utils/apis/table';
-
+import EmptyTableBox from './table/EmptyTableBox';
 const TablePage = () => {
 	const queryClient = useQueryClient();
 	const { isPending, data } = useQuery({
@@ -29,6 +29,7 @@ const TablePage = () => {
 		ORDER: 'order',
 		ADD: 'add',
 		EDIT: 'edit',
+		EMPTY: 'empty',
 	};
 	Object.freeze(rightMenuPreset);
 	const [selectedTable, setSelectedTable] = useState(null);
@@ -42,7 +43,7 @@ const TablePage = () => {
 		setTableViewChecked(event.target.checked);
 	};
 
-	const [rightMenu, setRightMenu] = useState('order');
+	const [rightMenu, setRightMenu] = useState(rightMenuPreset.EMPTY);
 
 	const [open, setOpen] = useState(false);
 
@@ -135,6 +136,9 @@ const TablePage = () => {
 				<Stack
 					spacing={1}
 					sx={{ height: '100%', justifyContent: 'space-between' }}>
+					{rightMenu === rightMenuPreset.EMPTY && (
+						<EmptyTableBox isEdit={false} setTable={setNewTableInfo} />
+					)}
 					{rightMenu === rightMenuPreset.ORDER && selectedTable && (
 						<OrderDetailBox table={selectedTable} />
 					)}
@@ -149,15 +153,17 @@ const TablePage = () => {
 						/>
 					)}
 					<Stack spacing={1}>
-						{selectedTable && (
-							<FlatButton
-								text="QR 보기"
-								onClick={() => {
-									handleClickOpen();
-								}}
-								color={colors.point.blue}
-							/>
-						)}
+						{selectedTable &&
+							(rightMenu === rightMenuPreset.EDIT ||
+								rightMenu === rightMenuPreset.ORDER) && (
+								<FlatButton
+									text="QR 보기"
+									onClick={() => {
+										handleClickOpen();
+									}}
+									color={colors.point.blue}
+								/>
+							)}
 						{rightMenu === rightMenuPreset.EDIT && selectedTable && (
 							<FlatButton
 								text="테이블 저장"
@@ -196,6 +202,7 @@ const TablePage = () => {
 					table={selectedTable}
 					open={open}
 					onClose={handleClose}
+					setTable={setSelectedTable}
 				/>
 			)}
 		</Stack>

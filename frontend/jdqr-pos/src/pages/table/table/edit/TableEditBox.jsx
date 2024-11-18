@@ -57,6 +57,7 @@ const TableEditBox = ({
 					width: '100%',
 				}}>
 				<SubtitleTextField
+					type="text"
 					title="테이블 이름"
 					value={tableName}
 					setValue={setTableName}
@@ -66,6 +67,7 @@ const TableEditBox = ({
 					setTableColor={setTableColor}
 				/>
 				<SubtitleTextField
+					type="number"
 					title="최대 인원 수"
 					value={tablePeople}
 					setValue={setTablePeople}

@@ -24,7 +24,7 @@ const HeaderBox = () => {
 	const [clock, setclock] = useState(currentTime);
 	const restaurantName = JSON.parse(
 		sessionStorage.getItem('restaurantInfo')
-	).restaurantName;
+	)?.restaurantName;
 	// 1초마다 clock의 값을 다시 계산 후 랜더링 (setClock 이용)
 	setInterval(() => setclock(currentTime), 1000);
 

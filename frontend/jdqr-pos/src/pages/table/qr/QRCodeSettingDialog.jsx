@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Dialog, Stack, Box, DialogContent } from '@mui/material';
+import { Dialog, Stack, Box, DialogContent, styled } from '@mui/material';
 import StickerBox from './StickerBox';
 import FlatButton from 'components/button/FlatButton';
 import { colors } from 'constants/colors';
@@ -7,6 +7,21 @@ import { enqueueSnackbar } from 'notistack';
 import { useReactToPrint } from 'react-to-print';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
+import { renewTableUrl } from 'utils/apis/table';
+import { RepeatOneSharp } from '@mui/icons-material';
+
+const VisuallyHiddenInput = styled('input')({
+	clip: 'rect(0 0 0 0)',
+	clipPath: 'inset(50%)',
+	height: 1,
+	overflow: 'hidden',
+	position: 'absolute',
+	bottom: 0,
+	left: 0,
+	whiteSpace: 'nowrap',
+	width: 1,
+});
+
 const handleCopy = async textToCopy => {
 	try {
 		enqueueSnackbar('복사 완료', { variant: 'success' });
@@ -17,7 +32,7 @@ const handleCopy = async textToCopy => {
 		alert('복사에 실패했습니다.');
 	}
 };
-const QRCodeSettingDialog = ({ onClose, open, table }) => {
+const QRCodeSettingDialog = ({ onClose, open, table, setTable }) => {
 	const handleClose = () => {
 		onClose();
 	};
@@ -36,6 +51,18 @@ const QRCodeSettingDialog = ({ onClose, open, table }) => {
 		});
 	};
 
+	const handleQrReissue = async () => {
+		const response = await renewTableUrl({ tableId: table.tableId });
+		console.log(table);
+		console.log(response);
+		setTable({
+			...table,
+			qrLink: response.data.data.url,
+			qrlastUpdatedAt: response.data.data.qrlastUpdatedAt,
+		});
+		enqueueSnackbar('QR코드 생성 완료', { variant: 'success' });
+	};
+
 	const buttonMenuList = [
 		{ text: 'URL 복사', onClick: () => handleCopy(table.qrLink) },
 		{
@@ -43,11 +70,11 @@ const QRCodeSettingDialog = ({ onClose, open, table }) => {
 			onClick: () => onDownloadBtn(),
 		},
 		{ text: '프린트하기', onClick: () => printQrSticker() },
-		{ text: 'QR 코드 재생성', onClick: () => handleCopy(table.qrLink) },
+		{ text: 'QR 코드 재생성', onClick: () => handleQrReissue() },
 	];
 
 	return (
-		<Dialog maxWidth={'md'} onClose={handleClose} open={open}>
+		<Dialog maxWidth={'lg'} onClose={handleClose} open={open}>
 			<DialogContent>
 				<Stack
 					direction="row"
@@ -69,14 +96,17 @@ const QRCodeSettingDialog = ({ onClose, open, table }) => {
 								<Box sx={{ fontWeight: '600', fontSize: '25px' }}>
 									{'최근 업데이트'}
 								</Box>
-
-								<Box>{'2024년 10월 31일 오후 12시 32분 '}</Box>
+								<Box>
+									{new Date(table.qrlastUpdatedAt).toLocaleString(
+										'ko-KR'
+									)}
+								</Box>
 							</Stack>
 							<Stack spacing={0.5}>
 								<Box sx={{ fontWeight: '600', fontSize: '25px' }}>
 									{'URL 주소'}
 								</Box>
-								<Box>
+								<Box sx={{ maxWidth: '400px', wordBreak: 'break-all' }}>
 									<a href={table.qrLink}>{table.qrLink}</a>
 								</Box>
 							</Stack>

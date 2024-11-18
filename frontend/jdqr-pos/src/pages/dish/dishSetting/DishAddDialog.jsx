@@ -1,15 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, Stack, Box, Button, ButtonGroup, Chip } from '@mui/material';
+import {
+	Dialog,
+	Stack,
+	Box,
+	Button,
+	ButtonGroup,
+	Chip,
+	styled,
+	darken,
+} from '@mui/material';
 import FlatButton from 'components/button/FlatButton';
 import { colors } from 'constants/colors';
 import SubtitleTextField from 'components/input/SubtitleTextField';
 import ImageBox from 'components/common/ImageBox';
 import EmptyImageBox from 'components/empty/EmptyImageBox';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { addDish, editDish, fetchDishCategoryList } from 'utils/apis/dish';
+import {
+	addDish,
+	editDish,
+	fetchDishCategoryList,
+	fetchDishOptionList,
+} from 'utils/apis/dish';
 import SubtitleSelector from 'components/input/SubtitleSelector';
 import { enqueueSnackbar } from 'notistack';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CheckIcon from '@mui/icons-material/Check';
 
+const VisuallyHiddenInput = styled('input')({
+	clip: 'rect(0 0 0 0)',
+	clipPath: 'inset(50%)',
+	height: 1,
+	overflow: 'hidden',
+	position: 'absolute',
+	bottom: 0,
+	left: 0,
+	whiteSpace: 'nowrap',
+	width: 1,
+});
 const DishAddDialog = ({
 	open,
 	onClose,
@@ -34,7 +61,10 @@ const DishAddDialog = ({
 		queryKey: ['categoryList'], // keyword를 queryKey에 포함하여 키워드가 변경되면 새로운 요청 실행
 		queryFn: () => fetchDishCategoryList(),
 	});
-
+	const { isPending: isOptionPending, data: optionList } = useQuery({
+		queryKey: ['optionList'], // keyword를 queryKey에 포함하여 키워드가 변경되면 새로운 요청 실행
+		queryFn: () => fetchDishOptionList(),
+	});
 	const [isComposing, setIsComposing] = useState(false);
 
 	const handleCompositionStart = () => {
@@ -74,7 +104,12 @@ const DishAddDialog = ({
 	};
 
 	const handleEnterKeyPress = event => {
-		if (event.key === 'Enter' && !isComposing && tag.trim() !== '') {
+		if (
+			event.key === 'Enter' &&
+			!isComposing &&
+			!event.nativeEvent.isComposing &&
+			tag.trim() !== ''
+		) {
 			event.preventDefault(); // 기본 동작 방지 (필요한 경우)
 
 			setNewDishInfo(prev => {
@@ -121,11 +156,30 @@ const DishAddDialog = ({
 								sx={{ width: '300px', height: '300px' }}
 							/>
 						)}
-						<input
-							type="file"
-							accept="image/*"
-							onChange={handleImageUpload}
-						/>
+						<Button
+							component="label"
+							role={undefined}
+							variant="contained"
+							tabIndex={-1}
+							disableElevation
+							sx={{
+								borderRadius: '10px',
+								backgroundColor: colors.point.blue, // 원하는 hex 값으로 배경색 설정
+								'&:hover': {
+									backgroundColor: darken(colors.point.blue, 0.2), // hover 시 색상도 설정 가능
+								},
+								fontSize: '20px',
+								fontWeight: '600',
+							}}
+							startIcon={<CloudUploadIcon />}>
+							이미지 업로드
+							<VisuallyHiddenInput
+								type="file"
+								accept="image/*"
+								onChange={handleImageUpload}
+								multiple
+							/>
+						</Button>
 						<Stack direction="row">
 							<FlatButton
 								text="상품 저장"
@@ -181,6 +235,7 @@ const DishAddDialog = ({
 						{settingMenu === 0 && (
 							<Stack spacing={1} sx={{ width: '380px' }}>
 								<SubtitleTextField
+									type="text"
 									title="상품명"
 									value={newDishInfo.dishName}
 									setValue={value => {
@@ -211,6 +266,7 @@ const DishAddDialog = ({
 									}}
 								/>
 								<SubtitleTextField
+									type="number"
 									title="가격(원)"
 									value={newDishInfo.price}
 									setValue={value => {
@@ -224,6 +280,7 @@ const DishAddDialog = ({
 								/>
 
 								<SubtitleTextField
+									type="text"
 									title="상품 설명"
 									value={newDishInfo.description}
 									setValue={value => {
@@ -237,6 +294,7 @@ const DishAddDialog = ({
 								/>
 
 								<SubtitleTextField
+									type="text"
 									title="태그"
 									value={tag}
 									setValue={setTag}
@@ -244,7 +302,7 @@ const DishAddDialog = ({
 									onCompositionEnd={handleCompositionEnd}
 									onKeyDown={handleEnterKeyPress}
 								/>
-								<Stack direction="row">
+								<Stack direction="row" spacing={0.5}>
 									{newDishInfo.tags?.map((_tag, index) => (
 										<Chip
 											label={_tag}
@@ -259,14 +317,45 @@ const DishAddDialog = ({
 								sx={{
 									display: 'flex',
 									flexWrap: 'wrap', // 너비를 초과하면 다음 줄로 넘어감
-									gap: 1, // 간격 설정
+									gap: 2, // 간격 설정
 									width: '380px', // 부모의 너비에 맞게 설정
 								}}>
-								{Array.from({ length: 10 }).map((_, index) => (
+								{optionList.data.options.map((option, index) => (
 									<Chip
 										key={`option-chip-${index}`}
-										label={`Item ${index + 1}`}
+										label={option.optionName}
 										variant="outlined"
+										icon={
+											newDishInfo.options.some(
+												_option =>
+													_option.optionId === option.optionId
+											) && <CheckIcon />
+										}
+										onClick={() => {
+											const isChecked = newDishInfo.options.some(
+												_option =>
+													_option.optionId === option.optionId
+											);
+											if (isChecked) {
+												setNewDishInfo(prev => {
+													return {
+														...prev,
+														options: prev.options.filter(
+															_option =>
+																_option.optionId !==
+																option.optionId
+														),
+													};
+												});
+											} else {
+												setNewDishInfo(prev => {
+													return {
+														...prev,
+														options: [...prev.options, option],
+													};
+												});
+											}
+										}}
 										clickable
 									/>
 								))}

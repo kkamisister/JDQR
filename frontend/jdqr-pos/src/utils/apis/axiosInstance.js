@@ -18,7 +18,6 @@ if (sessionStorage.getItem('accessToken')) {
 /**
  * 로그인 테스트용 코드
  */
-sessionStorage.setItem('accessToken', 'dummyAccessToken');
 // AccessToken 만료시 재요청하는 Axios interceptor
 axiosInstance.interceptors.response.use(
 	response => {

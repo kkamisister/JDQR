@@ -7,7 +7,7 @@ import RestaurantDetailDishItemCard from "../../../components/card/RestaurantDet
 
 const RestaurantDetailBox = ({ categories, dishes }) => {
   const handleCategoryClick = (category) => {
-    console.log("category:", category) // 클릭된 카테고리 이름
+    // console.log("category:", category) // 클릭된 카테고리 이름
     scroller.scrollTo(category, {
       duration: 800,
       delay: 0,
@@ -21,7 +21,7 @@ const RestaurantDetailBox = ({ categories, dishes }) => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100%",
+        height: "100vh",
       }}
     >
       <DishTab dishCategories={categories} onTabClick={handleCategoryClick} />
@@ -29,7 +29,7 @@ const RestaurantDetailBox = ({ categories, dishes }) => {
         id="scrollable-dish-list"
         sx={{
           flex: 1,
-          py: 1,
+          pb: 1,
           bgcolor: colors.background.box,
           color: colors.text.main,
           overflowY: "auto",

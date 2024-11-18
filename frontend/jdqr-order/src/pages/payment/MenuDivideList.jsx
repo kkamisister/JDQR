@@ -2,6 +2,7 @@ import { Stack, FormControlLabel, Checkbox, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import { colors } from "../../constants/colors";
 import MenuDivideListItem from "./MenuDivideListItem";
+import QuantitySelectDialog from "../../components/dialog/QuantitySelectDialog";
 
 export default function MenuDivideList({ orders }) {
   const userId = sessionStorage.getItem("userId");

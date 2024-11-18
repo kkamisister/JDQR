@@ -23,8 +23,10 @@ export default function MenuDivideList({ orders }) {
   const [paymentWidget, setPaymentWidget] = useState(null);
 
   const filteredDishes = showOnlyMine
-    ? allDishes.filter((dish) => dish.userId === userId)
-    : allDishes;
+    ? allDishes.filter(
+        (dish) => dish.userId === userId && dish.restQuantity > 0
+      )
+    : allDishes.filter((dish) => dish.restQuantity > 0);
 
   useEffect(() => {
     if (!client) {
@@ -55,7 +57,7 @@ export default function MenuDivideList({ orders }) {
   }, [client, connect]);
 
   const handleDishClick = (dish) => {
-    if (dish.quantity > 1) {
+    if (dish.restQuantity > 1) {
       // 수량 선택 다이얼로그 열기
       setCurrentDish(dish);
       setDialogOpen(true);
@@ -114,6 +116,10 @@ export default function MenuDivideList({ orders }) {
     }
   };
 
+  const totalQuantity = selectedItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
   return (
     <Stack>
       <FormControlLabel
@@ -155,11 +161,12 @@ export default function MenuDivideList({ orders }) {
       <QuantitySelectDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        maxQuantity={currentDish?.quantity || 1}
+        maxQuantity={currentDish?.restQuantity || 1}
         onSelectQuantity={handleDialogConfirm}
       />
       <BaseButton
         onClick={handlePayment}
+        count={totalQuantity}
         disabled={!ready || selectedItems.length === 0}
       >
         선택한 메뉴 결제하기

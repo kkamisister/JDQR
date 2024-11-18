@@ -12,6 +12,7 @@ import { CheckoutPage } from "./pages/payment/toss/Checkouts";
 import PaymentValidationPage from "./pages/payment/validation/PaymentValidationPage";
 import { FailurePage } from "./pages/payment/toss/Failure";
 import SdkCheckoutPage from "./pages/payment/toss/SdkCheckout";
+import CelebrationPage from "./pages/payment/validation/CelebrationPage";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ function App() {
             <Route path="/toss" element={<SdkCheckoutPage />} />
             <Route path="/success" element={<PaymentValidationPage />} />
             <Route path="/fail" element={<FailurePage />} />
+            <Route path="/celebration" element={<CelebrationPage />} />
           </Routes>
         </BrowserRouter>
       </QueryClientProvider>

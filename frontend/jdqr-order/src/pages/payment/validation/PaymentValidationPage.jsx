@@ -29,8 +29,6 @@ export default function PaymentValidationPage() {
   }
 `;
 
-  const paymentType = searchParams.get("paymentType");
-
   useEffect(() => {
     if (!client) {
       connect();
@@ -40,10 +38,14 @@ export default function PaymentValidationPage() {
       const subscription = client.subscribe(
         `/sub/payment/${tableId}`,
         (message) => {
-          console.log("WebSocket 메시지 수신");
           try {
             const parsedBody = JSON.parse(message.body || message._body);
-            console.log("수신된 메시지 내용:", parsedBody);
+            console.log("수신된 메시지 내용:", parsedBody.status);
+            if (parsedBody.status === "WHOLE_PAYMENT_SUCCESS") {
+              navigate("/celebration");
+            } else if (parsedBody.status === "PAYMENT_SUCCESS") {
+              navigate("/payment");
+            }
           } catch (error) {
             console.error("메시지 파싱 오류:", error);
           }

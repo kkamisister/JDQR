@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Dialog, Stack, Box, DialogContent } from '@mui/material';
+import { Dialog, Stack, Box, DialogContent, styled } from '@mui/material';
 import StickerBox from './StickerBox';
 import FlatButton from 'components/button/FlatButton';
 import { colors } from 'constants/colors';
@@ -8,6 +8,18 @@ import { useReactToPrint } from 'react-to-print';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
 import { renewTableUrl } from 'utils/apis/table';
+
+const VisuallyHiddenInput = styled('input')({
+	clip: 'rect(0 0 0 0)',
+	clipPath: 'inset(50%)',
+	height: 1,
+	overflow: 'hidden',
+	position: 'absolute',
+	bottom: 0,
+	left: 0,
+	whiteSpace: 'nowrap',
+	width: 1,
+});
 
 const handleCopy = async textToCopy => {
 	try {

@@ -87,7 +87,7 @@ const RestaurantItemCard = ({ restaurant, sx, onClick }) => {
           sx={{ flex: 1, alignItems: "center" }}
         >
           <Chip
-            label={!restaurant.open ? "영업중" : "영업 종료"}
+            label={restaurant.open ? "영업중" : "영업 종료"}
             sx={{
               width: "45px",
               fontSize: "9px",

@@ -366,6 +366,8 @@ public class OrderServiceImpl implements OrderService {
         // 2. 해당 테이블의 가장 최근 parentOrder를 확인하고, 결제 방식을 업데이트시킨다
         ParentOrder parentOrder = updatePaymentMethodOfOrder(tableId, paymentMethod, serveNum);
 
+        System.out.println("parentOrder = " + parentOrder);
+
         // 3. paymentMethod 에 따라 다르게 재고 관리를 시행
         Payment payment;
         // 3-1. paymentMethod 가 MONEY_DIVIDE 일 경우

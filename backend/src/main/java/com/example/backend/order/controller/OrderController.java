@@ -148,7 +148,7 @@ public class OrderController {
 
 	@Operation(summary = "결제 수행", description = "부분결제를 수행하는 api")
 	@PostMapping("/payment")
-	public ResponseEntity<ResponseWithData<InitialPaymentResponseDto>> payForOrder(HttpServletRequest request, PaymentRequestDto paymentRequestDto) {
+	public ResponseEntity<ResponseWithData<InitialPaymentResponseDto>> payForOrder(HttpServletRequest request, @RequestBody PaymentRequestDto paymentRequestDto) {
 		String tableId = (String)request.getAttribute("tableId");
 
 		InitialPaymentResponseDto initialPaymentResponseDto = orderService.payForOrder(tableId, paymentRequestDto);

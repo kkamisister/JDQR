@@ -41,7 +41,7 @@ const DishEditDialog = ({
 	const queryClient = useQueryClient();
 	const [editedDishInfo, setEditedDishInfo] = useState(dishInfo);
 	const [settingMenu, setSettingMenu] = useState(0);
-	const { isCategoryPending, data: categoryList } = useQuery({
+	const { isPending: isCategoryPending, data: categoryList } = useQuery({
 		queryKey: ['categoryList'], // keyword를 queryKey에 포함하여 키워드가 변경되면 새로운 요청 실행
 		queryFn: () => fetchDishCategoryList(),
 	});
@@ -81,7 +81,7 @@ const DishEditDialog = ({
 		onClose();
 	};
 
-	const { isOptionPending, data: optionList } = useQuery({
+	const { isPending: isOptionPending, data: optionList } = useQuery({
 		queryKey: ['optionList'], // keyword를 queryKey에 포함하여 키워드가 변경되면 새로운 요청 실행
 		queryFn: () => fetchDishOptionList(),
 	});
@@ -90,7 +90,7 @@ const DishEditDialog = ({
 	const handleImageUpload = event => {
 		const file = event.target.files[0];
 		if (file) {
-			setImageRawSrc(file);
+			setImageRawSrc(() => file);
 			const reader = new FileReader();
 			reader.onload = () => {
 				setImageSrc(reader.result); // base64 URL로 설정
@@ -117,7 +117,7 @@ const DishEditDialog = ({
 		setEditedDishInfo(dishInfo);
 		setImageRawSrc('');
 		setImageSrc('');
-	}, [dishInfo, imageRawSrc, imageSrc]);
+	}, [dishInfo]);
 	return (
 		<Dialog maxWidth={'md'} fullWidth={true} onClose={onClose} open={open}>
 			<Stack
@@ -141,7 +141,7 @@ const DishEditDialog = ({
 						{!editedDishInfo.image && !imageSrc && (
 							<EmptyImageBox sx={{ width: '300px', height: '300px' }} />
 						)}
-						{editedDishInfo.image && (
+						{editedDishInfo.image && !imageSrc && (
 							<ImageBox
 								src={dishInfo.image}
 								alt={'음식 이미지'}

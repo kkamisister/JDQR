@@ -22,6 +22,7 @@ const TablePage = () => {
 	const { isPending, data } = useQuery({
 		queryKey: ['tableList'], // keyword를 queryKey에 포함하여 키워드가 변경되면 새로운 요청 실행
 		queryFn: () => fetchTableList(),
+		refetchInterval: 1000, // 5초 간격으로 데이터 요청
 	});
 
 	const rightMenuPreset = {

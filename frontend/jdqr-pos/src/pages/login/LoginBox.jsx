@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import {
 	Button,
 	Grid,
@@ -10,7 +10,39 @@ import {
 import ImageBox from 'components/common/ImageBox';
 import RestaurantLogoSample from 'assets/images/RestaurantLogoSample.png';
 import { colors } from 'constants/colors';
+import { useNavigate } from 'react-router-dom';
+import { enqueueSnackbar } from 'notistack';
+import { fetchLoginInfoByCode } from 'utils/apis/auth';
+import { fetchRestaurant } from 'utils/apis/setting';
+
 const LoginBox = () => {
+	const navigate = useNavigate();
+	const [code, setCode] = useState('');
+	const handleLoginButtonClicked = async () => {
+		if (code.trim() === '') {
+			enqueueSnackbar('유효하지 않은 코드 형식입니다', {
+				variant: 'warning',
+			});
+			return;
+		}
+
+		await fetchLoginInfoByCode(code);
+		console.log(sessionStorage.getItem('accessToken'));
+		if (sessionStorage.getItem('accessToken')) {
+			navigate('/owner/table');
+		} else {
+			enqueueSnackbar('유효하지 않은 코드입니다', {
+				variant: 'error',
+			});
+			return;
+		}
+	};
+	const handleEnterKeyPress = event => {
+		if (event.key === 'Enter') {
+			event.preventDefault(); // 기본 동작 방지 (필요한 경우)
+			handleLoginButtonClicked();
+		}
+	};
 	return (
 		<Grid
 			container
@@ -70,7 +102,15 @@ const LoginBox = () => {
 						{'사업장 코드'}
 					</Typography>
 					<Stack spacing={1}>
-						<TextField size="small" placeholder="사업장 코드 입력" />
+						<TextField
+							size="small"
+							placeholder="사업장 코드 입력"
+							onKeyDown={handleEnterKeyPress}
+							onChange={e => {
+								setCode(e.target.value);
+							}}
+							value={code}
+						/>
 						<Button
 							variant="contained"
 							disableElevation
@@ -78,7 +118,8 @@ const LoginBox = () => {
 							sx={{
 								fontWeight: 'bold',
 								backgroundColor: colors.main.primary500,
-							}}>
+							}}
+							onClick={handleLoginButtonClicked}>
 							로그인
 						</Button>
 					</Stack>

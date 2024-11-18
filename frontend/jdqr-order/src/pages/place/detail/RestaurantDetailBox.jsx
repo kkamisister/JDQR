@@ -7,7 +7,7 @@ import RestaurantDetailDishItemCard from "../../../components/card/RestaurantDet
 
 const RestaurantDetailBox = ({ categories, dishes }) => {
   const handleCategoryClick = (category) => {
-    console.log("category:", category) // 클릭된 카테고리 이름
+    // console.log("category:", category) // 클릭된 카테고리 이름
     scroller.scrollTo(category, {
       duration: 800,
       delay: 0,

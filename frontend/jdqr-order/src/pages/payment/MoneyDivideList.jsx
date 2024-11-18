@@ -76,6 +76,22 @@ const MoneyDivideList = ({ orders }) => {
     };
   }, [client, connect]);
 
+  const moneyPay = async () => {
+    try {
+      const response = await moneyDivide({
+        peopleNum: total,
+        serveNum: portion,
+      });
+
+      const { tossOrderId, amount } = response;
+      console.log("moneyPay 성공:", response);
+      return { tossOrderId, amount };
+    } catch (error) {
+      console.error("moneyPay 요청 중 에러 발생:", error);
+      throw error;
+    }
+  };
+
   const handlePayment = async () => {
     if (!paymentWidget || !ready) {
       console.error("TossPayments 객체가 준비되지 않았습니다.");
@@ -83,10 +99,12 @@ const MoneyDivideList = ({ orders }) => {
     }
 
     try {
-      console.log("결제 요청 시작:", { money });
+      console.log("결제 요청 시작");
+      const { tossOrderId, amount } = await moneyPay(); // moneyPay 호출
+
       await paymentWidget.requestPayment("카드", {
-        amount: money,
-        orderId: `order-${Date.now()}`, // 고유한 주문 ID
+        amount, // moneyPay로 받은 결제 금액
+        orderId: tossOrderId, // moneyPay로 받은 tossOrderId
         orderName: `${orders.tableName}의 주문`,
         successUrl: `${window.location.origin}/success`,
         failUrl: `${window.location.origin}/fail`,

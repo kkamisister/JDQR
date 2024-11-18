@@ -32,7 +32,7 @@ const RestaurantInfo = ({ restaurant, open }) => {
       >
         <Stack
           direction="row"
-          spacing={2}
+          spacing={1}
           sx={{ flex: 1, alignItems: "center" }}
         >
           <Typography
@@ -53,46 +53,58 @@ const RestaurantInfo = ({ restaurant, open }) => {
           >
             {restaurant.restaurantCategories.major[0].restaurantCategoryName}
           </Typography>
+          <Typography
+            fontSize={13}
+            color={colors.text.sub2}
+            sx={{
+              whiteSpace: "nowrap",
+              textDecoration: "underline",
+            }}
+          >
+            {restaurant.phoneNumber}
+          </Typography>
         </Stack>
         <Stack
           direction="row"
           spacing={2}
           sx={{ flex: 1, alignItems: "center" }}
         >
-          <Chip
-            label={`${restaurant.restSeatNum}석`}
-            sx={{
-              width: "55px",
-              height: "30px",
-              fontSize: "15px",
-              borderRadius: "10px",
-              backgroundColor: colors.background.box,
-              color:
-                restaurant.open && restaurant.restSeatNum > 0
-                  ? colors.main.primary500
-                  : colors.text.sub1,
-              ".MuiChip-label": {
-                padding: 0,
-              },
-            }}
-          />
-          <Chip
-            label={`${restaurant.restTableNum}T`}
-            sx={{
-              width: "55px",
-              height: "30px",
-              fontSize: "15px",
-              borderRadius: "10px",
-              backgroundColor: colors.background.box,
-              color:
-                restaurant.open && restaurant.restSeatNum > 0
-                  ? colors.main.primary500
-                  : colors.text.sub1,
-              ".MuiChip-label": {
-                padding: 0,
-              },
-            }}
-          />
+          <Stack direction="row" spacing={1}>
+            <Chip
+              label={restaurant.open ? `${restaurant.restSeatNum}석` : "-"}
+              sx={{
+                width: "55px",
+                height: "30px",
+                fontSize: "15px",
+                borderRadius: "10px",
+                backgroundColor: colors.background.box,
+                color:
+                  restaurant.open && restaurant.restSeatNum > 0
+                    ? colors.main.primary500
+                    : colors.text.sub1,
+                ".MuiChip-label": {
+                  padding: 0,
+                },
+              }}
+            />
+            <Chip
+              label={restaurant.open ? `${restaurant.restTableNum}T` : "-"}
+              sx={{
+                width: "55px",
+                height: "30px",
+                fontSize: "15px",
+                borderRadius: "10px",
+                backgroundColor: colors.background.box,
+                color:
+                  restaurant.open && restaurant.restSeatNum > 0
+                    ? colors.main.primary500
+                    : colors.text.sub1,
+                ".MuiChip-label": {
+                  padding: 0,
+                },
+              }}
+            />
+          </Stack>
           <Typography
             fontSize={13}
             fontWeight={600}

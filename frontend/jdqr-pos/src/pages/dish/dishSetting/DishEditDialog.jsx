@@ -7,6 +7,7 @@ import {
 	ButtonGroup,
 	Chip,
 	darken,
+	styled,
 } from '@mui/material';
 import FlatButton from 'components/button/FlatButton';
 import { colors } from 'constants/colors';
@@ -24,6 +25,19 @@ import {
 import SubtitleSelector from 'components/input/SubtitleSelector';
 import { enqueueSnackbar } from 'notistack';
 import CheckIcon from '@mui/icons-material/Check';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
+const VisuallyHiddenInput = styled('input')({
+	clip: 'rect(0 0 0 0)',
+	clipPath: 'inset(50%)',
+	height: 1,
+	overflow: 'hidden',
+	position: 'absolute',
+	bottom: 0,
+	left: 0,
+	whiteSpace: 'nowrap',
+	width: 1,
+});
 const DishEditDialog = ({
 	open,
 	onClose,
@@ -155,11 +169,30 @@ const DishEditDialog = ({
 								sx={{ width: '300px', height: '300px' }}
 							/>
 						)}
-						<input
-							type="file"
-							accept="image/*"
-							onChange={handleImageUpload}
-						/>
+						<Button
+							component="label"
+							role={undefined}
+							variant="contained"
+							tabIndex={-1}
+							disableElevation
+							sx={{
+								borderRadius: '10px',
+								backgroundColor: colors.point.blue, // 원하는 hex 값으로 배경색 설정
+								'&:hover': {
+									backgroundColor: darken(colors.point.blue, 0.2), // hover 시 색상도 설정 가능
+								},
+								fontSize: '20px',
+								fontWeight: '600',
+							}}
+							startIcon={<CloudUploadIcon />}>
+							이미지 업로드
+							<VisuallyHiddenInput
+								type="file"
+								accept="image/*"
+								onChange={handleImageUpload}
+								multiple
+							/>
+						</Button>
 						<Stack direction="row" spacing={1}>
 							<FlatButton
 								text="상품 저장"

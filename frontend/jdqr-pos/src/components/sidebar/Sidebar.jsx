@@ -12,8 +12,8 @@ import { enqueueSnackbar } from 'notistack';
 const menuList = [
 	{ name: '테이블', path: '/owner/table' },
 	{ name: '메뉴', path: '/owner/dish' },
-	{ name: '직원 호출', path: '/owner/employee' },
-	{ name: '사업장', path: '/owner/restaurant' },
+	// { name: '직원 호출', path: '/owner/employee' },
+	// { name: '사업장', path: '/owner/restaurant' },
 ];
 
 const Sidebar = () => {

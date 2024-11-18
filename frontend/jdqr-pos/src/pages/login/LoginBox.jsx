@@ -28,6 +28,11 @@ const LoginBox = () => {
 
 		await fetchLoginInfoByCode(code);
 		console.log(sessionStorage.getItem('accessToken'));
+		const restaurantInfoResponse = await fetchRestaurant();
+		sessionStorage.setItem(
+			'restaurantInfo',
+			JSON.stringify(restaurantInfoResponse.data)
+		);
 		if (sessionStorage.getItem('accessToken')) {
 			navigate('/owner/table');
 		} else {

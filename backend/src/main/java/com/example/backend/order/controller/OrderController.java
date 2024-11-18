@@ -106,7 +106,7 @@ public class OrderController {
 			.status(simpleResponseMessage.name())
 			.detailMessage(simpleResponseMessage.getMessage())
 			.build();
-		messagingTemplate.convertAndSend("/sub/cart/"+tableId, paymentConfirmResponseDto);
+		messagingTemplate.convertAndSend("/sub/payment/"+tableId, paymentConfirmResponseDto);
 	}
 
 	@Operation(summary = "상위 주문 상태 조회", description = "parentOrder의 상태를 조회하는 api")

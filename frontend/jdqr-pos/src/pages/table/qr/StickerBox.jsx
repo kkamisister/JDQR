@@ -24,12 +24,6 @@ const StickerBox = forwardRef(({ table }, ref) => {
 				direction="row"
 				spacing={1}
 				sx={{ justifyContent: 'center', alignItems: 'center' }}>
-				<ImageBox
-					borderRadius="10px"
-					sx={{ height: '40px', width: 'auto' }}
-					src={RestaurantLogoSample}
-					alt={'가게 이미지'}
-				/>
 				<Box sx={{ fontWeight: '600', fontSize: '30px' }}>{table.name}</Box>
 			</Stack>
 

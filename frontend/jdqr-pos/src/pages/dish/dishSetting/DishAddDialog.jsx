@@ -230,6 +230,7 @@ const DishAddDialog = ({
 						{settingMenu === 0 && (
 							<Stack spacing={1} sx={{ width: '380px' }}>
 								<SubtitleTextField
+									type="text"
 									title="상품명"
 									value={newDishInfo.dishName}
 									setValue={value => {
@@ -260,6 +261,7 @@ const DishAddDialog = ({
 									}}
 								/>
 								<SubtitleTextField
+									type="number"
 									title="가격(원)"
 									value={newDishInfo.price}
 									setValue={value => {
@@ -273,6 +275,7 @@ const DishAddDialog = ({
 								/>
 
 								<SubtitleTextField
+									type="text"
 									title="상품 설명"
 									value={newDishInfo.description}
 									setValue={value => {
@@ -286,6 +289,7 @@ const DishAddDialog = ({
 								/>
 
 								<SubtitleTextField
+									type="text"
 									title="태그"
 									value={tag}
 									setValue={setTag}

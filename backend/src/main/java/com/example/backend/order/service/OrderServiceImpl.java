@@ -1040,6 +1040,7 @@ public class OrderServiceImpl implements OrderService {
      * @param parentOrder
      * @param paymentRequestDto : 결제 정보가 담긴 record
      */
+    @RedLock(key = "'payment'")
     @Transactional
     protected Payment createBasePaymentForMenuDivide(ParentOrder parentOrder, PaymentRequestDto paymentRequestDto) {
         List<OrderItemRequestDto> orderItemRequestDtos = paymentRequestDto.orderItemInfos();
@@ -1099,6 +1100,7 @@ public class OrderServiceImpl implements OrderService {
      * @param totalPurchaseAmount : 총 주문 금액
      * @param paymentRequestDto   : 결제 정보가 담긴 record
      */
+    @RedLock(key = "'payment'")
     @Transactional
     protected Payment createBasePaymentForMoneyDivide(ParentOrder parentOrder, Integer totalPurchaseAmount, PaymentRequestDto paymentRequestDto) {
         // 1. 현재 결제가 된 총 금액을 구한다.

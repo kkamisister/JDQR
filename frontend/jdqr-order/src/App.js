@@ -8,6 +8,7 @@ import HomePage from "./pages/place/main/HomePage";
 import DishDetailPage from "./pages/dish/detail/DishDetailPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import OrderPage from "./pages/order/OrderPage";
+import { CheckoutPage } from "./pages/payment/toss/Checkouts";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/payment" element={<PaymentPage />} />
             <Route path="/order" element={<OrderPage />} />
+            <Route path="/toss" element={<CheckoutPage />} />
           </Routes>
         </BrowserRouter>
       </QueryClientProvider>

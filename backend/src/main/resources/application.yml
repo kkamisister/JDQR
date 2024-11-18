@@ -57,7 +57,7 @@ spring:
 
 external:
   token:
-    toss: test_sk_Z61JOxRQVEGdzZDnPgkQ8W0X9bAq
+    toss: test_sk_vZnjEJeQVxe0x7eGKmoDrPmOoBN0
   url:
     toss: https://api.tosspayments.com
 

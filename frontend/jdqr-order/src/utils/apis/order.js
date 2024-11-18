@@ -69,3 +69,58 @@ export const fetchPaymentList = async () => {
     throw new Error("헉스바리 결제 진행 내역 조회가 안 돼요");
   }
 };
+
+/**
+ * N빵 결제 요청 (Money Divide)
+ * @param {Object} params
+ * @param {number} params.peopleNum - 전체 인원
+ * @param {number} params.serveNum - 결제할 몫의 수
+ * @returns {Object}
+ */
+export const moneyDivide = async ({ peopleNum, serveNum }) => {
+  try {
+    const orderResponse = fetchOrderStatus();
+    if (orderResponse.orderStatus === "PENDING") {
+      changeOrderStatus();
+    } else if (orderResponse.orderStatus === "CANCELLED") {
+      window.alert("취소된 주문이라 결제가 종료되었습니다.");
+      return;
+    } else if (orderResponse.orderStatus === "PAID") {
+      window.alert("결제가 완료되어 더 이상 결제를 진행할 수 없습니다.");
+      return;
+    }
+    const response = await axiosInstance.post("order/payment", {
+      type: "MONEY_DIVIDE",
+      peopleNum,
+      serveNum,
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error("으악! N빵 결제 안 돼");
+  }
+};
+
+/**
+ * 주문 상태 변경
+ */
+export const changeOrderStatus = async () => {
+  try {
+    const response = await axiosInstance.post("order/status");
+    return response;
+  } catch (error) {
+    console.log("주문상태 변경 에러", error);
+  }
+};
+
+/**
+ * 주문 상태 조회
+ */
+export const fetchOrderStatus = async () => {
+  try {
+    const response = await axiosInstance.get("order/status");
+    return response.data.data;
+  } catch (error) {
+    console.log("주문 상태 조회 중 에러 발생");
+  }
+};

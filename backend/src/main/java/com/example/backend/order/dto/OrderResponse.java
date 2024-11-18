@@ -2,6 +2,7 @@ package com.example.backend.order.dto;
 
 
 import com.example.backend.order.enums.OrderStatus;
+import com.example.backend.order.enums.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -18,6 +19,7 @@ public record OrderResponse() {
         Integer dishCnt,
         Integer userCnt,
         Integer restDishCnt,
+        PaymentMethod paymentType,
         Integer price,
         Integer restPrice,
         List<OrderInfoResponseDto> orders

@@ -146,7 +146,7 @@ public class OrderController {
 
 		TotalOrderInfoResponseDto data = orderService.getTotalPaymentInfo(tableId);
 
-		ResponseWithData<TotalOrderInfoResponseDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(), "부분결제 요청에 성공하였습니다", data);
+		ResponseWithData<TotalOrderInfoResponseDto> responseWithData = new ResponseWithData<>(HttpStatus.OK.value(), "주문 정보와, 결제된 정보", data);
 
 		return ResponseEntity.status(responseWithData.status())
 			.body(responseWithData);

@@ -570,6 +570,7 @@ public class OrderServiceImpl implements OrderService {
         if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
             List<Payment> payments = paymentRepository.findAllByParentOrder(parentOrder);
             int paidAmount = payments.stream()
+                .filter(payment -> payment.getPaymentStatus().equals(PaymentStatus.PAID))
                 .mapToInt(Payment::getAmount)
                 .sum();
 
@@ -666,6 +667,7 @@ public class OrderServiceImpl implements OrderService {
                 .tableName(table.getName())
                 .dishCnt(totalDishCount)
                 .userCnt(userCnt)
+                .paymentType(paymentMethod)
                 .price(totalPrice)
                 .restPrice(totalPrice - paidAmount)
                 .orders(orderInfoResponseDtos)
@@ -799,6 +801,7 @@ public class OrderServiceImpl implements OrderService {
                 .tableName(table.getName())
                 .dishCnt(totalDishCount)
                 .userCnt(userCnt)
+                .paymentType(paymentMethod)
                 .restDishCnt(restDishCnt)
                 .price(totalPrice)
                 .restPrice(restPrice)

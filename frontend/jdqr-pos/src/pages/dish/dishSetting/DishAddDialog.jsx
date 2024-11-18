@@ -104,7 +104,12 @@ const DishAddDialog = ({
 	};
 
 	const handleEnterKeyPress = event => {
-		if (event.key === 'Enter' && !isComposing && tag.trim() !== '') {
+		if (
+			event.key === 'Enter' &&
+			!isComposing &&
+			!event.nativeEvent.isComposing &&
+			tag.trim() !== ''
+		) {
 			event.preventDefault(); // 기본 동작 방지 (필요한 경우)
 
 			setNewDishInfo(prev => {
@@ -297,7 +302,7 @@ const DishAddDialog = ({
 									onCompositionEnd={handleCompositionEnd}
 									onKeyDown={handleEnterKeyPress}
 								/>
-								<Stack direction="row">
+								<Stack direction="row" spacing={0.5}>
 									{newDishInfo.tags?.map((_tag, index) => (
 										<Chip
 											label={_tag}
@@ -312,7 +317,7 @@ const DishAddDialog = ({
 								sx={{
 									display: 'flex',
 									flexWrap: 'wrap', // 너비를 초과하면 다음 줄로 넘어감
-									gap: 1, // 간격 설정
+									gap: 2, // 간격 설정
 									width: '380px', // 부모의 너비에 맞게 설정
 								}}>
 								{optionList.data.options.map((option, index) => (

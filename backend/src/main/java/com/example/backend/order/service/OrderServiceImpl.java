@@ -1095,6 +1095,7 @@ public class OrderServiceImpl implements OrderService {
 
         // 2-2. payment entity 생성
         Payment payment = Payment.builder()
+            .parentOrder(parentOrder)
             .amount(paymentAmount)
             .tossOrderId(tossOrderId)
             .paymentStatus(PaymentStatus.PENDING)

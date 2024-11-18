@@ -4,8 +4,16 @@ import Sidebar from 'components/sidebar/Sidebar';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import HeaderBox from 'components/header/HeaderBox';
 import { fetchRestaurant } from 'utils/apis/setting';
+import { enqueueSnackbar } from 'notistack';
+
 const DefaultLayout = () => {
+	const navigate = useNavigate();
 	useEffect(() => {
+		if (!sessionStorage.getItem('accessToken')) {
+			navigate('/owner');
+			enqueueSnackbar('허가되지 않은 접근입니다', { variant: 'warning' });
+			return;
+		}
 		fetchRestaurant().then(response => {
 			sessionStorage.setItem(
 				'restaurantInfo',

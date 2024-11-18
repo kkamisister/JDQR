@@ -22,7 +22,6 @@ export function CheckoutPage() {
     setAmount({
       currency: "KRW",
       value: value,
-      // value: 300000000,
     });
   }, [value]);
   const [ready, setReady] = useState(false);
@@ -40,8 +39,6 @@ export function CheckoutPage() {
         const widgets = tossPayments.widgets({
           customerKey,
         });
-        // 비회원 결제
-        // const widgets = tossPayments.widgets({ customerKey: ANONYMOUS });
 
         setWidgets(widgets);
       } catch (error) {
@@ -139,13 +136,11 @@ export function CheckoutPage() {
               // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
               // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
               await widgets.requestPayment({
-                orderId: generateRandomString(),
-                orderName: "토스 티셔츠 외 2건",
+                orderId: orderId,
+                // amount: amount,
+                orderName: orderName,
                 successUrl: window.location.origin + "/success",
                 failUrl: window.location.origin + "/fail",
-                customerEmail: "customer123@gmail.com",
-                customerName: "김토스",
-                customerMobilePhone: "01012341234",
               });
             } catch (error) {
               // 에러 처리하기

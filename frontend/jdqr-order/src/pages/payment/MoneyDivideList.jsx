@@ -5,6 +5,7 @@ import BaseButton from "../../components/button/BaseButton";
 import { moneyDivide } from "../../utils/apis/order";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useWebSocketStore from "../../stores/SocketStore";
 
 const MoneyDivideList = ({ orders }) => {
   const navigate = useNavigate(); // 반드시 함수 호출 형태여야 함
@@ -12,6 +13,7 @@ const MoneyDivideList = ({ orders }) => {
   const [total, setTotal] = useState(orders.userCnt);
   const [portion, setPortion] = useState(1);
   const [money, setMoney] = useState(0);
+  const { client, connect } = useWebSocketStore();
 
   const conjoinedDishes = dishes.reduce((acc, dish) => {
     const key = `${dish.dishId}-${dish.options
@@ -42,7 +44,6 @@ const MoneyDivideList = ({ orders }) => {
   const conjoinedDishesArray = Object.values(conjoinedDishes);
   const moneyPay = async () => {
     try {
-      console.log("portion", portion);
       const response = await moneyDivide({
         peopleNum: total,
         serveNum: portion,
@@ -54,17 +55,16 @@ const MoneyDivideList = ({ orders }) => {
       await sendTossOrder({ tossOrderId, value: amount });
     } catch (error) {
       console.error("결제 요청 중 에러 발생:", error);
-      alert("결제 요청 중 문제가 발생했습니다. 다시 시도해 주세요.");
     }
   };
 
   const sendTossOrder = async ({ tossOrderId, value }) => {
     try {
-      const orderName = "테스트 주문"; // orderName 정의
+      const orderName = `${orders.tableName}의 주문`;
       navigate("/toss", {
         state: {
           orderId: tossOrderId,
-          value: value,
+          value,
           orderName,
         },
       });
@@ -79,6 +79,29 @@ const MoneyDivideList = ({ orders }) => {
     setMoney(money);
   };
 
+  useEffect(() => {
+    if (!client) {
+      connect();
+    }
+  }, [client, connect]);
+
+  useEffect(() => {
+    const tableId = sessionStorage.getItem("tableId");
+    if (client && client.connected && tableId) {
+      const subscription = client.subscribe(
+        "/sub/payment/" + tableId,
+        (message) => {
+          console.log("롸?");
+          try {
+            const parsedBody = JSON.parse(message.body || message._body);
+            console.log("수신된 메시지 내용:", parsedBody);
+          } catch (error) {
+            console.error("메시지 파싱 오류:", error);
+          }
+        }
+      );
+    }
+  }, [client]);
   return (
     <Stack>
       <MoneyDivideInfo

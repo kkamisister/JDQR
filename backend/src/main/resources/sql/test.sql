@@ -1,5 +1,5 @@
 use
-product;
+    product;
 
 -- 1. owners 테이블
 INSERT INTO `owners` (`id`, `created_at`, `updated_at`, `code`, `email`, `name`, `status`)
@@ -20,7 +20,7 @@ INSERT INTO `restaurants` (`id`, `latitude`, `longitude`, `open`, `owner_id`, `c
 VALUES (1, 37.7749, -122.4194, b'1', 1, NOW(), NOW(), '123 Main St, San Francisco, CA', 'image1.jpg', 'Food',
         'Tasty Restaurant', '555-1234', '123456789', 'ACTIVE'),
        -- 진짜 데이터
-       -- 진대감 역삼점
+--     진대감 역삼점
        (11, 37.5027474950576, 127.03720072319, b'1', 11, NOW(), NOW(), '서울 강남구 봉은사로30길 75',
         'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_11_0.jfif', 'Food', '진대감 역삼점',
         '02-552-2472', '261-81-00884', 'ACTIVE'),
@@ -39,7 +39,11 @@ VALUES (1, 37.7749, -122.4194, b'1', 1, NOW(), NOW(), '123 Main St, San Francisc
 --     농민백암순대 본점
        (15, 37.5037329376349, 127.052982069884, b'1', 15, NOW(), NOW(), '서울특별시 강남구 선릉로86길 40-4',
         'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_15.jpg', 'Food', '농민백암순대 본점',
-        '02-555-9603', '254-12-01439', 'ACTIVE')
+        '02-555-9603', '254-12-01439', 'ACTIVE'),
+--     멀티캠퍼스
+       (16, 37.5012767241426, 127.039600248343, b'1', 16, NOW(), NOW(), '서울특별시 강남구 테헤란로 212',
+        'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_16.jpg', 'Food', '멀티캠퍼스 20층',
+        '1544-9001', '104-81-53114', 'ACTIVE')
 ;
 
 -- 3. restaurant_categories 테이블
@@ -64,7 +68,8 @@ VALUES (1, 11, 1, NOW(), NOW(), 'ACTIVE'), -- Tasty Restaurant: Fast Food
        (12, 16, 12, NOW(), NOW(), 'ACTIVE'),
        (13, 11, 13, NOW(), NOW(), 'ACTIVE'),
        (14, 12, 14, NOW(), NOW(), 'ACTIVE'),
-       (15, 11, 15, NOW(), NOW(), 'ACTIVE')
+       (15, 11, 15, NOW(), NOW(), 'ACTIVE'),
+       (16, 11, 16, NOW(), NOW(), 'ACTIVE')
 ;
 
 -- 5. dish_categories 테이블
@@ -80,11 +85,11 @@ VALUES (1, 1, NOW(), NOW(), 'Appetizers', 'ACTIVE'),
        (9, 1, NOW(), NOW(), 'Sides', 'ACTIVE'),
        (10, 1, NOW(), NOW(), 'Combos', 'ACTIVE'),
        -- 진짜 데이터
-       -- 진대감 역삼점
+--        진대감 역삼점
        (11, 11, NOW(), NOW(), '점심', 'ACTIVE'),
        (12, 11, NOW(), NOW(), '본차림', 'ACTIVE'),
 
-       -- 공차 역삼점
+--        공차 역삼점
        (13, 12, NOW(), NOW(), '밀크티', 'ACTIVE'),
        (14, 12, NOW(), NOW(), '오리지널 티', 'ACTIVE'),
        (15, 12, NOW(), NOW(), '커피', 'ACTIVE'),
@@ -100,8 +105,15 @@ VALUES (1, 1, NOW(), NOW(), 'Appetizers', 'ACTIVE'),
        (21, 14, NOW(), NOW(), '사이드', 'ACTIVE'),
        (22, 14, NOW(), NOW(), '음료', 'ACTIVE'),
 
---        메인메뉴
-       (23, 15, NOW(), NOW(), '메인 메뉴', 'ACTIVE')
+--        농민백암순대
+       (23, 15, NOW(), NOW(), '메인 메뉴', 'ACTIVE'),
+
+--        멀티캠퍼스
+       (24, 16, NOW(), NOW(), 'A: 한식', 'ACTIVE'),
+       (25, 16, NOW(), NOW(), 'B: 일품', 'ACTIVE'),
+       (26, 16, NOW(), NOW(), '도시락', 'ACTIVE'),
+       (27, 16, NOW(), NOW(), '샌드위치', 'ACTIVE'),
+       (28, 16, NOW(), NOW(), '샐러드', 'ACTIVE')
 ;
 
 -- 6. dish 테이블
@@ -252,7 +264,29 @@ VALUES (1, 1, 500, NOW(), NOW(), 'Crispy French Fries', 'french_fries.jpg', 'Fre
        (69, 23, 36000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_69.jpg',
         '모듬 수육', '', 'ACTIVE'),
        (70, 23, 13000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dish_70.jpg',
-        '토종순대', '', 'ACTIVE')
+        '토종순대', '', 'ACTIVE'),
+
+--     멀티캠퍼스 (카테고리id: 한식=24, 일품=25, 도시락=26, 샌드위치=27, 샐러드=28)
+       (71, 24, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/bb442326-3bcf-4abd-81c9-ab1dea4e332cdish_71.jpg', '차돌짬뽕밥',
+        '[]', 'ACTIVE'),
+       (72, 24, 11000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/39951d54-6229-4da8-8615-369d1dcffeeedish_72.jpg', '매운닭고구마찜',
+        '[]', 'ACTIVE'),
+       (73, 25, 11000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/284e8702-16bc-4a52-bd75-91cad44419aedish_73.jpg', '해산물토마토스파게티',
+        '[]', 'ACTIVE'),
+       (74, 25, 8000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/617ffda4-8dd8-46aa-b753-22a3d21fc2bedish_74.jpg', '비빔밥',
+        '[]', 'ACTIVE'),
+       (75, 26, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/eeb836c5-a2a3-4670-abc3-c10bbf0ba327dish_75.jpg', '매운제육고추장볶음',
+        '[]', 'ACTIVE'),
+       (76, 26, 9000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/fa328549-8ec1-4f03-b214-2a885482b860dish_76.jpg', '해물데리야끼볶음',
+        '[]', 'ACTIVE'),
+       (77, 27, 7000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/1281fb75-5af5-4537-b39b-ce3ec5338ec3dish_77.jpg', '바질토마토 크림치즈베이글',
+        '[]', 'ACTIVE'),
+       (78, 27, 7500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/53693f66-3c5c-431b-ad9c-fc64ecf98f2bdish_78.jpg', '인기가요 샌드위치',
+        '[]', 'ACTIVE'),
+       (79, 28, 9000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/fda0435a-3a4e-41f8-88cb-de11c8373df5dish_79.jpg', '쉬림프 보울',
+        '[]', 'ACTIVE'),
+       (80, 28, 9500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/9db92db5-002c-4770-bb7c-7b7e5eadbd63dish_80.jpg', '훈제오리 파스타 샐러드',
+        '[]', 'ACTIVE')
 ;
 -- 7. options 테이블
 INSERT INTO `options` (`id`, `restaurant_id`, `max_choice_count`, `mandatory`, `created_at`, `updated_at`, `name`,
@@ -275,7 +309,11 @@ VALUES (1, 1, 1, b'1', NOW(), NOW(), 'Size', 'ACTIVE'),
        (12, 14, 6, b'0', NOW(), NOW(), '버거 토핑 추가 선택(B)', 'ACTIVE'),
 
 --        농민백암순대
-       (13, 15, 1, b'1', NOW(), NOW(), '양 선택', 'ACTIVE')
+       (13, 15, 1, b'1', NOW(), NOW(), '양 선택', 'ACTIVE'),
+
+--        멀티캠퍼스
+       (14, 16, 1, b'0', NOW(), NOW(), '후식 선택', 'ACTIVE'),
+       (15, 16, 1, b'1', NOW(), NOW(), '음료 선택', 'ACTIVE')
 ;
 
 
@@ -334,7 +372,17 @@ VALUES (1, 1, 100, NOW(), NOW(), 'Small Size', 'ACTIVE'),
        (57, 12, 1000, NOW(), NOW(), '베이컨 추가', 'ACTIVE'),
        (58, 12, 3500, NOW(), NOW(), '더블(패티&치즈) 추가', 'ACTIVE'),
        (59, 13, 0, NOW(), NOW(), '보통', 'ACTIVE'),
-       (60, 13, 2000, NOW(), NOW(), '특', 'ACTIVE')
+       (60, 13, 2000, NOW(), NOW(), '특', 'ACTIVE'),
+
+       --        멀티캠퍼스
+       (61, 14, 0, NOW(), NOW(), 'ICE초코', 'ACTIVE'),
+       (62, 14, 0, NOW(), NOW(), '아이스티', 'ACTIVE'),
+       (63, 14, 0, NOW(), NOW(), '식혜', 'ACTIVE'),
+       (64, 15, 0, NOW(), NOW(), '두유', 'ACTIVE'),
+       (65, 15, 0, NOW(), NOW(), '바나나두유', 'ACTIVE'),
+       (66, 15, 0, NOW(), NOW(), '검은콩두유', 'ACTIVE'),
+       (67, 15, 0, NOW(), NOW(), '제로사이다', 'ACTIVE'),
+
 ;
 
 -- 9. dish_options 테이블
@@ -422,8 +470,17 @@ VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
        (77, 63, 9, NOW(), NOW(), 'ACTIVE'),
 
 --        농민백암순대
-       (78, 68, 13, NOW(), NOW(), 'ACTIVE')
---        (79, 44, 4, NOW(), NOW(), 'ACTIVE'),
+       (78, 68, 13, NOW(), NOW(), 'ACTIVE'),
+--        멀티캠퍼스
+       (79, 71, 14, NOW(), NOW(), 'ACTIVE'),
+       (80, 72, 14, NOW(), NOW(), 'ACTIVE'),
+       (81, 73, 14, NOW(), NOW(), 'ACTIVE'),
+       (82, 74, 14, NOW(), NOW(), 'ACTIVE'),
+       (83, 77, 15, NOW(), NOW(), 'ACTIVE'),
+       (84, 78, 15, NOW(), NOW(), 'ACTIVE'),
+       (85, 79, 15, NOW(), NOW(), 'ACTIVE'),
+       (86, 80, 15, NOW(), NOW(), 'ACTIVE')
+
 ;
 
 -- parent_orders 테이블
@@ -443,7 +500,6 @@ values (1, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PAID', 'MENU_DIVIDE', 'ACT
        (11, NOW(), NOW(), '6721aa9b0d22a923091eef73', 'PENDING', 'UNDEFINED', 'ACTIVE'),
        (12, NOW(), NOW(), '67345a90fb5b4a3df7c2076a', 'PAY_WAITING', 'MENU_DIVIDE', 'ACTIVE'),
        (13, NOW(), NOW(), '67345b67fb5b4a3df7c2076c', 'PAY_WAITING', 'MONEY_DIVIDE', 'ACTIVE')
-
 ;
 
 -- 10. orders 테이블
@@ -467,7 +523,6 @@ VALUES (1, 1, NOW(), NOW(), 'ACTIVE'),
        (15, 12, NOW(), NOW(), 'ACTIVE'),
        (16, 13, NOW(), NOW(), 'ACTIVE'),
        (17, 13, NOW(), NOW(), 'ACTIVE')
-
 ;
 
 --
@@ -487,7 +542,8 @@ VALUES (1, 1, 1, 500, 2, NOW(), NOW(), NOW(), 'user_1', 'ACTIVE'),
 ;
 
 -- 진짜 데이터
-INSERT INTO `order_items` (id, dish_id, order_id, order_price, paid_quantity, quantity, created_at, ordered_at, updated_at, user_id, status)
+INSERT INTO `order_items` (id, dish_id, order_id, order_price, paid_quantity, quantity, created_at, ordered_at,
+                           updated_at, user_id, status)
 values (11, 27, 11, 5000, 0, 2, NOW(), NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440000', 'ACTIVE'),
        (12, 27, 11, 4500, 0, 4, NOW(), NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440000', 'ACTIVE'),
        (13, 35, 12, 4800, 0, 5, NOW(), NOW(), NOW(), 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 'ACTIVE'),

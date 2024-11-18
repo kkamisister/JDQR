@@ -294,6 +294,7 @@ public class TableServiceImpl implements TableService{
 			.name(table.getName())
 			.color(table.getColor())
 			.qrLink(table.getQrCode())
+			.qrlastUpdatedAt(table.getQrUpdatedAt())
 			.people(table.getPeople())
 			.dishes(new ArrayList<>())
 			.build();

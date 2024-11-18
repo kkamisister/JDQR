@@ -8,6 +8,7 @@ import { useReactToPrint } from 'react-to-print';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
 import { renewTableUrl } from 'utils/apis/table';
+import { RepeatOneSharp } from '@mui/icons-material';
 
 const VisuallyHiddenInput = styled('input')({
 	clip: 'rect(0 0 0 0)',
@@ -54,7 +55,11 @@ const QRCodeSettingDialog = ({ onClose, open, table, setTable }) => {
 		const response = await renewTableUrl({ tableId: table.tableId });
 		console.log(table);
 		console.log(response);
-		setTable({ ...table, qrLink: response.data.data.url });
+		setTable({
+			...table,
+			qrLink: response.data.data.url,
+			qrlastUpdatedAt: response.data.data.qrlastUpdatedAt,
+		});
 		enqueueSnackbar('QR코드 생성 완료', { variant: 'success' });
 	};
 
@@ -87,13 +92,16 @@ const QRCodeSettingDialog = ({ onClose, open, table, setTable }) => {
 							{table.name}
 						</Box>
 						<Stack spacing={1}>
-							{/* <Stack spacing={0.5}>
+							<Stack spacing={0.5}>
 								<Box sx={{ fontWeight: '600', fontSize: '25px' }}>
 									{'최근 업데이트'}
 								</Box>
-
-								<Box>{'2024년 10월 31일 오후 12시 32분 '}</Box>
-							</Stack> */}
+								<Box>
+									{new Date(table.qrlastUpdatedAt).toLocaleString(
+										'ko-KR'
+									)}
+								</Box>
+							</Stack>
 							<Stack spacing={0.5}>
 								<Box sx={{ fontWeight: '600', fontSize: '25px' }}>
 									{'URL 주소'}

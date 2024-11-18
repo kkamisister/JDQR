@@ -114,7 +114,12 @@ const DishEditDialog = ({
 	};
 
 	const handleEnterKeyPress = event => {
-		if (event.key === 'Enter' && !isComposing && tag.trim() !== '') {
+		if (
+			event.key === 'Enter' &&
+			!isComposing &&
+			!event.nativeEvent.isComposing &&
+			tag.trim() !== ''
+		) {
 			event.preventDefault(); // 기본 동작 방지 (필요한 경우)
 
 			setEditedDishInfo(prev => {
@@ -323,7 +328,7 @@ const DishEditDialog = ({
 									onCompositionEnd={handleCompositionEnd}
 									onKeyDown={handleEnterKeyPress}
 								/>
-								<Stack direction="row">
+								<Stack direction="row" spacing={0.5}>
 									{editedDishInfo.tags?.map((_tag, index) => (
 										<Chip
 											label={_tag}

@@ -19,7 +19,6 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "options")
-@ToString
 public class Option extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

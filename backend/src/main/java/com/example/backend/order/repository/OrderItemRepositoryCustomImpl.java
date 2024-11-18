@@ -45,23 +45,23 @@ public class OrderItemRepositoryCustomImpl extends Querydsl4RepositorySupport im
             .fetch();
     }
 
-    @Override
-    public List<TableOrderResponseVo> findDishOptionsAndChoicesByOrderItem(OrderItem orderItem) {
-
-        return select(Projections.constructor(TableOrderResponseVo.class,
-            QOrderItem.orderItem.id,
-            dish.id, dish.name, dish.price,
-            option.id, option.name,
-            choice.id, choice.name, choice.price
-        ))
-            .from(QOrderItem.orderItem)
-            .join(QOrderItem.orderItem.dish, dish)
-            .leftJoin(QOrderItem.orderItem.orderItemChoices,orderItemChoice)
-            .leftJoin(orderItemChoice.choice, choice)
-            .leftJoin(choice.option, option)
-            .where(QOrderItem.orderItem.eq(orderItem))
-            .fetch();
-    }
+    // @Override
+    // public List<TableOrderResponseVo> findDishOptionsAndChoicesByOrderItem(OrderItem orderItem) {
+    //
+    //     return select(Projections.constructor(TableOrderResponseVo.class,
+    //         QOrderItem.orderItem.id,
+    //         dish.id, dish.name, dish.price,
+    //         option.id, option.name,
+    //         choice.id, choice.name, choice.price
+    //     ))
+    //         .from(QOrderItem.orderItem)
+    //         .join(QOrderItem.orderItem.dish, dish)
+    //         .leftJoin(QOrderItem.orderItem.orderItemChoices,orderItemChoice)
+    //         .leftJoin(orderItemChoice.choice, choice)
+    //         .leftJoin(choice.option, option)
+    //         .where(QOrderItem.orderItem.eq(orderItem))
+    //         .fetch();
+    // }
 
     public List<TableOrderResponseVo> findAllDishOptionsAndChoicesByParentOrder(ParentOrder parentOrder) {
         return select(Projections.constructor(TableOrderResponseVo.class,

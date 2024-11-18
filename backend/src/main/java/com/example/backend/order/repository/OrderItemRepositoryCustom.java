@@ -11,8 +11,5 @@ import com.example.backend.table.dto.TableOrderResponseVo;
 public interface OrderItemRepositoryCustom {
     List<OrderItem> findOrderItemByOrder(List<Order> orders);
     List<OrderItem> findOrderItemByParentOrder(ParentOrder parentOrder);
-
-    List<TableOrderResponseVo> findDishOptionsAndChoicesByOrderItem(OrderItem orderItem);
-
     List<TableOrderResponseVo> findAllDishOptionsAndChoicesByParentOrder(ParentOrder parentOrder);
 }

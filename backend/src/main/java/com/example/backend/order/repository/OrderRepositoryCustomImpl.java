@@ -24,14 +24,6 @@ import static com.example.backend.dish.entity.QDishCategory.dishCategory;
 
 public class OrderRepositoryCustomImpl extends Querydsl4RepositorySupport implements OrderRepositoryCustom {
     @Override
-    public ParentOrder findUnpaidOrders(String tableId) {
-        return selectFrom(parentOrder)
-            .where(parentOrder.tableId.eq(tableId))
-            .orderBy(parentOrder.id.desc())
-            .fetchFirst();
-    }
-
-    @Override
     public List<OrderResponseVo> findWholeOrderInfos(ParentOrder parentOrder) {
         return select(Projections.constructor(OrderResponseVo.class, order.id, orderItem.id, dish.id, orderItem.userId,
             dish.name, dish.price, dishCategory.id, dishCategory.name, orderItem.quantity, option.id,

@@ -105,6 +105,7 @@ public class OrderServiceImpl implements OrderService {
      * @param productInfo
      * @throws JDQRException if order status is PAY_WAITING
      */
+
     @Override
     @Transactional
     // @RedLock(key = "'table:' + #tableId", waitTime = 5000L,leaseTime = 1000L)
@@ -131,6 +132,12 @@ public class OrderServiceImpl implements OrderService {
         Restaurant restaurant = dishCategory.getRestaurant();
         if(restaurant.getId() != restaurantId){
             throw new ValidationException(List.of("존재하지 않는 메뉴입니다"));
+        }
+
+        // 1.6. 테이블이 비어 있을 경우, 테이블의 상태를 '이용 중'으로 변경
+        if (table.getUseStatus().equals(UseStatus.AVAILABLE)) {
+            table.setUseStatus(UseStatus.OCCUPIED);
+            tableRepository.save(table);
         }
 
         // 2. 테이블 장바구니에 물품을 담는다
@@ -923,7 +930,8 @@ public class OrderServiceImpl implements OrderService {
         ParentOrder parentOrder = payment.getParentOrder();
 
         // 결제가 다 끝났는지를 확인
-        boolean flag = getTotalPurchaseAmount(parentOrder).equals(getCurPaidAmount(parentOrder));
+        // 총 주문 금액과, 유저가 결제한 금액의 차이가 100원 미만이면 결제가 모두 끝났다고 판정
+        boolean flag = Math.abs(getTotalPurchaseAmount(parentOrder) - getCurPaidAmount(parentOrder)) < 100;
 
         // 결제가 끝났을 경우 : order과 table의 상태 변경
         if (flag) {
@@ -945,6 +953,13 @@ public class OrderServiceImpl implements OrderService {
     @RedLock(key = "'payment'")
     protected SimpleResponseMessage updatePaymentStatusToSuccess(String tossOrderId, SimpleTossPaymentRequestDto tossPaymentSimpleResponseDto) {
         Payment payment = paymentRepository.findByTossOrderId(tossOrderId);
+
+        // paymentKey가 이미 존재하는 경우 -> 이미 결제를 시도한 거래임
+        // 에러 반환
+        if (!payment.getPaymentKey().isEmpty()) {
+            throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
+        }
+        payment.setPaymentKey(tossPaymentSimpleResponseDto.paymentKey());
 
         // validation 로직
         // 클라이언트에서 결제 amount를 임의로 조작하는 것을 막기 위해, 서버에 저장해 둔 amount와 body에 들어온 amount를 비교
@@ -1121,6 +1136,7 @@ public class OrderServiceImpl implements OrderService {
      */
     private Integer getCurPaidAmount(ParentOrder parentOrder) {
         return paymentRepository.findPaymentsByOrders(parentOrder).stream()
+            .filter(payment -> payment.getPaymentStatus().equals(PaymentStatus.PAID))
             .map(Payment::getAmount)
             .reduce(0, Integer::sum);
     }

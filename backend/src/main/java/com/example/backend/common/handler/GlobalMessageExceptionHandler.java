@@ -3,6 +3,7 @@ package com.example.backend.common.handler;
 import java.security.Principal;
 import java.util.List;
 
+import com.example.backend.common.exception.JDQRException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.Message;
@@ -33,7 +34,7 @@ public class GlobalMessageExceptionHandler {
 	}
 
 	// GlobalExceptionHandler에서 처리하는 모든 타입의 예외를 그대로 메시지 예외 핸들러에서도 처리해야하기에 래퍼 구조를 사용
-	@MessageExceptionHandler(ValidationException.class)
+	@MessageExceptionHandler({ValidationException.class})
 	@SendToUser(destinations = "/queue/errors", broadcast = false)
 	public ResponseWithMessage handleMethodArgumentNotValidException(ValidationException e) {
 		log.warn("유효성 검사 실패: {}", e.getMessage());

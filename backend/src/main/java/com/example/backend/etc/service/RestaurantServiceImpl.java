@@ -376,15 +376,21 @@ public class RestaurantServiceImpl implements RestaurantService {
 				}
 			}
 
-			// 인원수가 기본값이 아닌 경우, 남은 좌석 수가 인원수보다 적고 열지 않았으면 해당 식당을 건너뜀
-			if((people > 0 && restSeatNum < people) || !restaurant.getOpen()){
-				continue;
+			// 인원수가 기본값이 아닌 경우, 남은 좌석 수가 인원수보다 적거나 열지 않았으면 해당 식당을 건너뜀
+			if(people > 0){
+				if(restSeatNum < people || !restaurant.getOpen())continue;
 			}
+			// if((people > 0 && restSeatNum < people) || (people > 0 && !restaurant.getOpen())){
+			// 	continue;
+			// }
 
 			// 함께 앉기를 원하는 경우, 최대 테이블 인원수가 인원수보다 적거나 열지 않았으면 해당 식당을 건너뜀
-			if(together && !isAvailable){
-				continue;
+			if(together){
+				if(!isAvailable || !restaurant.getOpen())continue;
 			}
+			// if(together && !isAvailable){
+			// 	continue;
+			// }
 
 			// 식당정보 생성
 			List<RestaurantCategoryDto> restaurantCategories = IdToRestaurantCategoryMap.get(restaurantId);

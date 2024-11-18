@@ -12,8 +12,8 @@ VALUES (1, NOW(), NOW(), 'owner_code_1', 'owner1@example.com', 'John Doe', 'ACTI
        (14, NOW(), NOW(), 'ssafygyeonghyun608', 'sujipark2009@gmail.com', '김경현', 'ACTIVE'),
        (15, NOW(), NOW(), 'ssafyyoonji608', 'kkamisister1207@gmail.com', '김윤지', 'ACTIVE'),
        (16, NOW(), NOW(), 'ssafyhayeon608', 'hayeonful@gmail.com', '김하연', 'ACTIVE'),
-       (17, NOW(), NOW(), 'ssafycoldsteel608','coldsteel@gmail.com','한기철','ACTIVE')
-
+       (17, NOW(), NOW(), 'ssafycoldsteel608','coldsteel@gmail.com','한기철','ACTIVE'),
+       (18, NOW(), NOW(), 'ssafychinese608','chinese@gmail.com','중국인','ACTIVE')
 ;
 
 -- 2. restaurants 테이블
@@ -51,6 +51,12 @@ VALUES (1, 37.7749, -122.4194, b'1', 1, NOW(), NOW(), '123 Main St, San Francisc
        (17,37.498470,127.035136,b'1',17,NOW(),NOW(),'긴자료코 역삼점,서울특별시 강남구 역삼동 736-24 1층',
          'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/ginzaryoko.png','Food','긴자료코',
          '02-554-5112','539-39-01171','ACTIVE')
+
+--     안사부
+       (18,37.502364,127.036724,b'1',18,NOW(),NOW(),'안사부,서울특별시 강남구 논현로94길 3',
+         'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/ansabu.jpg','Food','안사부',
+         '0507-1365-8662','664-06-02672','ACTIVE')
+
 ;
 
 -- 3. restaurant_categories 테이블
@@ -77,7 +83,8 @@ VALUES (1, 11, 1, NOW(), NOW(), 'ACTIVE'), -- Tasty Restaurant: Fast Food
        (14, 12, 14, NOW(), NOW(), 'ACTIVE'),
        (15, 11, 15, NOW(), NOW(), 'ACTIVE'),
        (16, 11, 16, NOW(), NOW(), 'ACTIVE'),
-       (17, 14, 17, NOW(), NOW(), 'ACTIVE')
+       (17, 14, 17, NOW(), NOW(), 'ACTIVE'),
+       (18, 13, 18, NOW(), NOW(), 'ACTIVE')
 ;
 
 -- 5. dish_categories 테이블
@@ -121,7 +128,21 @@ VALUES (1, 1, NOW(), NOW(), 'Appetizers', 'ACTIVE'),
        (25, 16, NOW(), NOW(), 'B: 일품', 'ACTIVE'),
        (26, 16, NOW(), NOW(), '도시락', 'ACTIVE'),
        (27, 16, NOW(), NOW(), '샌드위치', 'ACTIVE'),
-       (29, 16, NOW(), NOW(), '샐러드', 'ACTIVE')
+       (29, 16, NOW(), NOW(), '샐러드', 'ACTIVE'),
+
+--      긴자료코
+       (30, 17, NOW(), NOW(), '돈까스', 'ACTIVE'),
+       (31, 17, NOW(), NOW(), '함박스테이크', 'ACTIVE'),
+       (32, 17, NOW(), NOW(), '덮밥', 'ACTIVE'),
+       (33, 17, NOW(), NOW(), '카레라이스', 'ACTIVE'),
+       (34, 17, NOW(), NOW(), '우동', 'ACTIVE')
+
+--      안사부
+       (35, 18, NOW(), NOW(), '짜장면', 'ACTIVE'),
+       (36, 18, NOW(), NOW(), '짬뽕', 'ACTIVE'),
+       (37, 18, NOW(), NOW(), '볶음밥', 'ACTIVE'),
+       (38, 18, NOW(), NOW(), '요리', 'ACTIVE');
+
 ;
 
 -- 6. dish 테이블
@@ -295,6 +316,47 @@ VALUES (1, 1, 500, NOW(), NOW(), 'Crispy French Fries', 'french_fries.jpg', 'Fre
         '[]', 'ACTIVE'),
        (90, 29, 9500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/9db92db5-002c-4770-bb7c-7b7e5eadbd63dish_80.jpg', '훈제오리 파스타 샐러드',
         '[]', 'ACTIVE')
+
+--      긴자료코
+       (91, 30, 10500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_91.jpg', '데미그라스 돈까스',
+        '[]', 'ACTIVE'),
+       (92, 30, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_92.jpg', '머슈룸데미그라스 돈까스',
+        '[]', 'ACTIVE'),
+       (93, 31, 15500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_93.jpg', '데미그라스 함박스테이크',
+        '[]', 'ACTIVE'),
+       (94, 31, 13500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_94.jpg', '데미그라스 돈까스 함박세트',
+        '[]', 'ACTIVE'),
+       (95, 32, 8500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_95.jpg', '가츠동',
+        '[]', 'ACTIVE'),
+       (96, 32, 8500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_96.jpg', '오야꼬동',
+        '[]', 'ACTIVE'),
+       (97, 33, 8000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_97.jpg', '소고기매콤카레라이스',
+        '[]', 'ACTIVE'),
+       (98, 33, 8500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_98.jpg', '불맛카레라이스',
+        '[]', 'ACTIVE'),
+       (99, 34, 9000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_99.jpg', '매콤카레우동',
+        '[]', 'ACTIVE'),
+       (100, 34, 9500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_100.jpg', '불맛카레우동',
+        '[]', 'ACTIVE')
+
+--      안사부
+        (101, 35, 8500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_101.jpg', '짜장면',
+        '[]', 'ACTIVE'),
+       (102, 36, 11000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_102.jpg', '안사부백짬뽕',
+        '[]', 'ACTIVE'),
+       (103, 36, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_103.jpg', '안사부백짬뽕밥',
+        '[]', 'ACTIVE'),
+       (104, 37, 9500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_104.jpg', '안사부볶음밥',
+        '[]', 'ACTIVE'),
+       (105, 37, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_105.jpg', '마파덮밥',
+        '[]', 'ACTIVE'),
+       (106, 38, 25000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_106.jpg', '해물짬뽕탕',
+        '[]', 'ACTIVE'),
+       (107, 38, 35000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_107.jpg', '오징어탕수육',
+        '[]', 'ACTIVE'),
+       (108, 38, 27000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/dishes_108.jpg', '유린기',
+        '[]', 'ACTIVE');
+
 ;
 -- 7. options 테이블
 INSERT INTO `options` (`id`, `restaurant_id`, `max_choice_count`, `mandatory`, `created_at`, `updated_at`, `name`,
@@ -321,7 +383,11 @@ VALUES (1, 1, 1, b'1', NOW(), NOW(), 'Size', 'ACTIVE'),
 
 --        멀티캠퍼스
        (23, 16, 1, b'0', NOW(), NOW(), '후식 선택', 'ACTIVE'),
-       (24, 16, 1, b'1', NOW(), NOW(), '음료 선택', 'ACTIVE')
+       (24, 16, 1, b'1', NOW(), NOW(), '음료 선택', 'ACTIVE'),
+
+--      긴자료코
+       (25, 17, 1, b'0', NOW(), NOW(), '추가 선택', 'ACTIVE'),
+       (26, 17, 1, b'1', NOW(), NOW(), '사이드 추가선택', 'ACTIVE')
 ;
 
 
@@ -390,6 +456,16 @@ VALUES (1, 1, 100, NOW(), NOW(), 'Small Size', 'ACTIVE'),
        (89, 24, 0, NOW(), NOW(), '바나나두유', 'ACTIVE'),
        (90, 24, 0, NOW(), NOW(), '검은콩두유', 'ACTIVE'),
        (91, 24, 0, NOW(), NOW(), '제로사이다', 'ACTIVE')
+
+--      긴자료코
+       (95, 25, 0, NOW(), NOW(), '장국 추가', 'ACTIVE'),
+       (96, 25, 0, NOW(), NOW(), '김치 추가', 'ACTIVE'),
+       (97, 25, 2500, NOW(), NOW(), '데미그라스 소스 추가', 'ACTIVE'),
+       (98, 26, 4000, NOW(), NOW(), '가라아게 5pc 추가', 'ACTIVE'),
+       (99, 26, 6500, NOW(), NOW(), '굴튀김 5pc 추가', 'ACTIVE'),
+       (100, 26, 1500, NOW(), NOW(), '수란 추가', 'ACTIVE'),
+       (101, 26, 2000, NOW(), NOW(), '스프라이트 355ml', 'ACTIVE'),
+       (102, 26, 2000, NOW(), NOW(), '코카콜라 355ml', 'ACTIVE');
 ;
 
 -- 9. dish_options 테이블

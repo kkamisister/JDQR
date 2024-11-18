@@ -568,6 +568,12 @@ public class OrderServiceImpl implements OrderService {
 
         // 2-1. N빵 결제 방식일 경우
         if (paymentMethod.equals(PaymentMethod.MONEY_DIVIDE)) {
+
+            Integer peopleNum = parentOrder.getPeopleNum();
+            if (peopleNum == null) {
+                throw new JDQRException(ErrorCode.INVALID_ORDER);
+            }
+
             List<Payment> payments = paymentRepository.findAllByParentOrder(parentOrder);
             int paidAmount = payments.stream()
                 .filter(payment -> payment.getPaymentStatus().equals(PaymentStatus.PAID))
@@ -667,6 +673,7 @@ public class OrderServiceImpl implements OrderService {
                 .tableName(table.getName())
                 .dishCnt(totalDishCount)
                 .userCnt(userCnt)
+                .peopleNum(peopleNum)
                 .paymentType(paymentMethod)
                 .price(totalPrice)
                 .restPrice(totalPrice - paidAmount)

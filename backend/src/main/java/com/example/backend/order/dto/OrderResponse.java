@@ -19,6 +19,7 @@ public record OrderResponse() {
         Integer dishCnt,
         Integer userCnt,
         Integer restDishCnt,
+        Integer peopleNum,
         PaymentMethod paymentType,
         Integer price,
         Integer restPrice,

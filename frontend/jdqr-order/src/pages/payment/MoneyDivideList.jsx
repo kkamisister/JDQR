@@ -1,25 +1,28 @@
 import { Stack } from "@mui/material";
 import MoneyDivideInfo from "./MoneyDivideInfo";
+import MoneyDivideListItem from "./MoneyDivideListItem";
+import BaseButton from "../../components/button/BaseButton";
+import { moneyDivide } from "../../utils/apis/order";
+import { useState, useEffect } from "react";
 
 const MoneyDivideList = ({ orders }) => {
-  console.log(orders);
   const dishes = orders.orders.flatMap((order) => order.dishes);
+  const [total, setTotal] = useState(orders.userCnt);
+  const [portion, setPortion] = useState(1);
+  const [money, setMoney] = useState(0);
 
   const conjoinedDishes = dishes.reduce((acc, dish) => {
-    // 모든 옵션 정보를 key에 반영
     const key = `${dish.dishId}-${dish.options
       ?.map((option) => `${option.optionId}-${option.choiceId}`) // optionId-choiceId 형태로 변환
       .sort() // 옵션을 정렬
       .join("_")}`; // 정렬된 옵션을 병합
-    console.log(`${dish.dishName}의 key값은 ${key}`);
 
     if (acc[key]) {
-      // 동일한 key가 존재하면 totalPrice와 quantity를 합침
       acc[key].totalPrice += dish.price * dish.quantity;
       acc[key].quantity += dish.quantity;
     } else {
-      // 새로운 key 생성
       acc[key] = {
+        key,
         dishId: dish.dishId,
         dishName: dish.dishName,
         price: dish.price,
@@ -27,7 +30,7 @@ const MoneyDivideList = ({ orders }) => {
         quantity: dish.quantity,
         dishCategoryId: dish.dishCategoryId,
         dishCategoryName: dish.dishCategoryName,
-        options: [...dish.options], // 모든 옵션 정보 유지
+        options: [...dish.options],
       };
     }
 
@@ -35,11 +38,38 @@ const MoneyDivideList = ({ orders }) => {
   }, {});
 
   const conjoinedDishesArray = Object.values(conjoinedDishes);
+  const moneyPay = async () => {
+    try {
+      const response = await moneyDivide({
+        peopleNum: total,
+        serveNum: portion,
+      });
+      console.log("결제 성공:", response);
+    } catch (error) {
+      console.error("결제 요청 중 에러 발생:", error);
+      alert("결제 요청 중 문제가 발생했습니다. 다시 시도해 주세요.");
+    }
+  };
 
-  console.log(conjoinedDishesArray);
+  const handleVaulesChange = ({ total, portion, money }) => {
+    setTotal(total);
+    setPortion(portion);
+    setMoney(money);
+  };
+
   return (
     <Stack>
-      <MoneyDivideInfo initTotal={orders.userCnt} initPortion={1} />
+      <MoneyDivideInfo
+        initTotal={orders.userCnt}
+        totalPrice={orders.price}
+        onValuesChange={handleVaulesChange}
+      />
+      {conjoinedDishesArray.map((dish) => (
+        <MoneyDivideListItem key={dish.key} dish={dish} />
+      ))}
+      <BaseButton onClick={moneyPay}>
+        {money.toLocaleString()}원 결제하기
+      </BaseButton>
     </Stack>
   );
 };

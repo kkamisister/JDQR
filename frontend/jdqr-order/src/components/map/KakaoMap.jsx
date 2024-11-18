@@ -169,7 +169,7 @@ const KakaoMap = ({
                       <Stack>{restaurant.restTableNum} Table</Stack>
                     )
                   ) : (
-                    <Typography>영업 종료</Typography>
+                    <Typography fontSize={13}>영업 종료</Typography>
                   )}
                 </Stack>
                 <Typography

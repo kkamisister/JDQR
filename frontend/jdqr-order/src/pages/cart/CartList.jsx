@@ -7,8 +7,8 @@ import { useSnackbar } from "notistack";
 import useWebSocketStore from "../../stores/SocketStore";
 import CartListItem from "./CartListItem";
 import BaseButton from "../../components/button/BaseButton";
-import Footer from "../../components/footer/Footer";
 import { placeOrder } from "../../utils/apis/order";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 
 export default function CartList() {
   const navigate = useNavigate();
@@ -64,13 +64,45 @@ export default function CartList() {
   };
 
   return (
-    <Stack>
+    <Stack alignItems={"center"} justifyContent={"center"}>
+      {myDishes.length === 0 && othersDishes.length === 0 && (
+        <Stack
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            textAlign: "center",
+            mt: 10,
+          }}
+        >
+          {myDishes.length === 0 && othersDishes.length === 0 && (
+            <Stack alignItems="center">
+              <AddShoppingCartIcon
+                sx={{
+                  color: colors.main.primary500,
+                  fontSize: 200,
+                }}
+              />
+              <Typography
+                sx={{
+                  color: colors.text.main,
+                  fontWeight: 600,
+                  fontSize: 18,
+                  mt: 2,
+                }}
+              >
+                아직 담은 메뉴가 없습니다. 메뉴를 추가해보세요!
+              </Typography>
+            </Stack>
+          )}
+        </Stack>
+      )}
       {myDishes?.length > 0 && (
         <CartListItem title="내가 담은 메뉴" dishes={myDishes} />
       )}
       {othersDishes?.length > 0 && (
         <CartListItem title="일행이 담은 메뉴" dishes={othersDishes} />
       )}
+      {/* {(myDishes.length > 0 || othersDishes.length > 0) && ( */}
       <Button
         endIcon={<AddCircleIcon />}
         onClick={goToDish}
@@ -84,6 +116,7 @@ export default function CartList() {
       >
         메뉴 더 담기
       </Button>
+      {/* )} */}
       <Box>
         {totalQuantity > 0 && totalPrice && (
           <BaseButton count={totalQuantity} onClick={submitOrder}>

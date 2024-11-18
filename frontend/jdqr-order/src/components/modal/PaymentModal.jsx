@@ -1,83 +1,98 @@
 import React, { useState } from "react";
-import { Modal, Box, Typography, Button, Backdrop } from "@mui/material";
+import { Modal, Box, Typography, Button, TextField } from "@mui/material";
+import { colors } from "../../constants/colors";
 
-const PaymentModal = ({ open, onClose, total, money, onPay }) => {
-  const remainingAmount = total - money; // 남은 결제 금액 계산
-  const perPerson = remainingAmount > 0 ? Math.ceil(remainingAmount / 2) : 0; // 1인당 결제 금액 예제 계산
+const PaymentModal = ({
+  restPrice,
+  peopleNum,
+  onPayment,
+  paymentWidget,
+  customerKey,
+}) => {
+  const [serveNum, setServeNum] = useState(1); // 초기값 1인분
+
+  const handlePaymentClick = async () => {
+    if (!paymentWidget) {
+      console.error("TossPayments 객체가 준비되지 않았습니다.");
+      alert("결제 시스템이 초기화되지 않았습니다. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
+
+    if (serveNum > 0 && serveNum <= peopleNum) {
+      try {
+        // moneyPay 호출
+        const { tossOrderId, amount } = await onPayment({
+          peopleNum,
+          serveNum,
+        });
+
+        // SDK 결제 요청
+        await paymentWidget.requestPayment("카드", {
+          amount,
+          orderId: tossOrderId,
+          orderName: `${serveNum}인분 결제`,
+          successUrl: `${window.location.origin}/success`,
+          failUrl: `${window.location.origin}/fail`,
+          customerKey,
+        });
+        console.log(`결제 성공: OrderID: ${tossOrderId}, Amount: ${amount}`);
+      } catch (error) {
+        console.error("결제 요청 중 오류:", error);
+        alert("결제 요청 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      }
+    } else {
+      alert("유효한 인분을 입력해주세요.");
+    }
+  };
 
   return (
-    <Modal
-      open={open}
-      onClose={(event, reason) => {
-        if (reason !== "backdropClick") return; // 모달 외부 클릭 방지
-      }}
-      closeAfterTransition
-      BackdropComponent={Backdrop}
-      BackdropProps={{
-        timeout: 500,
-        style: { backgroundColor: "rgba(0, 0, 0, 0.7)" }, // 배경 어둡게
-      }}
-    >
+    <Modal open={true} aria-labelledby="payment-modal-title">
       <Box
         sx={{
           position: "absolute",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 400,
-          bgcolor: "background.paper",
+          width: 300,
+          bgcolor: colors.background.white,
+          borderRadius: "10px",
           boxShadow: 24,
           p: 4,
-          borderRadius: 2,
           textAlign: "center",
         }}
       >
-        <Typography variant="h6" gutterBottom>
-          결제 내역
+        <Typography id="payment-modal-title" fontSize={16}>
+          잔여 금액: {restPrice.toLocaleString()}원
         </Typography>
-        <Typography variant="body1" gutterBottom>
-          총액: {total.toLocaleString()}원 중 {money.toLocaleString()}원
-          결제되었습니다.
-        </Typography>
-        <Typography variant="body1" gutterBottom>
-          남은 결제 금액:{" "}
-          {remainingAmount > 0 ? remainingAmount.toLocaleString() : 0}원
-        </Typography>
-        <Typography variant="body1" gutterBottom>
-          1인: {perPerson.toLocaleString()}원
+        <Typography fontSize={14}>
+          {peopleNum}인분 중에{" "}
+          <TextField
+            type="number"
+            value={serveNum}
+            onChange={(e) =>
+              setServeNum(
+                Math.min(Math.max(Number(e.target.value), 1), peopleNum)
+              )
+            }
+            inputProps={{ min: 1, max: peopleNum }}
+            sx={{ width: 60 }}
+          />{" "}
+          인분
         </Typography>
         <Button
           variant="contained"
-          color="primary"
-          fullWidth
-          onClick={onPay}
-          disabled={remainingAmount <= 0} // 남은 금액이 0원 이하일 경우 버튼 비활성화
-          sx={{ mt: 2 }}
+          sx={{
+            mt: 2,
+            backgroundColor: colors.main.primary500,
+            "&:hover": { backgroundColor: colors.main.primary700 },
+          }}
+          onClick={handlePaymentClick}
         >
-          나도 결제하기
+          결제하기
         </Button>
       </Box>
     </Modal>
   );
 };
 
-export default function App() {
-  const [open, setOpen] = useState(true);
-
-  const handlePay = () => {
-    alert("결제 완료!"); // 결제 로직 구현
-    setOpen(false); // 모달 닫기
-  };
-
-  return (
-    <div>
-      <PaymentModal
-        open={open}
-        onClose={() => setOpen(false)}
-        total={100000} // 총 결제 금액 예제
-        money={50000} // 이미 결제된 금액 예제
-        onPay={handlePay}
-      />
-    </div>
-  );
-}
+export default PaymentModal;

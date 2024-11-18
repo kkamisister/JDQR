@@ -42,7 +42,7 @@ function App() {
               <Route path="/cart" element={<CartPage />} />
               <Route path="/payment" element={<PaymentPage />} />
               <Route path="/order" element={<OrderPage />} />
-              <Route path="/success" element={<WithOrderStatusRedirect />} />
+              <Route path="/success" element={<PaymentValidationPage />} />
               <Route path="/fail" element={<FailurePage />} />
               <Route path="/celebration" element={<CelebrationPage />} />
             </Routes>
@@ -102,16 +102,13 @@ function WithOrderStatusRedirect() {
     const checkOrderStatus = async () => {
       try {
         const response = await fetchOrderStatus();
-        if (response?.orderStatus === "PAY_WAITING") {
-          enqueueSnackbar(
-            "결제가 완료되지 않았습니다. 결제페이지로 이동합니다.",
-            {
-              variant: "warning",
-              autoHideDuration: 3000,
-            }
-          );
-          navigate("/payment", { replace: true });
-        }
+        // if (response?.orderStatus === "PAY_WAITING") {
+        //   enqueueSnackbar("결제가 완료되지 않았습니다.", {
+        //     variant: "warning",
+        //     autoHideDuration: 3000,
+        //   });
+        //   navigate("/payment", { replace: true });
+        // }
       } catch (error) {
         console.error("주문 상태 조회 중 오류 발생:", error);
       }

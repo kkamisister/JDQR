@@ -11,6 +11,7 @@ import OrderPage from "./pages/order/OrderPage";
 import { CheckoutPage } from "./pages/payment/toss/Checkouts";
 import PaymentValidationPage from "./pages/payment/validation/PaymentValidationPage";
 import { FailurePage } from "./pages/payment/toss/Failure";
+import SdkCheckoutPage from "./pages/payment/toss/SdkCheckout";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +31,8 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/payment" element={<PaymentPage />} />
             <Route path="/order" element={<OrderPage />} />
-            <Route path="/toss" element={<CheckoutPage />} />
+            {/* <Route path="/toss" element={<CheckoutPage />} /> */}
+            <Route path="/toss" element={<SdkCheckoutPage />} />
             <Route path="/success" element={<PaymentValidationPage />} />
             <Route path="/fail" element={<FailurePage />} />
           </Routes>

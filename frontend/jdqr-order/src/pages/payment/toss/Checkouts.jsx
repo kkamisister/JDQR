@@ -6,7 +6,10 @@ import { useLocation } from "react-router-dom";
 // TODO: 구매자의 고유 아이디를 불러와서 customerKey로 설정하세요. 이메일・전화번호와 같이 유추가 가능한 값은 안전하지 않습니다.
 // @docs https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-const customerKey = sessionStorage.getItem("userId");
+// const clientKey = "test_ck_pP2YxJ4K87BAoKJbayO0rRGZwXLO";
+// const customerKey = sessionStorage.getItem("userId");
+const userId = sessionStorage.getItem("userId") || "";
+const customerKey = userId.length > 50 ? userId.slice(0, 45) : userId;
 
 export function CheckoutPage() {
   const location = useLocation();

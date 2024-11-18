@@ -45,6 +45,8 @@ const MoneyDivideList = ({ orders }) => {
         serveNum: portion,
       });
       console.log("결제 성공:", response);
+      
+
     } catch (error) {
       console.error("결제 요청 중 에러 발생:", error);
       alert("결제 요청 중 문제가 발생했습니다. 다시 시도해 주세요.");

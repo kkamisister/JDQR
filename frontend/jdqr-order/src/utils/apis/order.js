@@ -95,7 +95,7 @@ export const moneyDivide = async ({ peopleNum, serveNum }) => {
       serveNum,
     });
 
-    return response.data;
+    return response.data.data;
   } catch (error) {
     throw new Error("으악! N빵 결제 안 돼");
   }

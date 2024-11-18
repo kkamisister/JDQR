@@ -101,12 +101,15 @@ public class OrderController {
 		@Header("tossOrderId") String tossOrderId,  // 필요에 따라 헤더로 받기
 		@Header("status") String status
 	) {
-		SimpleResponseMessage simpleResponseMessage = orderService.finishPayment(tableId, tossOrderId, status, simpleTossPaymentRequestDto);
-		PaymentConfirmResponseDto paymentConfirmResponseDto = PaymentConfirmResponseDto.builder()
-			.status(simpleResponseMessage.name())
-			.detailMessage(simpleResponseMessage.getMessage())
-			.build();
-		messagingTemplate.convertAndSend("/sub/cart/"+tableId, paymentConfirmResponseDto);
+//		SimpleResponseMessage simpleResponseMessage = orderService.finishPayment(tableId, tossOrderId, status, simpleTossPaymentRequestDto);
+//
+//
+//		PaymentConfirmResponseDto paymentConfirmResponseDto = PaymentConfirmResponseDto.builder()
+//			.status(simpleResponseMessage.name())
+//			.detailMessage(simpleResponseMessage.getMessage())
+//			.build();
+		String paymentConfirmResponseDto = "보내졌음?";
+		messagingTemplate.convertAndSend("/sub/payment/"+tableId, paymentConfirmResponseDto);
 	}
 
 	@Operation(summary = "상위 주문 상태 조회", description = "parentOrder의 상태를 조회하는 api")

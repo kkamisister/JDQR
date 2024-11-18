@@ -196,6 +196,7 @@ const TablePage = () => {
 					table={selectedTable}
 					open={open}
 					onClose={handleClose}
+					setTable={setSelectedTable}
 				/>
 			)}
 		</Stack>

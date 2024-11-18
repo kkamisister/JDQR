@@ -75,6 +75,15 @@ const DishAddDialog = ({
 		setIsComposing(false);
 	};
 
+	const handleTagDelete = removedTag => {
+		setNewDishInfo(prev => {
+			return {
+				...prev,
+				tags: prev.tags.filter(item => item !== removedTag),
+			};
+		});
+	};
+
 	const [imageSrc, setImageSrc] = useState(null);
 	const [imageRawSrc, setImageRawSrc] = useState(null);
 	const saveCurrentDish = async () => {
@@ -87,6 +96,10 @@ const DishAddDialog = ({
 		);
 		queryClient.invalidateQueries('dishList');
 		enqueueSnackbar('메뉴를 추가했어요', { variant: 'success' });
+
+		setImageSrc(null);
+		setImageRawSrc(null);
+		setNewDishInfo(dishInfo);
 		onClose();
 	};
 
@@ -307,6 +320,9 @@ const DishAddDialog = ({
 										<Chip
 											label={_tag}
 											key={`_tag-${_tag}-${index}`}
+											onDelete={() => {
+												handleTagDelete(_tag);
+											}}
 										/>
 									))}
 								</Stack>

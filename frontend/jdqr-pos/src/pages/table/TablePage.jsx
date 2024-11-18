@@ -121,9 +121,10 @@ const TablePage = () => {
 									handleTableClick(table);
 								}}>
 								<OrderBox
-									tableName={`${table.name} (${table.people}인)`}
+									tableName={`${table.name}`}
 									order={table.dishes}
 									color={table.color}
+									people={table.people}
 								/>
 							</Box>
 						))}

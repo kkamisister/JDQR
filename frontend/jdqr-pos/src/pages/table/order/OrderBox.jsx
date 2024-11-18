@@ -3,7 +3,7 @@ import { colors } from 'constants/colors';
 import { darken } from '@mui/system';
 import React from 'react';
 
-const OrderBox = ({ tableName, order, color }) => {
+const OrderBox = ({ tableName, order, color, people }) => {
 	return (
 		<Stack
 			spacing={1}
@@ -28,6 +28,11 @@ const OrderBox = ({ tableName, order, color }) => {
 						}}>{`· ${dish.dishName} x${dish.quantity}`}</Box>
 				))}
 			</Stack>
+			<Box
+				sx={{
+					fontSize: '15px',
+					fontWeight: 'bold',
+				}}>{`${people}인 테이블`}</Box>
 		</Stack>
 	);
 };

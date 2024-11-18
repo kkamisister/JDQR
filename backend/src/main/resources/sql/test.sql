@@ -11,7 +11,9 @@ VALUES (1, NOW(), NOW(), 'owner_code_1', 'owner1@example.com', 'John Doe', 'ACTI
        (13, NOW(), NOW(), 'ssafygyeonghwan608', 'gjrudghks1669@gmail.com', '허경환', 'ACTIVE'),
        (14, NOW(), NOW(), 'ssafygyeonghyun608', 'sujipark2009@gmail.com', '김경현', 'ACTIVE'),
        (15, NOW(), NOW(), 'ssafyyoonji608', 'kkamisister1207@gmail.com', '김윤지', 'ACTIVE'),
-       (16, NOW(), NOW(), 'ssafyhayeon608', 'hayeonful@gmail.com', '김하연', 'ACTIVE')
+       (16, NOW(), NOW(), 'ssafyhayeon608', 'hayeonful@gmail.com', '김하연', 'ACTIVE'),
+       (17, NOW(), NOW(), 'ssafycoldsteel608','coldsteel@gmail.com','한기철','ACTIVE')
+
 ;
 
 -- 2. restaurants 테이블
@@ -43,7 +45,12 @@ VALUES (1, 37.7749, -122.4194, b'1', 1, NOW(), NOW(), '123 Main St, San Francisc
 --     멀티캠퍼스
        (16, 37.5012767241426, 127.039600248343, b'1', 16, NOW(), NOW(), '서울특별시 강남구 테헤란로 212',
         'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/restaurant_16.jpg', 'Food', '멀티캠퍼스 20층',
-        '1544-9001', '104-81-53114', 'ACTIVE')
+        '1544-9001', '104-81-53114', 'ACTIVE'),
+
+--     긴자료코
+       (17,37.498470,127.035136,b'1',17,NOW(),NOW(),'긴자료코 역삼점,서울특별시 강남구 역삼동 736-24 1층',
+         'https://jdqr-aws-bucket.s3.us-east-1.amazonaws.com/ginzaryoko.png','Food','긴자료코',
+         '02-554-5112','539-39-01171','ACTIVE')
 ;
 
 -- 3. restaurant_categories 테이블
@@ -69,7 +76,8 @@ VALUES (1, 11, 1, NOW(), NOW(), 'ACTIVE'), -- Tasty Restaurant: Fast Food
        (13, 11, 13, NOW(), NOW(), 'ACTIVE'),
        (14, 12, 14, NOW(), NOW(), 'ACTIVE'),
        (15, 11, 15, NOW(), NOW(), 'ACTIVE'),
-       (16, 11, 16, NOW(), NOW(), 'ACTIVE')
+       (16, 11, 16, NOW(), NOW(), 'ACTIVE'),
+       (17, 14, 17, NOW(), NOW(), 'ACTIVE')
 ;
 
 -- 5. dish_categories 테이블
@@ -107,13 +115,13 @@ VALUES (1, 1, NOW(), NOW(), 'Appetizers', 'ACTIVE'),
 
 --        농민백암순대
        (23, 15, NOW(), NOW(), '메인 메뉴', 'ACTIVE'),
-
+,
 --        멀티캠퍼스
        (24, 16, NOW(), NOW(), 'A: 한식', 'ACTIVE'),
        (25, 16, NOW(), NOW(), 'B: 일품', 'ACTIVE'),
        (26, 16, NOW(), NOW(), '도시락', 'ACTIVE'),
        (27, 16, NOW(), NOW(), '샌드위치', 'ACTIVE'),
-       (28, 16, NOW(), NOW(), '샐러드', 'ACTIVE')
+       (29, 16, NOW(), NOW(), '샐러드', 'ACTIVE')
 ;
 
 -- 6. dish 테이블
@@ -267,25 +275,25 @@ VALUES (1, 1, 500, NOW(), NOW(), 'Crispy French Fries', 'french_fries.jpg', 'Fre
         '토종순대', '', 'ACTIVE'),
 
 --     멀티캠퍼스 (카테고리id: 한식=24, 일품=25, 도시락=26, 샌드위치=27, 샐러드=28)
-       (71, 24, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/bb442326-3bcf-4abd-81c9-ab1dea4e332cdish_71.jpg', '차돌짬뽕밥',
+       (81, 24, 12000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/bb442326-3bcf-4abd-81c9-ab1dea4e332cdish_71.jpg', '차돌짬뽕밥',
         '[]', 'ACTIVE'),
-       (72, 24, 11000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/39951d54-6229-4da8-8615-369d1dcffeeedish_72.jpg', '매운닭고구마찜',
+       (82, 24, 11000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/39951d54-6229-4da8-8615-369d1dcffeeedish_72.jpg', '매운닭고구마찜',
         '[]', 'ACTIVE'),
-       (73, 25, 11000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/284e8702-16bc-4a52-bd75-91cad44419aedish_73.jpg', '해산물토마토스파게티',
+       (83, 25, 11000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/284e8702-16bc-4a52-bd75-91cad44419aedish_73.jpg', '해산물토마토스파게티',
         '[]', 'ACTIVE'),
-       (74, 25, 8000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/617ffda4-8dd8-46aa-b753-22a3d21fc2bedish_74.jpg', '비빔밥',
+       (84, 25, 8000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/617ffda4-8dd8-46aa-b753-22a3d21fc2bedish_74.jpg', '비빔밥',
         '[]', 'ACTIVE'),
-       (75, 26, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/eeb836c5-a2a3-4670-abc3-c10bbf0ba327dish_75.jpg', '매운제육고추장볶음',
+       (85, 26, 10000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/eeb836c5-a2a3-4670-abc3-c10bbf0ba327dish_75.jpg', '매운제육고추장볶음',
         '[]', 'ACTIVE'),
-       (76, 26, 9000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/fa328549-8ec1-4f03-b214-2a885482b860dish_76.jpg', '해물데리야끼볶음',
+       (86, 26, 9000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/fa328549-8ec1-4f03-b214-2a885482b860dish_76.jpg', '해물데리야끼볶음',
         '[]', 'ACTIVE'),
-       (77, 27, 7000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/1281fb75-5af5-4537-b39b-ce3ec5338ec3dish_77.jpg', '바질토마토 크림치즈베이글',
+       (87, 27, 7000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/1281fb75-5af5-4537-b39b-ce3ec5338ec3dish_77.jpg', '바질토마토 크림치즈베이글',
         '[]', 'ACTIVE'),
-       (78, 27, 7500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/53693f66-3c5c-431b-ad9c-fc64ecf98f2bdish_78.jpg', '인기가요 샌드위치',
+       (88, 27, 7500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/53693f66-3c5c-431b-ad9c-fc64ecf98f2bdish_78.jpg', '인기가요 샌드위치',
         '[]', 'ACTIVE'),
-       (79, 28, 9000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/fda0435a-3a4e-41f8-88cb-de11c8373df5dish_79.jpg', '쉬림프 보울',
+       (89, 29, 9000, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/fda0435a-3a4e-41f8-88cb-de11c8373df5dish_79.jpg', '쉬림프 보울',
         '[]', 'ACTIVE'),
-       (80, 28, 9500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/9db92db5-002c-4770-bb7c-7b7e5eadbd63dish_80.jpg', '훈제오리 파스타 샐러드',
+       (90, 29, 9500, NOW(), NOW(), '', 'https://jdqr-aws-bucket.s3.amazonaws.com/9db92db5-002c-4770-bb7c-7b7e5eadbd63dish_80.jpg', '훈제오리 파스타 샐러드',
         '[]', 'ACTIVE')
 ;
 -- 7. options 테이블
@@ -312,8 +320,8 @@ VALUES (1, 1, 1, b'1', NOW(), NOW(), 'Size', 'ACTIVE'),
        (13, 15, 1, b'1', NOW(), NOW(), '양 선택', 'ACTIVE'),
 
 --        멀티캠퍼스
-       (14, 16, 1, b'0', NOW(), NOW(), '후식 선택', 'ACTIVE'),
-       (15, 16, 1, b'1', NOW(), NOW(), '음료 선택', 'ACTIVE')
+       (23, 16, 1, b'0', NOW(), NOW(), '후식 선택', 'ACTIVE'),
+       (24, 16, 1, b'1', NOW(), NOW(), '음료 선택', 'ACTIVE')
 ;
 
 
@@ -375,14 +383,13 @@ VALUES (1, 1, 100, NOW(), NOW(), 'Small Size', 'ACTIVE'),
        (60, 13, 2000, NOW(), NOW(), '특', 'ACTIVE'),
 
        --        멀티캠퍼스
-       (61, 14, 0, NOW(), NOW(), 'ICE초코', 'ACTIVE'),
-       (62, 14, 0, NOW(), NOW(), '아이스티', 'ACTIVE'),
-       (63, 14, 0, NOW(), NOW(), '식혜', 'ACTIVE'),
-       (64, 15, 0, NOW(), NOW(), '두유', 'ACTIVE'),
-       (65, 15, 0, NOW(), NOW(), '바나나두유', 'ACTIVE'),
-       (66, 15, 0, NOW(), NOW(), '검은콩두유', 'ACTIVE'),
-       (67, 15, 0, NOW(), NOW(), '제로사이다', 'ACTIVE'),
-
+       (85, 23, 0, NOW(), NOW(), 'ICE초코', 'ACTIVE'),
+       (86, 23, 0, NOW(), NOW(), '아이스티', 'ACTIVE'),
+       (87, 23, 0, NOW(), NOW(), '식혜', 'ACTIVE'),
+       (88, 24, 0, NOW(), NOW(), '두유', 'ACTIVE'),
+       (89, 24, 0, NOW(), NOW(), '바나나두유', 'ACTIVE'),
+       (90, 24, 0, NOW(), NOW(), '검은콩두유', 'ACTIVE'),
+       (91, 24, 0, NOW(), NOW(), '제로사이다', 'ACTIVE')
 ;
 
 -- 9. dish_options 테이블
@@ -472,14 +479,14 @@ VALUES (1, 1, 1, NOW(), NOW(), 'ACTIVE'), -- French Fries: Small Size
 --        농민백암순대
        (78, 68, 13, NOW(), NOW(), 'ACTIVE'),
 --        멀티캠퍼스
-       (79, 71, 14, NOW(), NOW(), 'ACTIVE'),
-       (80, 72, 14, NOW(), NOW(), 'ACTIVE'),
-       (81, 73, 14, NOW(), NOW(), 'ACTIVE'),
-       (82, 74, 14, NOW(), NOW(), 'ACTIVE'),
-       (83, 77, 15, NOW(), NOW(), 'ACTIVE'),
-       (84, 78, 15, NOW(), NOW(), 'ACTIVE'),
-       (85, 79, 15, NOW(), NOW(), 'ACTIVE'),
-       (86, 80, 15, NOW(), NOW(), 'ACTIVE')
+       (98, 81, 14, NOW(), NOW(), 'ACTIVE'),
+       (99, 82, 14, NOW(), NOW(), 'ACTIVE'),
+       (100, 83, 14, NOW(), NOW(), 'ACTIVE'),
+       (101, 84, 14, NOW(), NOW(), 'ACTIVE'),
+       (102, 85, 15, NOW(), NOW(), 'ACTIVE'),
+       (103, 86, 15, NOW(), NOW(), 'ACTIVE'),
+       (104, 87, 15, NOW(), NOW(), 'ACTIVE'),
+       (105, 88, 15, NOW(), NOW(), 'ACTIVE')
 
 ;
 

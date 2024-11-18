@@ -367,7 +367,9 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 1. 결제 방식을 확인한다
+        log.warn("여기서 터짐 ??");
         PaymentMethod paymentMethod = paymentRequestDto.type();
+        log.warn("여기서 터졌음 ????");
         Integer serveNum = paymentRequestDto.serveNum();
 
         // 2. 해당 테이블의 가장 최근 parentOrder를 확인하고, 결제 방식을 업데이트시킨다

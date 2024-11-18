@@ -1,5 +1,6 @@
 package com.example.backend.table.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.backend.dish.dto.DishResponse;
@@ -18,7 +19,8 @@ public record TableResponse() {
 		example = "https://jdqr608.duckdns.org/api/v1/order/auth/6721aa9b0d22a923091eef73/eee93bc1-66be-43e2-8075-e06ce2f4ebc6"
 	)
 	public record QRInfo(
-		String url
+		String url,
+		LocalDateTime qrlastUpdatedAt
 	){
 
 	}
@@ -50,6 +52,9 @@ public record TableResponse() {
 		String color,
 		@Schema(description = "테이블의 QR Link 입니다.")
 		String qrLink,
+		@Schema(description = "테이블 QR의 마지막 업데이트 일자입니다.")
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		LocalDateTime qrlastUpdatedAt,
 		@Schema(description = "테이블 좌석 수 입니다.")
 		int people,
 		@ArraySchema(schema = @Schema(implementation = DishDetailInfo.class))
@@ -64,6 +69,7 @@ public record TableResponse() {
 				.name(table.getName())
 				.color(table.getColor())
 				.qrLink(table.getQrCode())
+				.qrlastUpdatedAt(table.getQrUpdatedAt())
 				.people(table.getPeople())
 				.dishes(dishes)
 				.build();
@@ -75,6 +81,7 @@ public record TableResponse() {
 				.name(table.getName())
 				.color(table.getColor())
 				.qrLink(table.getQrCode())
+				.qrlastUpdatedAt(table.getQrUpdatedAt())
 				.people(table.getPeople())
 				.dishes(dishes)
 				.totalPrice(totalPrice)

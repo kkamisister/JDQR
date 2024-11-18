@@ -3,6 +3,7 @@ package com.example.backend.table.service;
 import static com.example.backend.table.dto.TableRequest.*;
 import static com.example.backend.table.dto.TableResponse.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -155,7 +156,7 @@ public class TableServiceImpl implements TableService{
 		table.updateQrCode(link);
 		tableRepository.save(table);
 
-		return new QRInfo(link);
+		return new QRInfo(link, LocalDateTime.now());
 	}
 
 	/**

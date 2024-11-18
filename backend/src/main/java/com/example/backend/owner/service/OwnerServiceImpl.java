@@ -307,12 +307,15 @@ public class OwnerServiceImpl implements OwnerService{
 			throw new JDQRException(ErrorCode.OCCUPIED_OPTION);
 		}
 		else{
-			// 이 경우, option의 status를 delete로 변경하고 나머지 연관된 entity를 수정한다
-			List<Choice> choices = choiceRepository.findByOption(option);
-			for(Choice choice : choices){
-				choice.changeStatus(DELETE);
+			// option을 삭제해도 괜찮은 경우
+			for(DishOption dishOption : dishOptions){
+				List<Choice> choices = choiceRepository.findByOption(option);
+				for(Choice choice : choices){
+					choice.changeStatus(DELETE);
+				}
+				option.changeStatus(DELETE);
+				dishOption.changeStatus(DELETE);
 			}
-			option.changeStatus(DELETE); // soft delete
 		}
 	}
 

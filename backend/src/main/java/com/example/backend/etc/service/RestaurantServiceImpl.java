@@ -310,15 +310,13 @@ public class RestaurantServiceImpl implements RestaurantService {
 			int dishCategoryId = dish.getDishCategory().getId();
 
 			// 메뉴의 옵션들을 가지고온다
-			List<DishOption> dishOptions = dishOptionRepository.findByDishId(dish.getId());
+			List<DishOption> dishOptions = dishOptionRepository.findByDish(dish);
 
 			List<OptionDto> optionDtos = new ArrayList<>();
 			for(DishOption dishOption : dishOptions){
-
 				Option option = dishOption.getOption();
 				List<Choice> choices = option.getChoices();
 				OptionDto optionDto = OptionDto.of(option, choices);
-
 				optionDtos.add(optionDto);
 			}
 

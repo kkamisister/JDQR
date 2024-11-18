@@ -45,20 +45,45 @@ public class OrderItemRepositoryCustomImpl extends Querydsl4RepositorySupport im
             .fetch();
     }
 
-    @Override
-    public List<TableOrderResponseVo> findDishOptionsAndChoicesByOrderItem(OrderItem orderItem) {
+    // @Override
+    // public List<TableOrderResponseVo> findDishOptionsAndChoicesByOrderItem(OrderItem orderItem) {
+    //
+    //     return select(Projections.constructor(TableOrderResponseVo.class,
+    //         QOrderItem.orderItem.id,
+    //         dish.id, dish.name, dish.price,
+    //         option.id, option.name,
+    //         choice.id, choice.name, choice.price
+    //     ))
+    //         .from(QOrderItem.orderItem)
+    //         .join(QOrderItem.orderItem.dish, dish)
+    //         .leftJoin(QOrderItem.orderItem.orderItemChoices,orderItemChoice)
+    //         .leftJoin(orderItemChoice.choice, choice)
+    //         .leftJoin(choice.option, option)
+    //         .where(QOrderItem.orderItem.eq(orderItem))
+    //         .fetch();
+    // }
 
+    public List<TableOrderResponseVo> findAllDishOptionsAndChoicesByParentOrder(ParentOrder parentOrder) {
         return select(Projections.constructor(TableOrderResponseVo.class,
-            dish.id, dish.name, dish.price,
-            option.id, option.name,
-            choice.id, choice.name, choice.price
+            orderItem.id.as("orderItemId"),
+            dish.id.as("dishId"),
+            dish.name.as("dishName"),
+            dish.description.as("description"),
+            dish.image.as("image"),
+            dish.price,
+            option.id.as("optionId"),
+            option.name.as("optionName"),
+            choice.id.as("choiceId"),
+            choice.name.as("choiceName"),
+            choice.price.as("choicePrice")
         ))
-            .from(QOrderItem.orderItem)
-            .join(QOrderItem.orderItem.dish, dish)
-            .leftJoin(QOrderItem.orderItem.orderItemChoices,orderItemChoice)
+            .from(orderItem)
+            .join(orderItem.dish, dish)
+            .leftJoin(orderItem.orderItemChoices, orderItemChoice)
             .leftJoin(orderItemChoice.choice, choice)
             .leftJoin(choice.option, option)
-            .where(QOrderItem.orderItem.eq(orderItem))
+            .where(orderItem.order.parentOrder.eq(parentOrder))
             .fetch();
     }
+
 }

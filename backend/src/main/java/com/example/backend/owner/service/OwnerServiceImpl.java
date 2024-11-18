@@ -185,6 +185,8 @@ public class OwnerServiceImpl implements OwnerService{
 		// 2. option table과 choice table을 join하여 현재 restaurant에 해당하는 옵션 정보를 들고 온다.
 		List<OptionVo> optionVos = optionRepository.findAllOptionByRestaurant(restaurant);
 
+		// log.warn("optionVos : {}",optionVos);
+
 		// 3. optionVos를 가지고 알맞은 api 반환 형식으로 가공한다.
 		// 3-1. stream의 groupingBy를 이용해 optionId를 key로 분류한다.
 		Map<Integer, List<OptionVo>> optionGroupByOptionId = optionVos.stream()
@@ -199,7 +201,7 @@ public class OwnerServiceImpl implements OwnerService{
 		List<OptionResponseDto> optionResponseDtos = optionGroupByOptionId.entrySet().stream()
 			.map(optionEntry -> {
 				Integer optionId = optionEntry.getKey();
-				log.warn("optionId : {}",optionId);
+				// log.warn("optionId : {}",optionId);
 				List<OptionVo> values = optionEntry.getValue();
 
 				return getOptionResponseDto(optionId, values);
@@ -308,14 +310,11 @@ public class OwnerServiceImpl implements OwnerService{
 		}
 		else{
 			// option을 삭제해도 괜찮은 경우
-			for(DishOption dishOption : dishOptions){
-				List<Choice> choices = choiceRepository.findByOption(option);
-				for(Choice choice : choices){
-					choice.changeStatus(DELETE);
-				}
-				option.changeStatus(DELETE);
-				dishOption.changeStatus(DELETE);
+			List<Choice> choices = choiceRepository.findByOption(option);
+			for(Choice choice : choices){
+				choice.changeStatus(DELETE);
 			}
+			option.changeStatus(DELETE);
 		}
 	}
 
@@ -492,8 +491,6 @@ public class OwnerServiceImpl implements OwnerService{
 	@Override
 	public void createCategory(CategoryDto categoryDto, Integer userId) {
 
-		log.warn("categoryDto : {}",categoryDto);
-
 		//1. 점주를 조회한다
 		Owner owner = ownerRepository.findById(userId)
 			.orElseThrow(() -> new JDQRException(ErrorCode.USER_NOT_FOUND));
@@ -545,7 +542,7 @@ public class OwnerServiceImpl implements OwnerService{
 
 			if(Objects.equals(dishCategory.getId(), dishCategoryId)){
 				// 카테고리 삭제 시, 카테고리에 속한 메뉴가 있는 지 확인한다
-				log.warn("dishes : {}",dishCategory.getDishes());
+				// log.warn("dishes : {}",dishCategory.getDishes());
 				if(ObjectUtils.isEmpty(dishCategory.getDishes())){
 					dishCategoryRepository.delete(dishCategory);
 					return;

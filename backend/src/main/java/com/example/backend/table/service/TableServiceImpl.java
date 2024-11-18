@@ -103,7 +103,6 @@ public class TableServiceImpl implements TableService{
 
 		//3. 삭제한다
 		table.setStatus(EntityStatus.DELETE);
-
 		tableRepository.save(table);
 	}
 
@@ -192,38 +191,40 @@ public class TableServiceImpl implements TableService{
 			}
 
 			ParentOrder parentOrder = optionalParentOrder.get();
-
 			Map<DishDetailInfo, Integer> dishCountMap = new LinkedHashMap<>();
-
 			// 아직 결제되지 않은 항목만 가지고온다
 			if(parentOrder.getOrderStatus().equals(OrderStatus.PENDING) || parentOrder.getOrderStatus().equals(OrderStatus.PAY_WAITING)){
 
-				List<OrderItem> orderItems = orderItemRepository.findOrderItemByParentOrder(parentOrder);
+				List<TableOrderResponseVo> voList = orderItemRepository.findAllDishOptionsAndChoicesByParentOrder(parentOrder);
 
-				// orderItem에 있는 dish에 대해서 dishOption과 choice를 찾아서 반환해야한다
-				for(OrderItem orderItem : orderItems){
-					// log.warn("orderItem : {}",orderItem);
-					List<TableOrderResponseVo> voList = orderItemRepository.findDishOptionsAndChoicesByOrderItem(
-						orderItem);
+				// OrderItem ID를 기준으로 그룹핑하여 각 orderItem별로 처리
+				Map<Integer, List<TableOrderResponseVo>> orderItemGroups = voList.stream()
+					.collect(Collectors.groupingBy(TableOrderResponseVo::getOrderItemId));
 
-					// 모두 한 orderItem에 대한 정보를 담고있으므로, 처음것을 가지고온다
-					TableOrderResponseVo firstVo = voList.get(0);
+				// orderItemVoList는 하나의 OrderItem에 대한 모든 옵션과 선택지를 포함하는 리스트
+				for (List<TableOrderResponseVo> orderItemVoList : orderItemGroups.values()) {
+					TableOrderResponseVo firstVo = orderItemVoList.get(0);
 
-					Map<Integer, List<TableOrderResponseVo>> optionsMap = voList.stream()
+					// Option ID를 기준으로 그룹핑합니다.
+					Map<Integer, List<TableOrderResponseVo>> optionsMap = orderItemVoList.stream()
 						.collect(Collectors.groupingBy(vo -> vo.getOptionId() == null ? -1 : vo.getOptionId()));
 
-					// optionDtos를 생성한다
-					// optionId와 choice는 1:N이므로 여러 optionDtos가 생길 수 있다
+					// OptionDto 리스트를 생성합니다.
 					List<OptionDto> optionDtos = getOptionDtos(optionsMap);
 
-					Dish dish = dishRepository.findById(firstVo.getDishId())
-						.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+					// Dish 정보를 생성합니다.
+					Dish dish = Dish.builder()
+						.id(firstVo.getDishId())
+						.name(firstVo.getDishName())
+						.description(firstVo.getDescription())
+						.image(firstVo.getImage())
+						.price(firstVo.getPrice())
+						.build();
 
-					// 한 메뉴에 대해 optionDto를 가진 dishDetailInfo를 생성한다
-					DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish,optionDtos);
+					// DishDetailInfo를 생성합니다.
+					DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish, optionDtos);
 
-					// 이때, 완전히 동일한 상태(메뉴,세부옵션 동일)가 있을 수 있으므로 ( 유저별로 orderItem 레코드가 기록되기 때문)
-					// Map의 equals를 재정의 하여 동일한 메뉴를 카운팅한다
+					// 동일한 메뉴와 옵션 조합의 수량을 누적합니다.
 					dishCountMap.put(dishDetailInfo, dishCountMap.getOrDefault(dishDetailInfo, 0) + 1);
 				}
 			}
@@ -249,8 +250,6 @@ public class TableServiceImpl implements TableService{
 			TableDetailInfo tableDetailInfo = TableDetailInfo.of(table,result,totalPrice);
 			tableDetailInfos.add(tableDetailInfo);
 		}
-
-
 
 		TableResultDto tableResultDto = new TableResultDto(tableDetailInfos,leftSeatNum);
 
@@ -329,36 +328,36 @@ public class TableServiceImpl implements TableService{
 		// 아직 결제되지 않은 항목만 가지고온다
 		if(parentOrder.getOrderStatus().equals(OrderStatus.PENDING) || parentOrder.getOrderStatus().equals(OrderStatus.PAY_WAITING)){
 
-			log.warn("parentOrder : {}",parentOrder);
-			List<OrderItem> orderItems = orderItemRepository.findOrderItemByParentOrder(parentOrder);
-			for(OrderItem orderItem : orderItems){
-				log.warn("orderItem : {}",orderItem);
-			}
+			List<TableOrderResponseVo> voList = orderItemRepository.findAllDishOptionsAndChoicesByParentOrder(parentOrder);
 
-			// orderItem에 있는 dish에 대해서 dishOption과 choice를 찾아서 반환해야한다
-			for(OrderItem orderItem : orderItems) {
-				List<TableOrderResponseVo> voList = orderItemRepository.findDishOptionsAndChoicesByOrderItem(
-					orderItem);
+			// OrderItem ID를 기준으로 그룹핑하여 각 orderItem별로 처리
+			Map<Integer, List<TableOrderResponseVo>> orderItemGroups = voList.stream()
+				.collect(Collectors.groupingBy(TableOrderResponseVo::getOrderItemId));
 
-				// 모두 한 orderItem에 대한 정보를 담고있으므로, 처음것을 가지고온다
-				TableOrderResponseVo firstVo = voList.get(0);
+			// orderItemVoList는 하나의 OrderItem에 대한 모든 옵션과 선택지를 포함하는 리스트
+			for (List<TableOrderResponseVo> orderItemVoList : orderItemGroups.values()) {
+				TableOrderResponseVo firstVo = orderItemVoList.get(0);
 
-				// optionId별로 groupBy하여 vo객체를 대응시킨다
-				Map<Integer, List<TableOrderResponseVo>> optionsMap = voList.stream()
+				// Option ID를 기준으로 그룹핑합니다.
+				Map<Integer, List<TableOrderResponseVo>> optionsMap = orderItemVoList.stream()
 					.collect(Collectors.groupingBy(vo -> vo.getOptionId() == null ? -1 : vo.getOptionId()));
 
-				// optionDtos를 생성한다
-				// optionId와 choice는 1:N이므로 여러 optionDtos가 생길 수 있다
+				// OptionDto 리스트를 생성합니다.
 				List<OptionDto> optionDtos = getOptionDtos(optionsMap);
 
-				Dish dish = dishRepository.findById(firstVo.getDishId())
-					.orElseThrow(() -> new JDQRException(ErrorCode.DISH_NOT_FOUND));
+				// Dish 정보를 생성합니다.
+				Dish dish = Dish.builder()
+					.id(firstVo.getDishId())
+					.name(firstVo.getDishName())
+					.description(firstVo.getDescription())
+					.image(firstVo.getImage())
+					.price(firstVo.getPrice())
+					.build();
 
-				// 한 메뉴에 대해 optionDto를 가진 dishDetailInfo를 생성한다
+				// DishDetailInfo를 생성합니다.
 				DishDetailInfo dishDetailInfo = DishDetailInfo.of(dish, optionDtos);
 
-				// 이때, 완전히 동일한 상태(메뉴,세부옵션 동일)가 있을 수 있으므로 ( 유저별로 orderItem 레코드가 기록되기 때문)
-				// Map의 equals를 재정의 하여 동일한 메뉴를 카운팅한다
+				// 동일한 메뉴와 옵션 조합의 수량을 누적합니다.
 				dishCountMap.put(dishDetailInfo, dishCountMap.getOrDefault(dishDetailInfo, 0) + 1);
 			}
 		}

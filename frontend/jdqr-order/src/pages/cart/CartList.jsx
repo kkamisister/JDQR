@@ -29,10 +29,10 @@ export default function CartList() {
   useEffect(() => {
     if (client && client.connected) {
       const subscription = client.subscribe(
-        "/sub/cart/" + tableId,
+        `/sub/cart/${tableId}`,
         (message) => {
           const data = JSON.parse(message.body);
-          console.log("내가 받은데이따", data.cartList);
+          console.log("받은 데이터:", data.cartList);
           setDishes(data.cartList);
           setTotalPrice(data.totalPrice);
           setTotalQuantity(data.totalQuantity);
@@ -42,11 +42,61 @@ export default function CartList() {
       return () => {
         subscription.unsubscribe();
       };
+    } else {
+      console.log("WebSocket 연결되지 않음");
     }
-  }, [client]);
+  }, [client, tableId]);
 
   const myDishes = dishes.filter((dish) => dish.userId === userId);
   const othersDishes = dishes.filter((dish) => dish.userId !== userId);
+
+  const updateQuantity = (dish, change) => {
+    if (client && client.connected) {
+      const postData = {
+        userId: dish.userId,
+        dishId: dish.dishId,
+        choiceIds: dish.choiceIds,
+        quantity: change,
+      };
+      client.send("/pub/cart/add", {}, JSON.stringify(postData));
+
+      // 로컬 상태 업데이트
+      setDishes((prevDishes) =>
+        prevDishes.map((d) =>
+          d.dishId === dish.dishId &&
+          d.choiceIds.join() === dish.choiceIds.join()
+            ? { ...d, quantity: Math.max(d.quantity + change, 0) }
+            : d
+        )
+      );
+    } else {
+      console.error("수량 변경 실패");
+    }
+  };
+
+  const deleteDish = (dish) => {
+    if (client && client.connected) {
+      const postData = {
+        userId: dish.userId,
+        dishId: dish.dishId,
+        choiceIds: dish.choiceIds,
+      };
+      client.send("/pub/cart/delete", {}, JSON.stringify(postData));
+
+      // 로컬 상태 업데이트
+      setDishes((prevDishes) =>
+        prevDishes.filter(
+          (d) =>
+            !(
+              d.dishId === dish.dishId &&
+              d.choiceIds.join() === dish.choiceIds.join()
+            )
+        )
+      );
+    } else {
+      console.error("삭제 실패");
+    }
+  };
 
   const goToDish = () => {
     navigate("/dish");
@@ -57,9 +107,7 @@ export default function CartList() {
       placeOrder();
       navigate("/order");
     } catch (error) {
-      throw new Error(
-        "왤케 조금 시키세요;;;;이러면 자영업자들 뭐 목고 살라고;;"
-      );
+      enqueueSnackbar("주문 실패! 다시 시도해주세요.", { variant: "error" });
     }
   };
 
@@ -74,35 +122,40 @@ export default function CartList() {
             mt: 10,
           }}
         >
-          {myDishes.length === 0 && othersDishes.length === 0 && (
-            <Stack>
-              <AddShoppingCartIcon
-                sx={{
-                  color: colors.main.primary500,
-                  fontSize: 200,
-                }}
-              />
-              <Typography
-                sx={{
-                  color: colors.text.main,
-                  fontWeight: 600,
-                  fontSize: 18,
-                  mt: 2,
-                }}
-              >
-                아직 담은 메뉴가 없습니다. 메뉴를 추가해보세요!
-              </Typography>
-            </Stack>
-          )}
+          <AddShoppingCartIcon
+            sx={{
+              color: colors.main.primary500,
+              fontSize: 200,
+            }}
+          />
+          <Typography
+            sx={{
+              color: colors.text.main,
+              fontWeight: 600,
+              fontSize: 18,
+              mt: 2,
+            }}
+          >
+            아직 담은 메뉴가 없습니다. 메뉴를 추가해보세요!
+          </Typography>
         </Stack>
       )}
       {myDishes?.length > 0 && (
-        <CartListItem title="내가 담은 메뉴" dishes={myDishes} />
+        <CartListItem
+          title="내가 담은 메뉴"
+          dishes={myDishes}
+          onUpdateQuantity={updateQuantity}
+          onDeleteDish={deleteDish}
+        />
       )}
       {othersDishes?.length > 0 && (
-        <CartListItem title="일행이 담은 메뉴" dishes={othersDishes} />
+        <CartListItem
+          title="일행이 담은 메뉴"
+          dishes={othersDishes}
+          onUpdateQuantity={updateQuantity}
+          onDeleteDish={deleteDish}
+        />
       )}
-      {/* {(myDishes.length > 0 || othersDishes.length > 0) && ( */}
       <Button
         endIcon={<AddCircleIcon />}
         onClick={goToDish}
@@ -116,7 +169,6 @@ export default function CartList() {
       >
         메뉴 더 담기
       </Button>
-      {/* )} */}
       <Box>
         {totalQuantity > 0 && totalPrice && (
           <BaseButton count={totalQuantity} onClick={submitOrder}>

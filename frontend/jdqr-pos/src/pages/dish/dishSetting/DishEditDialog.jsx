@@ -95,6 +95,15 @@ const DishEditDialog = ({
 		onClose();
 	};
 
+	const handleTagDelete = removedTag => {
+		setEditedDishInfo(prev => {
+			return {
+				...prev,
+				tags: prev.tags.filter(item => item !== removedTag),
+			};
+		});
+	};
+
 	const { isPending: isOptionPending, data: optionList } = useQuery({
 		queryKey: ['optionList'], // keyword를 queryKey에 포함하여 키워드가 변경되면 새로운 요청 실행
 		queryFn: () => fetchDishOptionList(),
@@ -333,6 +342,9 @@ const DishEditDialog = ({
 										<Chip
 											label={_tag}
 											key={`_tag-${_tag}-${index}`}
+											onDelete={() => {
+												handleTagDelete(_tag);
+											}}
 										/>
 									))}
 								</Stack>

@@ -79,7 +79,7 @@ export const fetchPaymentList = async () => {
  */
 export const moneyDivide = async ({ peopleNum, serveNum }) => {
   try {
-    const orderResponse = fetchOrderStatus();
+    const orderResponse = await fetchOrderStatus();
     if (orderResponse.orderStatus === "PENDING") {
       changeOrderStatus();
     } else if (orderResponse.orderStatus === "CANCELLED") {
@@ -98,6 +98,35 @@ export const moneyDivide = async ({ peopleNum, serveNum }) => {
     return response.data.data;
   } catch (error) {
     throw new Error("으악! N빵 결제 안 돼");
+  }
+};
+
+/**
+ * @param {Object} params
+ * @param {Array} params.orderItemInfos
+ * @returns {Object}
+ */
+export const menuDivide = async ({ orderItemInfos }) => {
+  try {
+    const orderResponse = await fetchOrderStatus();
+    console.log(orderResponse.orderStatus);
+    if (orderResponse.orderStatus === "PENDING") {
+      changeOrderStatus();
+    } else if (orderResponse.orderStatus === "CANCELLED") {
+      window.alert("취소된 주문이라 결제가 종료되었습니다.");
+      return;
+    } else if (orderResponse.orderStatus === "PAID") {
+      window.alert("결제가 완료되어 더 이상 결제를 진행할 수 없습니다.");
+      return;
+    }
+    const response = await axiosInstance.post("order/payment", {
+      type: "MENU_DIVIDE",
+      orderItemInfos,
+    });
+
+    return response.data.data;
+  } catch (error) {
+    throw new Error("엉엉 아이템별 결제 안돼");
   }
 };
 

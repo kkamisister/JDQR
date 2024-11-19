@@ -6,7 +6,10 @@ import { useLocation } from "react-router-dom";
 // TODO: 구매자의 고유 아이디를 불러와서 customerKey로 설정하세요. 이메일・전화번호와 같이 유추가 가능한 값은 안전하지 않습니다.
 // @docs https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-const customerKey = sessionStorage.getItem("userId");
+// const clientKey = "test_ck_pP2YxJ4K87BAoKJbayO0rRGZwXLO";
+// const customerKey = sessionStorage.getItem("userId");
+const userId = sessionStorage.getItem("userId") || "";
+const customerKey = userId.length > 50 ? userId.slice(0, 45) : userId;
 
 export function CheckoutPage() {
   const location = useLocation();
@@ -22,7 +25,6 @@ export function CheckoutPage() {
     setAmount({
       currency: "KRW",
       value: value,
-      // value: 300000000,
     });
   }, [value]);
   const [ready, setReady] = useState(false);
@@ -40,8 +42,6 @@ export function CheckoutPage() {
         const widgets = tossPayments.widgets({
           customerKey,
         });
-        // 비회원 결제
-        // const widgets = tossPayments.widgets({ customerKey: ANONYMOUS });
 
         setWidgets(widgets);
       } catch (error) {
@@ -139,13 +139,11 @@ export function CheckoutPage() {
               // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
               // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
               await widgets.requestPayment({
-                orderId: generateRandomString(),
-                orderName: "토스 티셔츠 외 2건",
+                orderId: orderId,
+                // amount: amount,
+                orderName: orderName,
                 successUrl: window.location.origin + "/success",
                 failUrl: window.location.origin + "/fail",
-                customerEmail: "customer123@gmail.com",
-                customerName: "김토스",
-                customerMobilePhone: "01012341234",
               });
             } catch (error) {
               // 에러 처리하기

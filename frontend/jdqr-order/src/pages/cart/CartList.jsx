@@ -64,7 +64,7 @@ export default function CartList() {
   };
 
   return (
-    <Stack alignItems={"center"} justifyContent={"center"}>
+    <Stack>
       {myDishes.length === 0 && othersDishes.length === 0 && (
         <Stack
           alignItems="center"
@@ -75,7 +75,7 @@ export default function CartList() {
           }}
         >
           {myDishes.length === 0 && othersDishes.length === 0 && (
-            <Stack alignItems="center">
+            <Stack>
               <AddShoppingCartIcon
                 sx={{
                   color: colors.main.primary500,

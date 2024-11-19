@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
-import { Element, scroller } from "react-scroll";
-import DishSearchBar from "./DishSearchBar";
-import { Box, Divider, Stack, Typography } from "@mui/material";
-import DishTab from "../../components/tab/DishTab";
-import DishItemCard from "../../components/card/DishItemCard";
-import { colors } from "../../constants/colors";
-import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react"
+import { Element, scroller } from "react-scroll"
+import DishSearchBar from "./DishSearchBar"
+import { Box, Divider, Stack, Typography } from "@mui/material"
+import DishTab from "../../components/tab/DishTab"
+import DishItemCard from "../../components/card/DishItemCard"
+import { colors } from "../../constants/colors"
+import { useNavigate } from "react-router-dom"
+import { useQuery } from "@tanstack/react-query"
 
 export default function DishList({ dishes, categories }) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleCategoryClick = (category) => {
     // console.log("카테고리는 말이죵", category);
@@ -18,12 +18,12 @@ export default function DishList({ dishes, categories }) {
       delay: 0,
       smooth: "easeInOutQuart",
       containerId: "scrollable-dish-list",
-    });
-  };
+    })
+  }
 
   const handleDishClick = (dishId) => {
-    navigate(`${dishId}`);
-  };
+    navigate(`${dishId}`)
+  }
 
   return (
     <Box
@@ -33,7 +33,7 @@ export default function DishList({ dishes, categories }) {
         height: "100%",
       }}
     >
-      <DishSearchBar />
+      {/* <DishSearchBar /> */}
       <DishTab dishCategories={categories} onTabClick={handleCategoryClick} />
 
       <Box
@@ -89,5 +89,5 @@ export default function DishList({ dishes, categories }) {
         ))}
       </Box>
     </Box>
-  );
+  )
 }

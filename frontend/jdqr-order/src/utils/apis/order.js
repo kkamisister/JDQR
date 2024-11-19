@@ -79,7 +79,7 @@ export const fetchPaymentList = async () => {
  */
 export const moneyDivide = async ({ peopleNum, serveNum }) => {
   try {
-    const orderResponse = fetchOrderStatus();
+    const orderResponse = await fetchOrderStatus();
     if (orderResponse.orderStatus === "PENDING") {
       changeOrderStatus();
     } else if (orderResponse.orderStatus === "CANCELLED") {
@@ -109,7 +109,7 @@ export const moneyDivide = async ({ peopleNum, serveNum }) => {
 export const menuDivide = async ({ orderItemInfos }) => {
   try {
     const orderResponse = await fetchOrderStatus();
-
+    console.log(orderResponse.orderStatus);
     if (orderResponse.orderStatus === "PENDING") {
       changeOrderStatus();
     } else if (orderResponse.orderStatus === "CANCELLED") {

@@ -548,7 +548,7 @@ public class OrderServiceImpl implements OrderService {
 
         // 주문이 비어 있거나, 이미 결제된 주문일 경우 error throw
         Optional<ParentOrder> optionalParentOrder = parentOrderRepository.findFirstByTableIdOrderByIdDesc(tableId);
-        if (optionalParentOrder.isEmpty() || optionalParentOrder.get().getOrderStatus().getGroup().equals(OrderStatusGroup.FINISHED)) {
+        if (optionalParentOrder.isEmpty()) {
             throw new JDQRException(ErrorCode.ORDER_ALREADY_PAID);
         }
 

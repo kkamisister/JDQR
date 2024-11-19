@@ -102,7 +102,9 @@ const RestaurantItemCard = ({ restaurant, sx, onClick }) => {
           <Typography
             fontSize={12}
             fontWeight={600}
-            color={colors.text.sub1}
+            color={
+              restaurant.maxPeopleNum > 0 ? colors.text.sub1 : colors.text.sub3
+            }
             sx={{ whiteSpace: "nowrap" }}
           >
             {restaurant.maxPeopleNum > 0

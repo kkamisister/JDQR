@@ -108,7 +108,9 @@ const RestaurantInfo = ({ restaurant, open }) => {
           <Typography
             fontSize={13}
             fontWeight={600}
-            color={colors.text.sub1}
+            color={
+              restaurant.maxPeopleNum > 0 ? colors.text.sub1 : colors.text.sub3
+            }
             sx={{
               whiteSpace: "nowrap",
             }}

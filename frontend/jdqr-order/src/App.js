@@ -19,6 +19,7 @@ import { FailurePage } from "./pages/payment/toss/Failure";
 import CelebrationPage from "./pages/payment/validation/CelebrationPage";
 import { fetchOrderStatus } from "./utils/apis/order";
 import { useEffect } from "react";
+import { CheckoutPage } from "./pages/payment/toss/Checkouts";
 
 const queryClient = new QueryClient();
 
@@ -30,23 +31,25 @@ function App() {
     >
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <WithRouteProtection>
-            <Routes>
-              <Route path="/place" element={<HomePage />} />
-              <Route
-                path="/place/:restaurantId"
-                element={<RestaurantDetailPage />}
-              />
-              <Route path="/dish" element={<DishPage />} />
-              <Route path="/dish/:dishId" element={<DishDetailPage />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/payment" element={<PaymentPage />} />
-              <Route path="/order" element={<OrderPage />} />
-              <Route path="/success" element={<PaymentValidationPage />} />
-              <Route path="/fail" element={<FailurePage />} />
-              <Route path="/celebration" element={<CelebrationPage />} />
-            </Routes>
-          </WithRouteProtection>
+          {/* <WithRouteProtection> */}
+          <Routes>
+            <Route path="/place" element={<HomePage />} />
+            <Route
+              path="/place/:restaurantId"
+              element={<RestaurantDetailPage />}
+            />
+
+            <Route path="/dish" element={<DishPage />} />
+            <Route path="/dish/:dishId" element={<DishDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/toss" element={<CheckoutPage />} />
+            <Route path="/order" element={<OrderPage />} />
+            <Route path="/success" element={<PaymentValidationPage />} />
+            <Route path="/fail" element={<FailurePage />} />
+            <Route path="/celebration" element={<CelebrationPage />} />
+          </Routes>
+          {/* </WithRouteProtection> */}
         </BrowserRouter>
       </QueryClientProvider>
     </SnackbarProvider>
@@ -54,70 +57,63 @@ function App() {
 }
 
 // 특정 경로 접근 차단 로직 추가 (PAY_WAITING 상태만 제한)
-function WithRouteProtection({ children }) {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { enqueueSnackbar } = useSnackbar();
+// function WithRouteProtection({ children }) {
+//   const location = useLocation();
+//   const navigate = useNavigate();
+//   const { enqueueSnackbar } = useSnackbar();
 
-  useEffect(() => {
-    const checkAndRestrict = async () => {
-      try {
-        const response = await fetchOrderStatus();
+//   useEffect(() => {
+//     const checkAndRestrict = async () => {
+//       try {
+//         const response = await fetchOrderStatus();
 
-        if (response?.orderStatus === "PAY_WAITING") {
-          const restrictedPaths = ["/dish", "/cart", "/order"];
-          const isRestricted =
-            restrictedPaths.some((path) =>
-              location.pathname.startsWith(path)
-            ) || /^\/dish\/[^/]+$/.test(location.pathname); // /dish/:dishId 처리
+//         if (response?.orderStatus === "PAY_WAITING") {
+//           const restrictedPaths = ["/dish", "/cart", "/order"];
+//           const isRestricted =
+//             restrictedPaths.some((path) =>
+//               location.pathname.startsWith(path)
+//             ) || /^\/dish\/[^/]+$/.test(location.pathname); // /dish/:dishId 처리
 
-          if (isRestricted) {
-            enqueueSnackbar(
-              "결제가 완료되지 않았습니다. 결제 페이지로 이동합니다.",
-              {
-                variant: "warning",
-                autoHideDuration: 3000,
-              }
-            );
-            navigate("/payment", { replace: true }); // /payment로 리다이렉트
-          }
-        }
-      } catch (error) {
-        console.error("주문 상태 조회 중 오류 발생:", error);
-      }
-    };
+//           if (isRestricted) {
+//             enqueueSnackbar(
+//               "결제가 완료되지 않았습니다. 결제 페이지로 이동합니다.",
+//               {
+//                 variant: "warning",
+//                 autoHideDuration: 3000,
+//               }
+//             );
+//             navigate("/payment", { replace: true }); // /payment로 리다이렉트
+//           }
+//         }
+//       } catch (error) {
+//         console.error("주문 상태 조회 중 오류 발생:", error);
+//       }
+//     };
 
-    checkAndRestrict();
-  }, [location, enqueueSnackbar, navigate]);
+//     checkAndRestrict();
+//   }, [location, enqueueSnackbar, navigate]);
 
-  return children;
-}
+//   return children;
+// }
 
-// fetchOrderStatus를 호출하여 상태 확인 후 처리
-function WithOrderStatusRedirect() {
-  const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate();
+// // fetchOrderStatus를 호출하여 상태 확인 후 처리
+// function WithOrderStatusRedirect() {
+//   const { enqueueSnackbar } = useSnackbar();
+//   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkOrderStatus = async () => {
-      try {
-        const response = await fetchOrderStatus();
-        // if (response?.orderStatus === "PAY_WAITING") {
-        //   enqueueSnackbar("결제가 완료되지 않았습니다.", {
-        //     variant: "warning",
-        //     autoHideDuration: 3000,
-        //   });
-        //   navigate("/payment", { replace: true });
-        // }
-      } catch (error) {
-        console.error("주문 상태 조회 중 오류 발생:", error);
-      }
-    };
+//   useEffect(() => {
+//     const checkOrderStatus = async () => {
+//       try {
+//         const response = await fetchOrderStatus();
+//       } catch (error) {
+//         console.error("주문 상태 조회 중 오류 발생:", error);
+//       }
+//     };
 
-    checkOrderStatus();
-  }, [enqueueSnackbar, navigate]);
+//     checkOrderStatus();
+//   }, [enqueueSnackbar, navigate]);
 
-  return null;
-}
+//   return null;
+// }
 
 export default App;

@@ -83,11 +83,11 @@ public class OrderItemRepositoryCustomImpl extends Querydsl4RepositorySupport im
         ))
             .from(orderItem)
             .join(orderItem.dish, dish)
-            .join(orderItem.order.parentOrder.payments, payment)
             .leftJoin(orderItem.orderItemChoices, orderItemChoice)
             .leftJoin(orderItemChoice.choice, choice)
             .leftJoin(choice.option, option)
-            .where(orderItem.order.parentOrder.eq(parentOrder))
+            .where(orderItem.order.parentOrder.eq(parentOrder)
+                .and(orderItem.paidQuantity.lt(orderItem.quantity)))
             .fetch();
     }
 

@@ -31,3 +31,15 @@ spring:
 
   jwt:
     secret-key: Z29nby10bS1zZXJ2ZXItZGxyamVvYW9yb3JodG9kZ290c3Atam9vbmdhbmduaW0teWVvbHNpbWhpaGFswvuqoxyve
+
+cloud:
+  aws:
+    credentials:
+      accessKey: awsId
+      secretKey: awsKey
+    s3:
+      bucketName: awsBucketName
+    region:
+      static: awsRegion
+    stack:
+      auto: false

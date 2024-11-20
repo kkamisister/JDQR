@@ -375,6 +375,7 @@ public final class TestDataGenerator {
 			.address(address)
 			.latitude(latitude)
 			.longitude(longitude)
+			.open(TRUE)
 			.build();
 
 	}

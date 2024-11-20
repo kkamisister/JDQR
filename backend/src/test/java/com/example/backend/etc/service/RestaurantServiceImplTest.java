@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +14,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.example.backend.TestDataGenerator;
 import com.example.backend.common.enums.CategoryType;
 import com.example.backend.common.enums.UseStatus;
+import com.example.backend.dish.dto.DishResponse;
+import com.example.backend.dish.entity.Dish;
+import com.example.backend.dish.entity.DishCategory;
+import com.example.backend.dish.entity.DishOption;
+import com.example.backend.dish.entity.Option;
+import com.example.backend.dish.repository.DishOptionRepository;
+import com.example.backend.dish.repository.DishRepository;
+import com.example.backend.etc.dto.RestaurantCategoryDetail;
+import com.example.backend.etc.dto.RestaurantCategoryDto;
+import com.example.backend.etc.dto.RestaurantResponse;
 import com.example.backend.etc.dto.RestaurantResponse.RestaurantInfo;
 import com.example.backend.etc.entity.Restaurant;
 import com.example.backend.etc.entity.RestaurantCategory;
@@ -43,6 +55,12 @@ class RestaurantServiceImplTest {
 	private RestaurantCategoryMapRepository restaurantCategoryMapRepository;
 	@Mock
 	private TableRepository tableRepository;
+	@Mock
+	private DishOptionRepository dishOptionRepository;
+	@Mock
+	private DishRepository dishRepository;
+
+	private final TestDataGenerator generator = new TestDataGenerator();
 
 	@DisplayName("유저의 화면범위에 존재하는 가맹점을 조회할 수 있다")
 	@Test
@@ -265,6 +283,116 @@ class RestaurantServiceImplTest {
 		// 	);
 
 		assertThat(res3.restaurants().size()).isEqualTo(3);
+	}
+
+	@DisplayName("가맹점의 상세정보를 조회할 수 있다")
+	@Test
+	void getRestaurantDetailTest(){
+		//given
+		List<Restaurant> restaurants = generator.generateTestRestaurantList(true);
+		List<RestaurantCategory> restaurantCategories = generator.generateTestRestaurantCategoryList(true);
+
+
+		List<RestaurantCategoryMap> restaurantCategoryMaps = generator.generateTestRestaurantCategoryMap(true);
+		for(int i=0;i<restaurantCategoryMaps.size();i++){
+			RestaurantCategoryMap restaurantCategoryMap = restaurantCategoryMaps.get(i);
+			restaurantCategoryMap.setRestaurantCategory(restaurantCategories.get(i));
+			restaurantCategoryMap.setRestaurant(restaurants.get(i));
+		}
+
+
+		Table table1 = Table.builder()
+			.id("11111")
+			.name("영표의식탁")
+			.color("#ffffff")
+			.useStatus(UseStatus.AVAILABLE)
+			.people(6)
+			.build();
+
+
+		Table table2 = Table.builder()
+			.id("22222")
+			.name("용수의식탁")
+			.color("#ffffff")
+			.useStatus(UseStatus.OCCUPIED)
+			.people(6)
+			.build();
+
+
+		Table table3 = Table.builder()
+			.id("33333")
+			.name("경환의식탁")
+			.color("#ffffff")
+			.useStatus(UseStatus.AVAILABLE)
+			.people(4)
+			.build();
+
+
+		Table table4 = Table.builder()
+			.id("44444")
+			.name("하연의식탁")
+			.color("#ffffff")
+			.useStatus(UseStatus.OCCUPIED)
+			.people(4)
+			.build();
+
+		List<Table> tables = List.of(table1,table2,table3,table4);
+
+		List<Dish> dishes = generator.generateTestDishList(true);
+		List<DishCategory> dishCategories = generator.generateTestDishCategoryList(true);
+		for(int i=0;i<dishCategories.size();i++){
+			DishCategory dishCategory = dishCategories.get(i);
+			dishCategory.setRestaurant(restaurants.get(i%2));
+		}
+
+		for(int i=0;i<dishes.size();i++){
+			Dish dish = dishes.get(i);
+			dish.setDishCategory(dishCategories.get(i%4));
+		}
+
+		List<Option> options = generator.generateTestOptionList(true);
+
+		List<DishOption> dishOptions = generator.generateTestDishOptionList(true);
+		for(int i=0;i<dishOptions.size();i++){
+			DishOption dishOption = dishOptions.get(i);
+			dishOption.setOption(options.get(i));
+			dishOption.setDish(dishes.get(i));
+		}
+
+		when(restaurantRepository.findById(anyInt()))
+			.thenReturn(Optional.of(restaurants.get(0)));
+
+		when(restaurantCategoryMapRepository.findByRestaurantId(anyInt()))
+			.thenReturn(restaurantCategoryMaps);
+
+		when(tableRepository.findByRestaurantId(anyInt()))
+			.thenReturn(tables);
+
+		when(dishOptionRepository.findByDish(any(Dish.class)))
+			.thenReturn(dishOptions);
+
+		when(dishRepository.findDishesByRestaurant(any(Restaurant.class)))
+			.thenReturn(dishes);
+
+		//when
+		RestaurantResponse.RestaurantDetailInfo res = restaurantService.getRestaurantDetail(
+			restaurants.get(0).getId());
+
+		//then
+		assertThat(res.restaurant().getRestaurantName())
+			.isEqualTo("용수의식당");
+
+		assertThat(res.restaurant().getRestaurantCategories().getMajor())
+			.extracting(RestaurantCategoryDto::getRestaurantCategoryName)
+			.contains("한식");
+
+		assertThat(res.restaurant().getRestTableNum())
+			.isEqualTo(2);
+		assertThat(res.restaurant().getRestSeatNum())
+			.isEqualTo(10);
+
+		assertThat(res.dishInfo().dishCategories())
+			.contains("햄버거","사이드");
 	}
 
 

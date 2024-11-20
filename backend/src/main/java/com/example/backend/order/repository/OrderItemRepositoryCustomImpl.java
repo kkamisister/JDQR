@@ -11,6 +11,8 @@ import com.example.backend.order.entity.ParentOrder;
 import com.example.backend.order.entity.OrderItem;
 import com.example.backend.order.entity.QOrderItem;
 import com.example.backend.order.entity.QOrderItemChoice;
+import com.example.backend.order.entity.QPayment;
+import com.example.backend.order.enums.PaymentStatus;
 import com.example.backend.table.dto.TableOrderResponseVo;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
@@ -24,6 +26,8 @@ import static com.example.backend.dish.entity.QOption.*;
 import static com.example.backend.order.entity.QOrder.*;
 import static com.example.backend.order.entity.QOrderItem.orderItem;
 import static com.example.backend.order.entity.QOrderItemChoice.*;
+import static com.example.backend.order.entity.QPayment.*;
+import static com.example.backend.order.enums.PaymentStatus.*;
 
 public class OrderItemRepositoryCustomImpl extends Querydsl4RepositorySupport implements OrderItemRepositoryCustom {
     // Order에 해당하는 OrderItem 목록을 반환
@@ -79,10 +83,12 @@ public class OrderItemRepositoryCustomImpl extends Querydsl4RepositorySupport im
         ))
             .from(orderItem)
             .join(orderItem.dish, dish)
+            .join(orderItem.order.parentOrder.payments, payment)
             .leftJoin(orderItem.orderItemChoices, orderItemChoice)
             .leftJoin(orderItemChoice.choice, choice)
             .leftJoin(choice.option, option)
-            .where(orderItem.order.parentOrder.eq(parentOrder))
+            .where(orderItem.order.parentOrder.eq(parentOrder)
+                .and(orderItem.paidQuantity.lt(orderItem.quantity)))
             .fetch();
     }
 

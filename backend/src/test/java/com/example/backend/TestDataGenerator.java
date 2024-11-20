@@ -8,6 +8,7 @@ import static java.lang.Boolean.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.backend.order.entity.Order;
 import com.example.backend.order.entity.ParentOrder;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +42,6 @@ public final class TestDataGenerator {
 	private final List<String> dishNameList;
 	private final List<Integer> dishPriceList;
 
-	private final List<String> tableIdList;
 	private final List<Integer> menuCntList;
 
 	private final List<String> categoryNameList;
@@ -61,6 +61,9 @@ public final class TestDataGenerator {
 	private final List<String> choiceList;
 	private final List<Integer> choicePriceList;
 
+	private final List<Integer> peopleNumList;
+	private final List<String> tableIdList;
+
 
 	public TestDataGenerator(){
 
@@ -76,14 +79,16 @@ public final class TestDataGenerator {
 		dishNameList = List.of("더블QPC","허니콤보","콜라","콤비네이션","베토디","고추바사삭","사이다","페퍼로니");
 		dishPriceList = List.of(8000,9000,18000,23000,2500,2500,23000,19000);
 
-		tableIdList = List.of("11111","22222");
 		menuCntList = List.of(5,7,9,11);
 
 		categoryNameList = List.of("한식","일식","양식","중식");
 		categoryTypeList = List.of(MAJOR,MAJOR,MAJOR,MAJOR);
 
-		orderStatusList = List.of(PAID,PENDING,PENDING,PAID);
-		paymentMethodList = List.of(UNDEFINED,MONEY_DIVIDE,UNDEFINED,MENU_DIVIDE);
+		orderStatusList = List.of(PAID,PAY_WAITING,PENDING,PAY_WAITING,PAID,PENDING);
+		paymentMethodList = List.of(UNDEFINED,MONEY_DIVIDE,UNDEFINED,MENU_DIVIDE,MENU_DIVIDE,MONEY_DIVIDE);
+		peopleNumList = List.of(4,4,4,4,6,6);
+		tableIdList = List.of("table1","table2","table3","table4","table5","table6");
+
 
 		userIdList = List.of("aaaaa","bbbbb","ccccc","ddddd");
 		quantityList = List.of(10,8,6,4,2,1);
@@ -110,6 +115,45 @@ public final class TestDataGenerator {
 			500,600,700,
 			300,300,300
 		);
+	}
+
+	//6개
+	public List<Order> generateTestOrderList(boolean  isIdNeed){
+
+		int numOfElement = 6;
+		List<Order> orderList = new ArrayList<>();
+		for(int i=0;i<numOfElement;i++){
+			orderList.add(Order.builder().build());
+		}
+		return orderList;
+	}
+
+	// 6개
+	public List<ParentOrder> generateTestParentOrderList(boolean isIdNeed){
+
+		int numOfElement = 6;
+		List<ParentOrder> parentOrderList = new ArrayList<>();
+		for(int i=0;i<numOfElement;i++){
+			parentOrderList.add(generateParentOrder(
+				tableIdList.get(i),orderStatusList.get(i),paymentMethodList.get(i), peopleNumList.get(i),
+				isIdNeed ? i+1 : null)
+			);
+		}
+		return parentOrderList;
+	}
+
+	private ParentOrder generateParentOrder(
+		String tableId,OrderStatus orderStatus,PaymentMethod paymentMethod,
+		int peopleNum,Integer id){
+
+		return ParentOrder.builder()
+			.id(id)
+			.tableId(tableId)
+			.orderStatus(orderStatus)
+			.paymentMethod(paymentMethod)
+			.peopleNum(peopleNum)
+			.build();
+
 	}
 
 	// 6개
@@ -172,14 +216,14 @@ public final class TestDataGenerator {
 			.build();
 	}
 
-	// 6개
+	// 12개
 	public List<OrderItem> generateTestOrderItemList(boolean isIdNeed){
 
-		int numOfElement = 6;
+		int numOfElement = 12;
 
 		List<OrderItem> orderItemList = new ArrayList<>();
 		for(int i = 0; i < numOfElement; i++){
-			orderItemList.add(generateOrderItem(userIdList.get(i%4),quantityList.get(i),paidQuantityList.get(i),orderPriceList.get(i),orderStatusList.get(i%4),isIdNeed ? i+1 : null));
+			orderItemList.add(generateOrderItem(userIdList.get(i%4),quantityList.get(i%6),paidQuantityList.get(i%6),orderPriceList.get(i%6),orderStatusList.get(i%6),isIdNeed ? i+1 : null));
 
 		}
 		return orderItemList;
@@ -235,25 +279,25 @@ public final class TestDataGenerator {
 			.build();
 	}
 
-	// 4개
-	public List<ParentOrder> generateTestOrderList(boolean isIdNeed){
-
-		int numOfElement = 4;
-
-		List<ParentOrder> parentOrderList = new ArrayList<>();
-		for(int i=0;i<numOfElement;i++){
-			parentOrderList.add(generateOrder(tableIdList.get(i%2),menuCntList.get(i),orderStatusList.get(i),paymentMethodList.get(i),isIdNeed ? i+1 : null));
-		}
-		return parentOrderList;
-	}
-
-	private ParentOrder generateOrder(String tableId, int cnt, OrderStatus orderStatus, PaymentMethod paymentMethod, Integer id){
-		return ParentOrder.builder()
-			.tableId(tableId)
-			.orderStatus(orderStatus)
-			.paymentMethod(paymentMethod)
-			.build();
-	}
+	// // 4개
+	// public List<ParentOrder> generateTestOrderList(boolean isIdNeed){
+	//
+	// 	int numOfElement = 4;
+	//
+	// 	List<ParentOrder> parentOrderList = new ArrayList<>();
+	// 	for(int i=0;i<numOfElement;i++){
+	// 		parentOrderList.add(generateOrder(tableIdList.get(i%2),menuCntList.get(i),orderStatusList.get(i),paymentMethodList.get(i),isIdNeed ? i+1 : null));
+	// 	}
+	// 	return parentOrderList;
+	// }
+	//
+	// private ParentOrder generateOrder(String tableId, int cnt, OrderStatus orderStatus, PaymentMethod paymentMethod, Integer id){
+	// 	return ParentOrder.builder()
+	// 		.tableId(tableId)
+	// 		.orderStatus(orderStatus)
+	// 		.paymentMethod(paymentMethod)
+	// 		.build();
+	// }
 
 
 	// 8개

@@ -24,4 +24,11 @@ public class OrderItemChoice extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "choice_id")
     private Choice choice;
+
+    public static OrderItemChoice of(OrderItem orderItem, Choice choice) {
+        return OrderItemChoice.builder()
+            .orderItem(orderItem)
+            .choice(choice)
+            .build();
+    }
 }

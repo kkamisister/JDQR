@@ -1,5 +1,8 @@
 package com.example.backend.order.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.example.backend.common.entity.BaseEntity;
 import com.example.backend.order.enums.OrderStatus;
 import com.example.backend.order.enums.PaymentMethod;
@@ -32,4 +35,8 @@ public class ParentOrder extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "parentOrder")
+    private List<Payment> payments = new ArrayList<>();
 }

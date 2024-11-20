@@ -39,18 +39,19 @@ export default function DishHeader() {
       initializeToken();
       tableId = sessionStorage.getItem("tableId");
     }
+    let subscription;
     if (client && client.connected) {
-      // console.log("일단 웹소켓 연결은 됨;;");
-      const subscription = client.subscribe(
-        "/sub/cart/" + tableId,
-        (message) => {
-          // console.log("이것이 멧쉐지", message.body);
-          const response = JSON.parse(message.body);
-          setCartList(response.cartList);
-          setPeopleCnt(response.peopleCnt);
-        }
-      );
+      subscription = client.subscribe("/sub/cart/" + tableId, (message) => {
+        const response = JSON.parse(message.body);
+        setCartList(response.cartList);
+        setPeopleCnt(response.peopleCnt);
+      });
     }
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
   }, [client]);
 
   const { data, isLoading } = useQuery({

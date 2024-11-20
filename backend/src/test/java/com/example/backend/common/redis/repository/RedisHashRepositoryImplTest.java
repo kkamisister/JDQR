@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Import({QuerydslConfig.class})
 @SpringBootTest
 @Slf4j
-class RedisHashRepositoryImplTest {
+class RedisHashRepositoryImplTest extends ContainerSupport {
 
 	@Autowired
 	private RedisHashRepositoryImpl redisHashRepository;

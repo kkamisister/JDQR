@@ -265,7 +265,7 @@
 
 - 토스 SDK를 이용해 결제 시스템 구축함. 서비스 서버와의 상호작용을 포함한 전체 과정은 다음과 같음
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/36d3fb29-3268-474f-9589-03300d0ac94a/image.png)
+![image__12_](/uploads/cec979b83fbc61639df02b2132671e90/image__12_.png)
 
 ### Front-End Optimistic Update를 통한 UX 개선
 

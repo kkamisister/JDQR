@@ -329,8 +329,7 @@
 ## MySQL ERD
 
 [https://www.erdcloud.com/d/7KE5MkJjDW3cQuJ6P](https://www.erdcloud.com/d/JdeXC8RLKDNnsrHuy)
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/6caf90a2-3d3f-46a9-9440-37ba461ddafc/image.png)
-
+![erd](/uploads/d6cd3a46215a6cea50fde2218bdffc0a/erd.PNG)
 
 # UCC 링크
 

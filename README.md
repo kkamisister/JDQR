@@ -211,3 +211,123 @@
         ```
         
         @Valid 어노테이션이 일반적으로 동작하지 않기 때문에, 해당 예외를 Validator를 사용하여 직접 잡아서 GlobalMessagingHandler에서 구현한 예외로 던졌다
+
+
+### 기타
+
+- 프론트에서 보내는 시간단위인 **new Date().toIsoString()** 에 **LocalDateTime**을 대응시키는게 필요했었다
+    - 이 날짜 데이터는 , Redis에서도 사용하고 JsonUtil을 사용한 직렬화에도 사용하고 심지어 Stomp Protocol에서도 사용했었다.
+    - 결국 각각에 맞는 **JavaTimeModule()**을 등록해서 해결할 수 있었다
+    - 예시
+        
+        ```jsx
+        //Redis의 경우, RedisConfig 파일
+        ...
+        objectMapper.registerModule(new JavaTimeModule());
+        ...
+        
+        // JsonUtil의 경우,
+          private static ObjectMapper getMapper() {
+            if (mapper == null) {
+              mapper = new ObjectMapper();
+              mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+              mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+              mapper.registerModule(new JavaTimeModule());  // Java 8 날짜 및 시간 지원
+            }
+            return mapper;
+          }
+          
+        // WebSocket의 경우, WebSocketConfig 파일
+        
+        	@Override
+        	public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
+        		MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        		ObjectMapper objectMapper = new ObjectMapper();
+        
+        		objectMapper.registerModule(new JavaTimeModule()); // Java 8 날짜/시간 모듈 등록
+        		converter.setObjectMapper(objectMapper);
+        		messageConverters.add(converter);
+        		return false;
+        	}
+        ```
+        
+- 동일한 DTO를 사용하는 경우에 대해, 특정 필드가 제외되는 경우 이를 위해 새로운 DTO를 생성해야 하는가 하는 문제를 겪었다
+    - `@JsonInclude(JsonInclude.Include.*NON_NULL*)` 을 활용하면, Null인 경우 응답에서 제외시킬 수 있다
+- Querydsl 사용 시 fetchOne() 과 fetchFirst()의 차이
+    - fetchOne을 사용하는 경우, 응답 객체가 여러가지 인 경우 예외를 던지게 된다
+    - 결과로 하나를 반환해야하는게 명확한 경우 fetchFirst()를 사용한다.
+        - fetchFirst()는 내부적으로 limit(1).fetchOne() 을 사용한다
+- (dishId,userId,optionsId) 를 사용하여 고유한 품목을 구분해낼 수 있어야 했는데, hashCode를 재정의 하여 사용하였다
+    - hashCode 재정의 로직에 리스트가 들어가면, 내부적으로 리스트 안의 내용을 까서 hashCode로 변환한다
+- 클라이언트가 쿠키를 까기 위해서는 **httpOnly** 옵션이 적용되어서도 안되지만, 해당 쿠키의 **DOMAIN**과 그 쿠키를 실제 사용하는 도메인이 일치해야 자바스크립트단에서 쿠키에 접근할 수 있다..
+
+### 결제 로직(Toss Payments SDK 사용)
+
+- 토스 SDK를 이용해 결제 시스템 구축함. 서비스 서버와의 상호작용을 포함한 전체 과정은 다음과 같음
+
+![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/36d3fb29-3268-474f-9589-03300d0ac94a/image.png)
+
+### Front-End Optimistic Update를 통한 UX 개선
+
+장바구니 수량 변경 시 ui 변경 후 websocket으로 수량 변경 요청, 서버 응답값에 따라 ui 재조정
+
+### 서비스 아키텍쳐
+
+![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/45555eba-c089-422a-923b-25d8412bd3e0/image.png)
+
+## 4. 사용 화면
+### 점주 로그인 후 테이블/메뉴 확인
+
+![1. 점주 로그인 후 테이블과 메뉴확인.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/d8c9d8a8-72be-44fe-8426-57d23dfc303f/1._%EC%A0%90%EC%A3%BC_%EB%A1%9C%EA%B7%B8%EC%9D%B8_%ED%9B%84_%ED%85%8C%EC%9D%B4%EB%B8%94%EA%B3%BC_%EB%A9%94%EB%89%B4%ED%99%95%EC%9D%B8.gif)
+
+### 테이블 추가
+
+![2. 테이블 추가.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/d719d040-9389-4545-9914-e054e7a56d53/2._%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%B6%94%EA%B0%80.gif)
+
+### 테이블 상세정보, QR 재생성
+
+![3. 테이블 상세정보,QR재생성,수정.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/a4496ab4-8634-4e01-924c-f687bc0fe3ad/3._%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%83%81%EC%84%B8%EC%A0%95%EB%B3%B4QR%EC%9E%AC%EC%83%9D%EC%84%B1%EC%88%98%EC%A0%95.gif)
+
+### 메뉴 설정
+
+![4. 메뉴설정화면.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/642de156-4c8b-4de6-ada9-9e80f28b9fd5/4._%EB%A9%94%EB%89%B4%EC%84%A4%EC%A0%95%ED%99%94%EB%A9%B4.gif)
+
+### 지도에서 식당확인
+
+용량이슈로 안올라감..
+
+### 일행과 동시주문
+
+![78. 일행과 동시주문.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/5ff95c9e-0e57-4108-b7e5-aab9b51b593b/78._%EC%9D%BC%ED%96%89%EA%B3%BC_%EB%8F%99%EC%8B%9C%EC%A3%BC%EB%AC%B8.gif)
+
+### 메뉴 결제
+
+1. **매장 관리 페이지**
+    
+    ![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/b72a4b9f-2b5a-42f4-b6bb-d247d7e154a3/image.png)
+    
+2. **고객 핵심 기능 - 가게 실시간 현황 및 최신 메뉴판**
+
+![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/6a5abb1f-4606-48c7-9018-c53ba6e6d4d3/image.png)
+
+![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/c1891d32-f62c-46a8-96f5-52fca6641d5b/image.png)
+
+## 5. 결론
+
+점주, 가게 고객, 예비 고객을 위해 3개의 프로젝트 구성
+
+## 6. UI/UX기획
+
+[https://www.figma.com/design/paoPdGGVdWBKbgWYgUtBml/SSAFY-11기-자율-프로젝트(주문-서비스)?node-id=4061-1359&node-type=canvas&t=RjzGY3S7FZObt13g-0](https://www.figma.com/design/paoPdGGVdWBKbgWYgUtBml/SSAFY-11%EA%B8%B0-%EC%9E%90%EC%9C%A8-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8(%EC%A3%BC%EB%AC%B8-%EC%84%9C%EB%B9%84%EC%8A%A4)?node-id=4061-1359&node-type=canvas&t=RjzGY3S7FZObt13g-0)
+
+# DB 설계
+
+## MySQL ERD
+
+[https://www.erdcloud.com/d/7KE5MkJjDW3cQuJ6P](https://www.erdcloud.com/d/JdeXC8RLKDNnsrHuy)
+![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/6caf90a2-3d3f-46a9-9440-37ba461ddafc/image.png)
+
+
+# UCC 링크
+
+https://youtu.be/cPtMN2Ho9ws

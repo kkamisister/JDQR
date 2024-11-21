@@ -273,44 +273,48 @@
 
 ### 서비스 아키텍쳐
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/45555eba-c089-422a-923b-25d8412bd3e0/image.png)
+![image__13_](/uploads/655a53582922ad14edf2834df940facd/image__13_.png)
 
 ## 4. 사용 화면
 ### 점주 로그인 후 테이블/메뉴 확인
 
-![1. 점주 로그인 후 테이블과 메뉴확인.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/d8c9d8a8-72be-44fe-8426-57d23dfc303f/1._%EC%A0%90%EC%A3%BC_%EB%A1%9C%EA%B7%B8%EC%9D%B8_%ED%9B%84_%ED%85%8C%EC%9D%B4%EB%B8%94%EA%B3%BC_%EB%A9%94%EB%89%B4%ED%99%95%EC%9D%B8.gif)
+![1._점주_로그인_후_테이블과_메뉴확인](/uploads/08b6ab861e0a7094cf5b79a2ea3f24c8/1._점주_로그인_후_테이블과_메뉴확인.gif)
 
 ### 테이블 추가
 
-![2. 테이블 추가.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/d719d040-9389-4545-9914-e054e7a56d53/2._%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%B6%94%EA%B0%80.gif)
+![2._테이블_추가](/uploads/d0fc199e26d0c09c7598474c2093a500/2._테이블_추가.gif)
 
 ### 테이블 상세정보, QR 재생성
 
-![3. 테이블 상세정보,QR재생성,수정.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/a4496ab4-8634-4e01-924c-f687bc0fe3ad/3._%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%83%81%EC%84%B8%EC%A0%95%EB%B3%B4QR%EC%9E%AC%EC%83%9D%EC%84%B1%EC%88%98%EC%A0%95.gif)
+![3._테이블_상세정보_QR재생성_수정](/uploads/a721eca3bfb2b772293ea7569e5d9217/3._테이블_상세정보_QR재생성_수정.gif)
+
 
 ### 메뉴 설정
 
-![4. 메뉴설정화면.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/642de156-4c8b-4de6-ada9-9e80f28b9fd5/4._%EB%A9%94%EB%89%B4%EC%84%A4%EC%A0%95%ED%99%94%EB%A9%B4.gif)
+![4._메뉴설정화면](/uploads/e0b79b7d15dfff5dde835aba097507a5/4._메뉴설정화면.gif)
+
 
 ### 지도에서 식당확인
 
-용량이슈로 안올라감..
+![5._지도에서_식당확인](/uploads/cd441ffa8bc53d565241433caa6e2005/5._지도에서_식당확인.gif)
+
 
 ### 일행과 동시주문
 
-![78. 일행과 동시주문.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/5ff95c9e-0e57-4108-b7e5-aab9b51b593b/78._%EC%9D%BC%ED%96%89%EA%B3%BC_%EB%8F%99%EC%8B%9C%EC%A3%BC%EB%AC%B8.gif)
+![78._일행과_동시주문](/uploads/ccd7e1a2f5cb40558119834ef99cdd29/78._일행과_동시주문.gif)
+
 
 ### 메뉴 결제
 
 1. **매장 관리 페이지**
     
-    ![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/b72a4b9f-2b5a-42f4-b6bb-d247d7e154a3/image.png)
+![image__15_](/uploads/11cecbe1465e72f4fec6affd27fcdac8/image__15_.png)
     
 2. **고객 핵심 기능 - 가게 실시간 현황 및 최신 메뉴판**
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/6a5abb1f-4606-48c7-9018-c53ba6e6d4d3/image.png)
+![image__14_](/uploads/b8bca42948fbba66ebac2be1fe86f8b4/image__14_.png)
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/23a1367e-0a84-4de0-a66c-80f93c033a64/c1891d32-f62c-46a8-96f5-52fca6641d5b/image.png)
+![image__16_](/uploads/7a3c4e2375359e2ade1ff04c2d52c852/image__16_.png)
 
 ## 5. 결론
 

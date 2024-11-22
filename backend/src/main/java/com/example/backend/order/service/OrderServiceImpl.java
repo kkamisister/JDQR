@@ -411,12 +411,12 @@ public class OrderServiceImpl implements OrderService {
             // DB 업데이트가 성공적으로 동작하지 않은 경우, Error Message 반환
             if (!simpleResponseMessage.equals(SimpleResponseMessage.PAYMENT_SUCCESS)) return simpleResponseMessage;
 
-            // 2. toss confirm api 호출
-            TossPaymentRequestDto tossPaymentRequestDto = TossPaymentRequestDto.from(simpleTossPaymentRequestDto, tossOrderId);
-            TossPaymentResponseDto tossPaymentResponseDto = tossWebClient.requestPayment(tossPaymentRequestDto);
-
-            // toss api가 실패할 경우 -> 에러 던지기
-            if (!tossPaymentResponseDto.getSuccess()) return SimpleResponseMessage.PAYMENT_FAILED;
+//            // 2. toss confirm api 호출
+//            TossPaymentRequestDto tossPaymentRequestDto = TossPaymentRequestDto.from(simpleTossPaymentRequestDto, tossOrderId);
+//            TossPaymentResponseDto tossPaymentResponseDto = tossWebClient.requestPayment(tossPaymentRequestDto);
+//
+//            // toss api가 실패할 경우 -> 에러 던지기
+//            if (!tossPaymentResponseDto.getSuccess()) return SimpleResponseMessage.PAYMENT_FAILED;
 
             // 3. 주문에 대한 결제가 모두 끝났는지를 체크
             return checkOrderIsFinished(tableId, tossOrderId);

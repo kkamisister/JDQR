@@ -1,5 +1,8 @@
 package com.example.backend.order.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.example.backend.common.entity.BaseEntity;
 import com.example.backend.order.enums.OrderStatus;
 import com.example.backend.order.enums.PaymentMethod;
@@ -13,7 +16,6 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "parent_orders")
-@ToString
 public class ParentOrder extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,4 +34,8 @@ public class ParentOrder extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "parentOrder")
+    private List<Payment> payments = new ArrayList<>();
 }
